@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Essential Redux Settings</title>
+  <style>
+    :root{--bg:#000;--surface:#1d1d1d;--text:#fff;--muted:#bdbdbd;--border:#444;--focus:#00aaff;--orange:#ff5500;--blue:#0055ff;--green:#00aa55;--pink:#ff00aa;--red:#ff0055;--yellow:#ffcc55;--white:#fff;--black:#000}*{box-sizing:border-box}body{margin:0;min-width:320px;background:var(--bg);color:var(--text);font:14px/1.35 Arial,sans-serif}.page{width:min(100%,430px);margin:auto;padding:16px 14px 88px}h1{font-size:28px;margin:0 0 2px}.intro{margin:0 0 14px;color:var(--muted)}.card{background:var(--surface);border:1px solid var(--border);padding:14px;margin:0 0 10px}h2{font-size:16px;margin:0 0 8px}.copy,.note{color:var(--muted);margin:0 0 10px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:38px}.row input[type=checkbox]{width:20px;height:20px;accent-color:var(--focus)}.theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.theme{--theme-bg:#000;--theme-fg:#fff;position:relative;min-height:54px;border:2px solid transparent;display:flex;align-items:center;justify-content:center;padding:5px;font-size:12px;font-weight:800;cursor:pointer;text-align:center;background:var(--theme-bg);color:var(--theme-fg)}.theme input{position:absolute;opacity:0}.theme.selected{border-color:var(--focus)}.default{--theme-bg:#000;--theme-fg:#fff}.orange{--theme-bg:var(--orange);--theme-fg:#000}.blue{--theme-bg:var(--blue);--theme-fg:#000}.green{--theme-bg:var(--green);--theme-fg:#000}.pink{--theme-bg:var(--pink);--theme-fg:#000}.red{--theme-bg:var(--red);--theme-fg:#000}.yellow{--theme-bg:var(--yellow);--theme-fg:#000}.white{--theme-bg:#fff;--theme-fg:#000}.black{--theme-bg:#000;--theme-fg:#fff;border-color:#777}body.reverse .orange{--theme-bg:#000;--theme-fg:var(--orange)}body.reverse .blue{--theme-bg:#000;--theme-fg:var(--blue)}body.reverse .green{--theme-bg:#000;--theme-fg:var(--green)}body.reverse .pink{--theme-bg:#000;--theme-fg:var(--pink)}body.reverse .red{--theme-bg:#000;--theme-fg:var(--red)}body.reverse .yellow{--theme-bg:#000;--theme-fg:var(--yellow)}body.reverse .white,body.reverse .black,body.reverse .default{--theme-bg:#000;--theme-fg:#fff}.metrics{display:grid;gap:7px}.metric{display:grid;grid-template-columns:64px 1fr;align-items:center;gap:8px}select,input[type=text]{width:100%;min-height:38px;background:#050505;color:#fff;border:1px solid #555;padding:0 10px}.actions{position:fixed;left:0;right:0;bottom:0;background:#111;border-top:1px solid #444;padding:10px 14px calc(10px + env(safe-area-inset-bottom))}.actions-inner{width:min(100%,430px);margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px}.btn{border:0;background:#555;color:#fff;min-height:40px;padding:0 16px;font-weight:800;cursor:pointer}.primary{background:#00aaff;color:#000}.status{grid-column:1/-1;min-height:18px;text-align:center;color:#00ff88;font-size:12px;font-weight:700}.hidden{display:none!important}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1>Essential Redux</h1>
+    <p class="intro">Use the settings below to customize your Pebble watchface.</p>
+
+    <section class="card">
+      <h2>Theme</h2>
+      <p class="copy">Select a color theme for your watchface.</p>
+      <div class="theme-grid" role="radiogroup" aria-label="Theme" id="themeGrid"></div>
+      <label class="row" style="margin-top:8px"><span>Reverse theme colors</span><input id="reverse" type="checkbox"></label>
+    </section>
+
+    <section class="card">
+      <h2>Display</h2>
+      <label class="row"><span>Use 24-hour format</span><input id="hour24" type="checkbox"></label>
+      <label class="row"><span>Use Celsius for temperature</span><input id="celsius" type="checkbox"></label>
+      <label class="row"><span>Show layout test values</span><input id="layoutTest" type="checkbox" checked></label>
+      <p class="note">Layout test values keep weather, calendar, and time predictable while the watchface is being built.</p>
+    </section>
+
+    <section class="card">
+      <h2>Metric slots</h2>
+      <p class="copy">Baseline controls copied from the DayPal config pattern. These can be wired into Essential Redux as features return.</p>
+      <div class="metrics">
+        <div class="metric"><b>Left</b><select id="leftMetric"></select></div>
+        <div class="metric"><b>Right</b><select id="rightMetric"></select></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="actions">
+    <div class="actions-inner">
+      <div id="status" class="status"></div>
+      <button class="btn" id="reset" type="button">Reset</button>
+      <button class="btn primary" id="save" type="button">Save settings</button>
+    </div>
+  </div>
+
+  <script>
+    var DEFAULT_SETTINGS={theme:'orange',reverse:false,hour24:true,celsius:false,layoutTest:true,leftMetric:'calendar',rightMetric:'weather'};
+    var THEMES=[['default','Default'],['orange','Orange'],['blue','Blue'],['green','Green'],['pink','Pink'],['red','Red'],['yellow','Yellow'],['white','White'],['black','Black']];
+    var METRICS=[['calendar','Calendar'],['weather','Weather'],['battery','Battery'],['heart','Heart rate'],['steps','Steps'],['none','None']];
+    function $(id){return document.getElementById(id)}
+    function parseSettings(){var match=location.search.match(/[?&]settings=([^&]+)/);if(!match)return Object.assign({},DEFAULT_SETTINGS);try{return Object.assign({},DEFAULT_SETTINGS,JSON.parse(decodeURIComponent(match[1])))}catch(e){return Object.assign({},DEFAULT_SETTINGS)}}
+    var settings=parseSettings();
+    function setStatus(text){$('status').textContent=text||''}
+    function renderThemes(){var grid=$('themeGrid');grid.innerHTML='';THEMES.forEach(function(item){var id=item[0],label=item[1],el=document.createElement('label');el.className='theme '+id+(settings.theme===id?' selected':'');el.innerHTML='<input type="radio" name="theme" value="'+id+'">'+label;el.onclick=function(){settings.theme=id;renderThemes()};grid.appendChild(el)})}
+    function fillSelect(id,value){var select=$(id);select.innerHTML='';METRICS.forEach(function(item){var option=document.createElement('option');option.value=item[0];option.textContent=item[1];select.appendChild(option)});select.value=value}
+    function render(){document.body.classList.toggle('reverse',!!settings.reverse);$('reverse').checked=!!settings.reverse;$('hour24').checked=!!settings.hour24;$('celsius').checked=!!settings.celsius;$('layoutTest').checked=!!settings.layoutTest;renderThemes();fillSelect('leftMetric',settings.leftMetric);fillSelect('rightMetric',settings.rightMetric)}
+    function readSettings(){settings.reverse=$('reverse').checked;settings.hour24=$('hour24').checked;settings.celsius=$('celsius').checked;settings.layoutTest=$('layoutTest').checked;settings.leftMetric=$('leftMetric').value;settings.rightMetric=$('rightMetric').value;return settings}
+    $('reverse').onchange=function(){settings.reverse=this.checked;render()};
+    $('reset').onclick=function(){settings=Object.assign({},DEFAULT_SETTINGS);render();setStatus('Layout reset.')};
+    $('save').onclick=function(){var payload=encodeURIComponent(JSON.stringify(readSettings()));setStatus('Saving...');location.href='pebblejs://close#'+payload};
+    render();
+  </script>
+</body>
+</html>
