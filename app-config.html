@@ -12,12 +12,12 @@
   <main class="page">
     <h1>Essential Redux</h1><p class="intro">Use the settings below to customize your Pebble watchface.</p>
     <section class="card"><div class="header"><h2>Theme</h2></div><p class="copy">Select a color theme for your watchface.</p><div class="theme-grid" role="radiogroup" aria-label="Theme" id="themeGrid"></div><label class="row" style="margin-top:8px"><span>Reverse theme colors</span><input id="reverse" type="checkbox"></label></section>
-    <section class="card"><div class="header"><h2>Settings</h2></div><label class="row"><span>Use 24-hour format</span><input id="hour24" type="checkbox" checked></label><label class="row"><span>Use Celsius for temperature</span><input id="celsius" type="checkbox"></label><label class="row"><span>Show layout test values</span><input id="layoutTest" type="checkbox" checked></label><p class="note">Layout test values keep weather, calendar, and time predictable while the watchface is being built.</p></section>
+    <section class="card"><div class="header"><h2>Settings</h2></div><label class="row"><span>Use 24-hour format</span><input id="hour24" type="checkbox" checked></label><label class="row"><span>Use Celsius for temperature</span><input id="celsius" type="checkbox"></label><label class="row"><span>Show layout test values</span><input id="layoutTest" type="checkbox"></label><p class="note">Layout test values keep weather, calendar, and time predictable while the watchface is being built.</p></section>
     <section class="card"><div class="header"><h2>Metric slots</h2></div><p class="copy">Customize which metric goes in which slot on the watchface.</p><div class="metrics"><div class="metric"><b>Left</b><select id="leftMetric"></select></div><div class="metric"><b>Right</b><select id="rightMetric"></select></div></div></section>
   </main>
   <div class="actions"><div class="actions-inner"><div id="status" class="status"></div><button class="btn" id="reset" type="button">Reset layout</button><button class="btn primary" id="save" type="button">Save settings</button></div></div>
   <script>
-    var D={theme:'orange',reverse:false,hour24:true,celsius:false,layoutTest:true,leftMetric:'calendar',rightMetric:'weather'};
+    var D={theme:'orange',reverse:false,hour24:true,celsius:false,layoutTest:false,leftMetric:'battery',rightMetric:'heart'};
     var M=[['calendar','Calendar'],['weather','Weather'],['battery','Battery'],['heart','Heart rate'],['steps','Steps'],['none','None']];
     var T=[['default','Default'],['orange','Orange'],['blue','Blue'],['green','Green'],['pink','Pink'],['red','Red'],['yellow','Yellow'],['white','White'],['black','Black']];
     function $(id){return document.getElementById(id)}
@@ -29,7 +29,7 @@
     function syncTheme(){document.body.classList.toggle('reverse',$('reverse').checked);document.querySelectorAll('.theme').forEach(function(t){t.classList.toggle('selected',!!t.querySelector('input:checked'))})}
     function render(s){$('hour24').checked=s.hour24;$('celsius').checked=s.celsius;$('layoutTest').checked=s.layoutTest;$('reverse').checked=s.reverse;(document.querySelector('input[name=theme][value="'+s.theme+'"]')||document.querySelector('input[name=theme][value="orange"]')).checked=true;fill($('leftMetric'),s.leftMetric);fill($('rightMetric'),s.rightMetric);syncTheme()}
     function collect(){return norm({theme:document.querySelector('input[name=theme]:checked').value,reverse:$('reverse').checked,hour24:$('hour24').checked,celsius:$('celsius').checked,layoutTest:$('layoutTest').checked,leftMetric:$('leftMetric').value,rightMetric:$('rightMetric').value})}
-    function save(){var encoded=encodeURIComponent(JSON.stringify(collect()));var closeUrl='pebblejs://close#'+encoded;$('status').textContent='Saving…';setTimeout(function(){window.location.href=closeUrl},250);setTimeout(function(){document.location=closeUrl},500);setTimeout(function(){$('status').textContent='Saved. If this window stays open, close it and rerun the emulator.'},1000)}
+    function save(){var encoded=encodeURIComponent(JSON.stringify(collect()));var closeUrl='pebblejs://close#'+encoded;$('status').textContent='Saving\u2026';setTimeout(function(){window.location.href=closeUrl},250);setTimeout(function(){document.location=closeUrl},500);setTimeout(function(){$('status').textContent='Saved. If this window stays open, close it and rerun the emulator.'},1000)}
     buildThemes();render(incoming());$('reverse').onchange=syncTheme;document.querySelectorAll('input[name=theme]').forEach(function(i){i.onchange=syncTheme});$('reset').onclick=function(){render(norm(D));$('status').textContent='Layout reset.'};$('save').onclick=save;
   </script>
 </body>
