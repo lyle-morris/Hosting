@@ -12,12 +12,12 @@
   <main class="page">
     <h1>Essential Redux</h1><p class="intro">Use the settings below to customize your Pebble watchface.</p>
     <section class="card"><div class="header"><h2>Theme</h2></div><p class="copy">Select a color theme for your watchface.</p><div class="theme-grid" role="radiogroup" aria-label="Theme" id="themeGrid"></div><label class="row" style="margin-top:8px"><span>Reverse theme colors</span><input id="reverse" type="checkbox"></label></section>
-    <section class="card"><div class="header"><h2>Settings</h2></div><label class="row"><span>Use 24-hour format</span><input id="hour24" type="checkbox" checked></label><label class="row"><span>Use Celsius for temperature</span><input id="celsius" type="checkbox"></label><label class="row"><span>Show layout test values</span><input id="layoutTest" type="checkbox"></label><p class="note">Layout test values keep weather, calendar, and time predictable while the watchface is being built.</p></section>
+    <section class="card"><div class="header"><h2>Settings</h2></div><label class="row"><span>Use 24-hour format</span><input id="hour24" type="checkbox"></label><label class="row"><span>Use Celsius for temperature</span><input id="celsius" type="checkbox"></label><label class="row"><span>Show layout test values</span><input id="layoutTest" type="checkbox"></label><p class="note">Layout test values keep weather, calendar, and time predictable while the watchface is being built.</p></section>
     <section class="card"><div class="header"><h2>Metric slots</h2></div><p class="copy">Customize which metric goes in which slot on the watchface.</p><div class="metrics"><div class="metric"><b>Left</b><select id="leftMetric"></select></div><div class="metric"><b>Right</b><select id="rightMetric"></select></div></div></section>
   </main>
   <div class="actions"><div class="actions-inner"><div id="status" class="status"></div><button class="btn" id="reset" type="button">Reset layout</button><button class="btn primary" id="save" type="button">Save settings</button></div></div>
   <script>
-    var D={theme:'orange',reverse:false,hour24:true,celsius:false,layoutTest:false,leftMetric:'battery',rightMetric:'heart'};
+    var D={theme:'orange',reverse:false,hour24:false,celsius:false,layoutTest:false,leftMetric:'calendar',rightMetric:'weather'};
     var M=[['calendar','Calendar'],['weather','Weather'],['battery','Battery'],['heart','Heart rate'],['steps','Steps'],['none','None']];
     var T=[['default','Default'],['orange','Orange'],['blue','Blue'],['green','Green'],['pink','Pink'],['red','Red'],['yellow','Yellow'],['white','White'],['black','Black']];
     function $(id){return document.getElementById(id)}
