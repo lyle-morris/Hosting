@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Essential Redux Settings</title>
+  <style>
+    :root{--bg:#000;--surface:#1d1d1d;--text:#fff;--muted:#bdbdbd;--border:#444;--focus:#00aaff;--orange:#ff5500;--light-blue:#00aaff;--yellow:#ffaa00;--green:#005500;--purple:#5500ff;--white:#fff}*{box-sizing:border-box}body{margin:0;min-width:320px;background:var(--bg);color:var(--text);font:14px/1.35 Arial,sans-serif}.page{width:min(100%,430px);margin:auto;padding:16px 14px 88px}h1{font-size:28px;margin:0 0 2px}.intro{margin:0 0 14px;color:var(--muted)}.card{background:var(--surface);border:1px solid var(--border);padding:14px;margin:0 0 10px}.header{display:flex;align-items:center;gap:8px;margin-bottom:8px}h2{font-size:16px;margin:0}.copy,.note{color:var(--muted);margin:0 0 10px}.row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:38px}.row input[type=checkbox]{width:20px;height:20px;accent-color:var(--focus)}.row select{width:52%}.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.theme{--theme-bg:#000;--theme-fg:#fff;position:relative;min-height:54px;border:2px solid transparent;display:flex;align-items:center;justify-content:center;padding:5px;font-size:12px;font-weight:800;cursor:pointer;text-align:center;background:var(--theme-bg);color:var(--theme-fg)}.theme input{position:absolute;opacity:0}.theme.selected{border-color:var(--focus)}.orange{--theme-bg:var(--orange);--theme-fg:#000}.white{--theme-bg:#fff;--theme-fg:#000}.lightBlue{--theme-bg:var(--light-blue);--theme-fg:#000}.yellow{--theme-bg:var(--yellow);--theme-fg:#000}.green{--theme-bg:var(--green);--theme-fg:#fff}.purple{--theme-bg:var(--purple);--theme-fg:#fff}.metrics{display:grid;gap:7px}.metric{display:grid;grid-template-columns:64px 1fr;align-items:center;gap:8px}select,input[type=text]{width:100%;min-height:38px;background:#050505;color:#fff;border:1px solid #555;padding:0 10px}.fields{display:grid;gap:8px;margin-top:8px}.or{text-align:center;color:var(--muted);font-weight:700}.donate{color:#8fdcff;font-weight:700;text-decoration:none}.actions{position:fixed;left:0;right:0;bottom:0;background:#111;border-top:1px solid #444;padding:10px 14px calc(10px + env(safe-area-inset-bottom))}.actions-inner{width:min(100%,430px);margin:auto;display:grid;grid-template-columns:1fr 1fr;gap:8px}.btn{border:0;background:#555;color:#fff;min-height:40px;padding:0 16px;font-weight:800;cursor:pointer}.primary{background:#00aaff;color:#000}.status{grid-column:1/-1;min-height:18px;text-align:center;color:#00ff88;font-size:12px;font-weight:700}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1>Essential Redux</h1>
+    <p class="intro" data-i18n="intro">Use the settings below to customize your Pebble watchface.</p>
+
+    <section class="card">
+      <div class="header"><h2 data-i18n="supportTitle">Support Essential Redux</h2></div>
+      <p class="copy" data-i18n="supportCopy">Essential Redux is free to use. If you enjoy it, consider leaving a small tip to support future updates and improvements.</p>
+      <a class="donate" id="donate" href="https://ko-fi.com/lylemorris" target="_blank" rel="noopener" data-i18n="donate">Donate</a>
+    </section>
+
+    <section class="card">
+      <div class="header"><h2 data-i18n="analyticsTitle">Help improve Essential Redux</h2></div>
+      <label class="row"><span data-i18n="analyticsLabel">Share anonymous usage analytics</span><input id="analytics" type="checkbox" checked></label>
+      <p class="copy" data-i18n="analyticsCopy">Anonymous analytics can be disabled any time.</p>
+    </section>
+
+    <section class="card">
+      <div class="header"><h2 data-i18n="settingsTitle">Settings</h2></div>
+      <label class="row"><span data-i18n="languageLabel">Language</span><select id="language"></select></label>
+      <label class="row"><span data-i18n="hour24">Use 24-hour format</span><input id="hour24" type="checkbox"></label>
+      <label class="row"><span data-i18n="leadingZero">Display leading zero on hour</span><input id="leadingZero" type="checkbox"></label>
+      <label class="row"><span data-i18n="celsius">Use Celsius for temperature</span><input id="celsius" type="checkbox"></label>
+    </section>
+
+    <section class="card">
+      <div class="header"><h2 data-i18n="locationTitle">Location</h2></div>
+      <p class="copy" data-i18n="locationCopy">Leave both fields blank to use your device location. Enter either field to override it.</p>
+      <div class="fields">
+        <label><span data-i18n="postalLabel">ZIP/postal code</span><input id="manualPostalCode" type="text" autocomplete="postal-code"></label>
+        <div class="or" data-i18n="or">or</div>
+        <label><span data-i18n="cityLabel">City</span><input id="manualCity" type="text" autocomplete="address-level2"></label>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="header"><h2 data-i18n="themeTitle">Theme</h2></div>
+      <p class="copy" data-i18n="themeCopy">Select a color theme for your watchface.</p>
+      <div class="theme-grid" role="radiogroup" aria-label="Theme" id="themeGrid"></div>
+    </section>
+
+    <section class="card">
+      <div class="header"><h2 data-i18n="metricsTitle">Metric slots</h2></div>
+      <p class="copy" data-i18n="metricsCopy">Customize which metric goes in which slot on the watchface.</p>
+      <div class="metrics">
+        <div class="metric"><b data-i18n="left">Left</b><select id="leftMetric"></select></div>
+        <div class="metric"><b data-i18n="right">Right</b><select id="rightMetric"></select></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="actions">
+    <div class="actions-inner">
+      <div id="status" class="status"></div>
+      <button class="btn" id="reset" type="button" data-i18n="reset">Reset layout</button>
+      <button class="btn primary" id="save" type="button" data-i18n="save">Save settings</button>
+    </div>
+  </div>
+
+  <script>
+    var GA_ID='G-37VYMTXT5S';
+    var D={theme:'orange',reverse:false,hour24:false,showLeadingZero:false,celsius:false,layoutTest:false,leftMetric:'calendar',rightMetric:'weather',language:'auto',manualLocation:false,manualPostalCode:'',manualCity:'',analyticsEnabled:true};
+    var LANGUAGE_VALUES=['auto','en','es','fr','de','pt'];
+    var METRIC_VALUES=['calendar','weather','battery','heart','steps','none'];
+    var THEME_VALUES=['orange','white','lightBlue','yellow','green','purple'];
+    var I18N={
+      en:{pageTitle:'Essential Redux Settings',intro:'Use the settings below to customize your Pebble watchface.',supportTitle:'Support Essential Redux',supportCopy:'Essential Redux is free to use. If you enjoy it, consider leaving a small tip to support future updates and improvements.',donate:'Donate',analyticsTitle:'Help improve Essential Redux',analyticsLabel:'Share anonymous usage analytics',analyticsCopy:'Anonymous analytics can be disabled any time.',settingsTitle:'Settings',languageLabel:'Language',hour24:'Use 24-hour format',leadingZero:'Display leading zero on hour',celsius:'Use Celsius for temperature',locationTitle:'Location',locationCopy:'Leave both fields blank to use your device location. Enter either field to override it.',postalLabel:'ZIP/postal code',or:'or',cityLabel:'City',themeTitle:'Theme',themeCopy:'Select a color theme for your watchface.',metricsTitle:'Metric slots',metricsCopy:'Customize which metric goes in which slot on the watchface.',left:'Left',right:'Right',reset:'Reset layout',save:'Save settings',saving:'Saving...',saved:'Saved. If this window stays open, close it and rerun the emulator.',languages:['Automatic (device)','English','Spanish','French','German','Portuguese'],metrics:['Calendar','Weather','Battery','Heart rate','Steps','None'],themes:['Orange','White','Light Blue','Yellow','Green','Purple']},
+      es:{pageTitle:'Configuración de Essential Redux',intro:'Usa los ajustes siguientes para personalizar la esfera de tu Pebble.',supportTitle:'Apoya Essential Redux',supportCopy:'Essential Redux es gratuito. Si te gusta, considera dejar una pequeña propina para apoyar futuras actualizaciones y mejoras.',donate:'Donar',analyticsTitle:'Ayuda a mejorar Essential Redux',analyticsLabel:'Compartir análisis de uso anónimos',analyticsCopy:'Los análisis anónimos se pueden desactivar en cualquier momento.',settingsTitle:'Ajustes',languageLabel:'Idioma',hour24:'Usar formato de 24 horas',leadingZero:'Mostrar cero inicial en la hora',celsius:'Usar Celsius para la temperatura',locationTitle:'Ubicación',locationCopy:'Deja ambos campos vacíos para usar la ubicación del dispositivo. Completa uno para reemplazarla.',postalLabel:'Código postal',or:'o',cityLabel:'Ciudad',themeTitle:'Tema',themeCopy:'Selecciona un tema de color para la esfera.',metricsTitle:'Espacios de métricas',metricsCopy:'Elige qué métrica aparece en cada espacio de la esfera.',left:'Izquierda',right:'Derecha',reset:'Restablecer diseño',save:'Guardar ajustes',saving:'Guardando...',saved:'Guardado. Si esta ventana sigue abierta, ciérrala y vuelve a ejecutar el emulador.',languages:['Automático (dispositivo)','Inglés','Español','Francés','Alemán','Portugués'],metrics:['Calendario','Clima','Batería','Frecuencia cardíaca','Pasos','Ninguno'],themes:['Naranja','Blanco','Azul claro','Amarillo','Verde','Morado']},
+      fr:{pageTitle:'Paramètres Essential Redux',intro:'Utilisez les paramètres ci-dessous pour personnaliser votre cadran Pebble.',supportTitle:'Soutenir Essential Redux',supportCopy:'Essential Redux est gratuit. Si vous l’appréciez, vous pouvez laisser un petit pourboire pour soutenir les futures mises à jour et améliorations.',donate:'Faire un don',analyticsTitle:'Aider à améliorer Essential Redux',analyticsLabel:'Partager des données d’utilisation anonymes',analyticsCopy:'Les données anonymes peuvent être désactivées à tout moment.',settingsTitle:'Paramètres',languageLabel:'Langue',hour24:'Utiliser le format 24 heures',leadingZero:'Afficher le zéro initial de l’heure',celsius:'Utiliser Celsius pour la température',locationTitle:'Localisation',locationCopy:'Laissez les deux champs vides pour utiliser la position de l’appareil. Remplissez-en un pour la remplacer.',postalLabel:'Code postal',or:'ou',cityLabel:'Ville',themeTitle:'Thème',themeCopy:'Sélectionnez un thème de couleur pour le cadran.',metricsTitle:'Emplacements des métriques',metricsCopy:'Choisissez la métrique affichée dans chaque emplacement du cadran.',left:'Gauche',right:'Droite',reset:'Réinitialiser',save:'Enregistrer',saving:'Enregistrement...',saved:'Enregistré. Si cette fenêtre reste ouverte, fermez-la et relancez l’émulateur.',languages:['Automatique (appareil)','Anglais','Espagnol','Français','Allemand','Portugais'],metrics:['Calendrier','Météo','Batterie','Fréquence cardiaque','Pas','Aucun'],themes:['Orange','Blanc','Bleu clair','Jaune','Vert','Violet']},
+      de:{pageTitle:'Essential Redux Einstellungen',intro:'Passe dein Pebble-Zifferblatt mit den folgenden Einstellungen an.',supportTitle:'Essential Redux unterstützen',supportCopy:'Essential Redux ist kostenlos. Wenn es dir gefällt, kannst du mit einem kleinen Beitrag zukünftige Updates und Verbesserungen unterstützen.',donate:'Spenden',analyticsTitle:'Essential Redux verbessern',analyticsLabel:'Anonyme Nutzungsdaten teilen',analyticsCopy:'Anonyme Analysen können jederzeit deaktiviert werden.',settingsTitle:'Einstellungen',languageLabel:'Sprache',hour24:'24-Stunden-Format verwenden',leadingZero:'Führende Null bei der Stunde anzeigen',celsius:'Celsius für die Temperatur verwenden',locationTitle:'Standort',locationCopy:'Lasse beide Felder leer, um den Gerätestandort zu verwenden. Fülle eines aus, um ihn zu überschreiben.',postalLabel:'Postleitzahl',or:'oder',cityLabel:'Stadt',themeTitle:'Design',themeCopy:'Wähle ein Farbdesign für dein Zifferblatt.',metricsTitle:'Messwertpositionen',metricsCopy:'Wähle, welcher Messwert an welcher Position angezeigt wird.',left:'Links',right:'Rechts',reset:'Layout zurücksetzen',save:'Einstellungen speichern',saving:'Wird gespeichert...',saved:'Gespeichert. Wenn dieses Fenster geöffnet bleibt, schließe es und starte den Emulator erneut.',languages:['Automatisch (Gerät)','Englisch','Spanisch','Französisch','Deutsch','Portugiesisch'],metrics:['Kalender','Wetter','Batterie','Herzfrequenz','Schritte','Keine'],themes:['Orange','Weiß','Hellblau','Gelb','Grün','Violett']},
+      pt:{pageTitle:'Configurações do Essential Redux',intro:'Use as configurações abaixo para personalizar o mostrador do Pebble.',supportTitle:'Apoie o Essential Redux',supportCopy:'O Essential Redux é gratuito. Se você gosta dele, considere deixar uma pequena contribuição para apoiar futuras atualizações e melhorias.',donate:'Doar',analyticsTitle:'Ajude a melhorar o Essential Redux',analyticsLabel:'Compartilhar dados anônimos de uso',analyticsCopy:'A análise anônima pode ser desativada a qualquer momento.',settingsTitle:'Configurações',languageLabel:'Idioma',hour24:'Usar formato de 24 horas',leadingZero:'Exibir zero inicial na hora',celsius:'Usar Celsius para a temperatura',locationTitle:'Localização',locationCopy:'Deixe os dois campos vazios para usar a localização do dispositivo. Preencha um deles para substituí-la.',postalLabel:'CEP/código postal',or:'ou',cityLabel:'Cidade',themeTitle:'Tema',themeCopy:'Selecione um tema de cor para o mostrador.',metricsTitle:'Espaços de métricas',metricsCopy:'Escolha qual métrica aparece em cada espaço do mostrador.',left:'Esquerda',right:'Direita',reset:'Redefinir layout',save:'Salvar configurações',saving:'Salvando...',saved:'Salvo. Se esta janela continuar aberta, feche-a e execute o emulador novamente.',languages:['Automático (dispositivo)','Inglês','Espanhol','Francês','Alemão','Português'],metrics:['Calendário','Clima','Bateria','Frequência cardíaca','Passos','Nenhum'],themes:['Laranja','Branco','Azul-claro','Amarelo','Verde','Roxo']}
+    };
+    var gaLoading=false,gaLoaded=false;
+    function $(id){return document.getElementById(id)}
+    function b(v,d){if(v===true||v===1||v==='1'||v==='true')return true;if(v===false||v===0||v==='0'||v==='false')return false;return d}
+    function clean(v){return String(v||'').trim()}
+    function validTheme(v){return THEME_VALUES.indexOf(v)>=0?v:D.theme}
+    function validLanguage(v){return LANGUAGE_VALUES.indexOf(v)>=0?v:D.language}
+    function deviceLanguage(){var raw=(navigator.language||navigator.userLanguage||'en').toLowerCase().split(/[-_]/)[0];return I18N[raw]?raw:'en'}
+    function effectiveLanguage(v){v=validLanguage(v);return v==='auto'?deviceLanguage():v}
+    function norm(s){
+      s=Object.assign({},D,s||{});
+      var postal=clean(s.manualPostalCode),city=clean(s.manualCity),manual=b(s.manualLocation,D.manualLocation)&&!!(postal||city);
+      return{theme:validTheme(String(s.theme||D.theme)),reverse:false,hour24:b(s.hour24,D.hour24),showLeadingZero:b(s.showLeadingZero,D.showLeadingZero),celsius:b(s.celsius,D.celsius),layoutTest:false,leftMetric:String(s.leftMetric||D.leftMetric),rightMetric:String(s.rightMetric||D.rightMetric),language:validLanguage(String(s.language||D.language)),manualLocation:manual,manualPostalCode:manual?postal:'',manualCity:manual?city:'',analyticsEnabled:b(s.analyticsEnabled,D.analyticsEnabled)}
+    }
+    function incoming(){var p=new URLSearchParams(location.search),u=p.get('donation_url'),r=p.get('settings');if(u)$('donate').href=u;if(!r)return norm(D);try{return norm(JSON.parse(decodeURIComponent(r)))}catch(e){return norm(D)}}
+    function setOptions(el,values,labels,selected){el.innerHTML='';values.forEach(function(value,index){var o=document.createElement('option');o.value=value;o.textContent=labels[index];el.appendChild(o)});el.value=selected}
+    function buildThemes(){var html='';THEME_VALUES.forEach(function(value){html+='<label class="theme '+value+'" data-theme="'+value+'"><input type="radio" name="theme" value="'+value+'"><span></span></label>'});$('themeGrid').innerHTML=html;document.querySelectorAll('input[name=theme]').forEach(function(i){i.onchange=syncTheme})}
+    function syncTheme(){document.querySelectorAll('.theme').forEach(function(t){t.classList.toggle('selected',!!t.querySelector('input:checked'))})}
+    function applyTranslations(){
+      var languageSetting=validLanguage($('language').value||D.language),lang=effectiveLanguage(languageSetting),t=I18N[lang];
+      var left=$('leftMetric').value||D.leftMetric,right=$('rightMetric').value||D.rightMetric;
+      document.documentElement.lang=lang;document.title=t.pageTitle;
+      document.querySelectorAll('[data-i18n]').forEach(function(el){var key=el.getAttribute('data-i18n');if(t[key])el.textContent=t[key]});
+      setOptions($('language'),LANGUAGE_VALUES,t.languages,languageSetting);
+      setOptions($('leftMetric'),METRIC_VALUES,t.metrics,left);
+      setOptions($('rightMetric'),METRIC_VALUES,t.metrics,right);
+      document.querySelectorAll('.theme').forEach(function(el,index){el.querySelector('span').textContent=t.themes[index]});
+    }
+    function loadGA(){if(gaLoaded||gaLoading||!$('analytics').checked)return;gaLoading=true;window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);s.onload=function(){gaLoading=false;gaLoaded=true;gtag('js',new Date());gtag('config',GA_ID,{send_page_view:true})};s.onerror=function(){gaLoading=false};document.head.appendChild(s)}
+    function reduxTrack(name,data,tries){if(!$('analytics').checked)return;if(gaLoaded&&window.gtag){gtag('event',name,data||{});return}loadGA();if((tries||0)<10)setTimeout(function(){reduxTrack(name,data,(tries||0)+1)},300)}
+    function render(s){
+      $('hour24').checked=s.hour24;$('leadingZero').checked=s.showLeadingZero;$('celsius').checked=s.celsius;$('manualPostalCode').value=s.manualLocation?s.manualPostalCode:'';$('manualCity').value=s.manualLocation?s.manualCity:'';$('analytics').checked=s.analyticsEnabled;
+      setOptions($('language'),LANGUAGE_VALUES,I18N.en.languages,s.language);
+      setOptions($('leftMetric'),METRIC_VALUES,I18N.en.metrics,s.leftMetric);
+      setOptions($('rightMetric'),METRIC_VALUES,I18N.en.metrics,s.rightMetric);
+      (document.querySelector('input[name=theme][value="'+s.theme+'"]')||document.querySelector('input[name=theme][value="orange"]')).checked=true;
+      applyTranslations();syncTheme();loadGA()
+    }
+    function collect(){var postal=clean($('manualPostalCode').value),city=clean($('manualCity').value);return norm({theme:document.querySelector('input[name=theme]:checked').value,hour24:$('hour24').checked,showLeadingZero:$('leadingZero').checked,celsius:$('celsius').checked,leftMetric:$('leftMetric').value,rightMetric:$('rightMetric').value,language:$('language').value,manualLocation:!!(postal||city),manualPostalCode:postal,manualCity:city,analyticsEnabled:$('analytics').checked})}
+    function closeConfig(encoded){var t=I18N[effectiveLanguage($('language').value)];var closeUrl='pebblejs://close#'+encoded;$('status').textContent=t.saving;try{window.location.href=closeUrl}catch(e){}try{document.location=closeUrl}catch(e){}setTimeout(function(){try{window.location.href=closeUrl}catch(e){}},50);setTimeout(function(){try{document.location=closeUrl}catch(e){}},150);setTimeout(function(){try{window.top.location.href=closeUrl}catch(e){}},300);setTimeout(function(){$('status').textContent=t.saved},1200)}
+    function save(){var s=collect();reduxTrack('settings_saved',{theme:s.theme,language:s.language,use_24_hour:s.hour24?1:0,leading_zero:s.showLeadingZero?1:0,use_celsius:s.celsius?1:0,manual_location:s.manualLocation?1:0,left_metric:s.leftMetric,right_metric:s.rightMetric});closeConfig(encodeURIComponent(JSON.stringify(s)))}
+    buildThemes();render(incoming());$('language').onchange=applyTranslations;$('analytics').onchange=function(){if(this.checked)loadGA()};$('donate').onclick=function(){reduxTrack('donation_clicked',{source:'app_config'})};$('reset').onclick=function(){var c=collect();reduxTrack('layout_reset',{source:'app_config'});render(Object.assign({},D,{language:c.language,analyticsEnabled:c.analyticsEnabled}))};$('save').onclick=save;
+  </script>
+</body>
+</html>
