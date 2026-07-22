@@ -22,7 +22,9 @@ Hosting/
     │   ├── qa/
     │   │   └── app-config.html
     │   └── releases/
-    │       └── 1.6.0/
+    │       ├── 1.6.0/
+    │       │   └── app-config.html
+    │       └── 1.6.1/
     │           └── app-config.html
     └── daypal/
         ├── prod/
@@ -30,7 +32,9 @@ Hosting/
         ├── qa/
         │   └── app-config.html
         └── releases/
-            └── 1.6.0/
+            ├── 1.6.0/
+            │   └── app-config.html
+            └── 1.6.1/
                 └── app-config.html
 ```
 
@@ -70,8 +74,8 @@ Release directories are immutable records of the configuration shipped with a wa
 
 ## Migration status
 
-- Essential Redux 1.6.0 continues to use root `app-config.html`.
-- The canonical Essential Redux production, QA, and 1.6.0 snapshot paths are available under `apps/essential-redux/`.
-- Published DayPal builds continue to use `DayPal-Hosting`.
-- The canonical DayPal production, QA, and 1.6.0 snapshot paths are available under `apps/daypal/`.
-- A future watch app release can move each companion's `CONFIG_URL` to its canonical production path.
+- Essential Redux 1.6.0 continues to use root `app-config.html`; Essential Redux 1.6.1 moves to the canonical production path.
+- The canonical Essential Redux production, QA, 1.6.0, and 1.6.1 snapshot paths are available under `apps/essential-redux/`.
+- DayPal 1.6.0 and earlier continue to use `DayPal-Hosting`; DayPal 1.6.1 moves to the canonical production path.
+- The canonical DayPal production, QA, 1.6.0, and 1.6.1 snapshot paths are available under `apps/daypal/`.
+- Legacy hosts remain online so installed releases keep working.
