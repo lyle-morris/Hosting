@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pebble App Configuration Pages</title>
+  <style>
+    :root{color-scheme:dark}
+    *{box-sizing:border-box}
+    body{margin:0;min-width:320px;background:#000;color:#fff;font:16px/1.45 Arial,sans-serif;padding:24px}
+    main{width:min(640px,100%);margin:0 auto}
+    h1{font-size:28px;margin:0 0 8px}
+    p{color:#c8c8c8}
+    .grid{display:grid;gap:16px;margin-top:24px}
+    .card{display:block;border:1px solid #555;background:#1d1d1d;color:#fff;padding:18px;text-decoration:none}
+    .card:focus,.card:hover{border-color:#00aaff;outline:none}
+    .card strong{display:block;font-size:20px;margin-bottom:4px}
+    .card span{color:#bdbdbd}
+    .testing{margin-top:28px}
+    .testing a{color:#8fdcff}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Pebble App Configuration Pages</h1>
+    <p>Production settings pages hosted for Lyle Morris's Pebble apps.</p>
+    <div class="grid">
+      <a class="card" href="essential-redux/prod/app-config.html">
+        <strong>Essential Redux</strong>
+        <span>Open production settings</span>
+      </a>
+      <a class="card" href="daypal/prod/app-config.html">
+        <strong>DayPal</strong>
+        <span>Open production settings</span>
+      </a>
+    </div>
+    <p class="testing">
+      Testing:
+      <a href="essential-redux/qa/app-config.html">Essential Redux QA</a>
+      ·
+      <a href="daypal/qa/app-config.html">DayPal QA</a>
+    </p>
+  </main>
+</body>
+</html>
