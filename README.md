@@ -22,6 +22,8 @@ Hosting/
     │   ├── qa/
     │   │   └── app-config.html
     │   └── releases/
+    │       ├── 1.3.0/
+    │       │   └── app-config.html
     │       └── 1.6.0/
     │           └── app-config.html
     └── daypal/
@@ -72,8 +74,8 @@ Release directories are immutable records of the configuration shipped with a wa
 
 ## Migration status
 
-- Essential Redux 1.3.0 is being tested from the canonical QA path and will move to the canonical production path after validation.
-- The canonical Essential Redux production, QA, and existing 1.6.0 snapshot paths are available under `apps/essential-redux/`.
+- Essential Redux 1.3.0 passed QA and is promoted to the canonical production path.
+- The canonical Essential Redux production, QA, 1.3.0 snapshot, and existing 1.6.0 snapshot paths are available under `apps/essential-redux/`.
 - DayPal 1.6.0 and earlier continue to use `DayPal-Hosting`; DayPal 1.6.1 moves to the canonical production path.
 - The canonical DayPal production, QA, 1.6.0, and 1.6.1 snapshot paths are available under `apps/daypal/`.
 - Legacy hosts remain online so installed releases keep working.
