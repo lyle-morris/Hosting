@@ -12,8 +12,6 @@ Hosting/
 ├── README.md
 ├── index.html
 ├── app-config.html
-├── qa/
-│   └── app-config.html
 └── apps/
     ├── index.html
     ├── essential-redux/
@@ -52,7 +50,6 @@ Hosting/
 ## Compatibility rules
 
 - Do not remove or repurpose root `app-config.html`; published Essential Redux builds use it.
-- Keep root `qa/app-config.html` available until no test build references it.
 - Keep `DayPal-Hosting` online while published DayPal builds use that repository.
 - Redirects must preserve both `location.search` and `location.hash`, because Pebble settings and responses can use them.
 - Configuration pages should remain self-contained unless shared assets are explicitly versioned.
@@ -70,12 +67,13 @@ Hosting/
 
 ## Release snapshots
 
-Release directories are immutable records of the configuration shipped with a watch app version. Production remains a stable URL so a hosted-page fix can be promoted without reorganizing the repository.
+Release directories are immutable records of the configuration shipped with a watch app version. Production remains a stable URL so a hosted-page fix can be promoted without reorganizing the repository. Identical production, QA, and snapshot files are intentional when they represent the same validated release.
 
 ## Migration status
 
 - Essential Redux 1.3.0 passed QA and is promoted to the canonical production path.
 - The canonical Essential Redux production, QA, 1.3.0 snapshot, and existing 1.6.0 snapshot paths are available under `apps/essential-redux/`.
-- DayPal 1.6.0 and earlier continue to use `DayPal-Hosting`; DayPal 1.6.1 moves to the canonical production path.
+- The obsolete shared root QA page was removed; all future QA work uses the app-specific paths under `apps/`.
+- DayPal 1.6.0 and earlier continue to use `DayPal-Hosting`; the open DayPal 1.6.1 release moves to the canonical production path after validation.
 - The canonical DayPal production, QA, 1.6.0, and 1.6.1 snapshot paths are available under `apps/daypal/`.
-- Legacy hosts remain online so installed releases keep working.
+- Legacy production hosts remain online so installed releases keep working.
