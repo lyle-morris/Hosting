@@ -517,6 +517,7 @@
     var LANGUAGE_CODES=['en','es','fr','de','pt','it','nl','da','nb','sv','fi','is','ca','eu','gl','pl','cs','sk','sl','hr','bs','sr-Latn','ro','hu','et','lv','lt','tr','sq','mt'];
     var LANGUAGE_VALUES=['en','auto'].concat(LANGUAGE_CODES.slice(1));
     var LANGUAGE_NAMES_EN=['English','Spanish','French','German','Portuguese','Italian','Dutch','Danish','Norwegian Bokmål','Swedish','Finnish','Icelandic','Catalan','Basque','Galician','Polish','Czech','Slovak','Slovenian','Croatian','Bosnian','Serbian (Latin)','Romanian','Hungarian','Estonian','Latvian','Lithuanian','Turkish','Albanian','Maltese'];
+    var LANGUAGE_LABEL_OVERRIDES={bs:'Bosnian (BS)',mt:'Maltese (MT)'};
     var METRIC_VALUES=['calendar','weather','battery','calories','activity','sleep','heart','steps','distance','none'];
     var THEME_VALUES=['orange','lightBlue','purple','yellow','green','red','white','black'];
     var PEBBLE_LEVELS=['00','55','aa','ff'];
@@ -796,7 +797,7 @@
       try{if(typeof Intl!=='undefined'&&Intl.DisplayNames)names=new Intl.DisplayNames([lang],{type:'language'})}catch(e){}
       LANGUAGE_VALUES.forEach(function(code){
         if(code==='auto'){labels.push(t.autoDevice||(t.languages&&t.languages[0])||I18N.en.languages[0]);return}
-        var index=LANGUAGE_CODES.indexOf(code);labels.push(names?names.of(code):LANGUAGE_NAMES_EN[index]);
+        var index=LANGUAGE_CODES.indexOf(code);labels.push(LANGUAGE_LABEL_OVERRIDES[code]||(names?names.of(code):LANGUAGE_NAMES_EN[index]));
       });
       setOptions($('language'),LANGUAGE_VALUES,labels,selected);
     }
