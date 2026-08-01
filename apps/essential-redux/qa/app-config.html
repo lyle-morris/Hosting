@@ -509,12 +509,13 @@
       themeMode:'preset',theme:'orange',reverse:false,hour24:false,showLeadingZero:false,
       showBatteryIndicator:true,showBluetooth:false,celsius:false,layoutTest:false,
       leftMetric:'calendar',middleMetric:'steps',rightMetric:'weather',showMiddleSlot:false,
-      language:'auto',manualLocation:false,manualPostalCode:'',manualCity:'',manualCountry:'',
+      language:'en',manualLocation:false,manualPostalCode:'',manualCity:'',manualCountry:'',
       analyticsEnabled:true,customBackgroundColor:'#ff5500',customTimeBoxColor:'#ffffff',
       customTimeBorderColor:'#000000',customTimeTextColor:'#000000',
       customInfo1TextColor:'#000000',customInfo2TextColor:'#000000',customInfo3TextColor:'#000000',customInfoDefaultsMigrated:true
     };
-    var LANGUAGE_VALUES=['auto','en','es','fr','de','pt','it','nl','da','nb','sv','fi','is','ca','eu','gl','pl','cs','sk','sl','hr','bs','sr-Latn','ro','hu','et','lv','lt','tr','sq','mt'];
+    var LANGUAGE_CODES=['en','es','fr','de','pt','it','nl','da','nb','sv','fi','is','ca','eu','gl','pl','cs','sk','sl','hr','bs','sr-Latn','ro','hu','et','lv','lt','tr','sq','mt'];
+    var LANGUAGE_VALUES=['en','auto'].concat(LANGUAGE_CODES.slice(1));
     var LANGUAGE_NAMES_EN=['English','Spanish','French','German','Portuguese','Italian','Dutch','Danish','Norwegian Bokmål','Swedish','Finnish','Icelandic','Catalan','Basque','Galician','Polish','Czech','Slovak','Slovenian','Croatian','Bosnian','Serbian (Latin)','Romanian','Hungarian','Estonian','Latvian','Lithuanian','Turkish','Albanian','Maltese'];
     var METRIC_VALUES=['calendar','weather','battery','calories','activity','sleep','heart','steps','distance','none'];
     var THEME_VALUES=['orange','lightBlue','purple','yellow','green','red','white','black'];
@@ -793,8 +794,10 @@
     function setLanguageOptions(lang,selected){
       var labels=[],names=null,t=I18N[lang]||I18N.en;
       try{if(typeof Intl!=='undefined'&&Intl.DisplayNames)names=new Intl.DisplayNames([lang],{type:'language'})}catch(e){}
-      labels.push(t.autoDevice||(t.languages&&t.languages[0])||I18N.en.languages[0]);
-      LANGUAGE_VALUES.slice(1).forEach(function(code,index){labels.push(names?names.of(code):LANGUAGE_NAMES_EN[index])});
+      LANGUAGE_VALUES.forEach(function(code){
+        if(code==='auto'){labels.push(t.autoDevice||(t.languages&&t.languages[0])||I18N.en.languages[0]);return}
+        var index=LANGUAGE_CODES.indexOf(code);labels.push(names?names.of(code):LANGUAGE_NAMES_EN[index]);
+      });
       setOptions($('language'),LANGUAGE_VALUES,labels,selected);
     }
     function setCountryOptions(selected,lang){
