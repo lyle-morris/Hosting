@@ -7,7 +7,7 @@
 
 | Environment | Path | Current instruction |
 |---|---|---|
-| QA | `apps/essential-redux/qa/app-config.html` | Active 2.0.0 testing surface; current cache label `qa-v8` |
+| QA | `apps/essential-redux/qa/app-config.html` | Active 2.0.0 testing surface; current cache label `qa-v9` |
 | Versioned release | `apps/essential-redux/releases/2.0.0/app-config.html` | Do not create or update until QA readiness is declared |
 | Production | `apps/essential-redux/prod/app-config.html` | Do not modify until the release copy is verified |
 
