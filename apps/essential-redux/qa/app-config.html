@@ -133,6 +133,41 @@
     .field{display:flex;flex-direction:column;gap:4px}
     .field-label{font-size:14px;font-weight:700}
     .fields{display:flex;flex-direction:column;gap:16px}
+    .input-with-clear{position:relative}
+    .input-with-clear input[type="text"]{padding-right:48px}
+    .field-clear{
+      position:absolute;
+      top:4px;
+      right:4px;
+      width:40px;
+      height:40px;
+      padding:0;
+      border:0;
+      border-radius:4px;
+      background:transparent;
+      color:#ffffff;
+      font-size:24px;
+      line-height:1;
+    }
+    .field-clear:focus{outline:2px solid var(--focus);outline-offset:-2px}
+    .country-select{
+      display:flex;
+      align-items:center;
+      width:100%;
+      height:48px;
+      padding:0 10px 0 12px;
+      border:2px solid #555555;
+      border-radius:4px;
+      background:#000000;
+      color:#ffffff;
+      font-size:16px;
+      font-weight:700;
+      text-align:left;
+    }
+    .country-select:focus{outline:none;border-color:var(--focus)}
+    .country-select.invalid{border-color:var(--error)}
+    .country-select-value{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .country-select-arrow{color:var(--focus);font-size:20px;line-height:1}
 
     .theme-card{
       overflow:visible;
@@ -297,6 +332,19 @@
     .palette-value{flex:1;font-family:monospace;font-size:16px;font-weight:700}
     .palette-done{min-width:96px}
     body.palette-open{overflow:hidden}
+    .country-list{display:flex;flex-direction:column;gap:4px;margin-top:12px}
+    .country-option{
+      min-height:48px;
+      padding:10px 12px;
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:4px;
+      background:#000000;
+      color:#ffffff;
+      font-weight:700;
+      text-align:left;
+    }
+    .country-option.selected{border-color:var(--focus);box-shadow:inset 4px 0 0 var(--focus)}
+    body.country-open{overflow:hidden}
 
     .slot-toggle{
       display:flex;
@@ -445,9 +493,9 @@
       <h2 data-i18n="locationTitle">Manual location</h2>
       <div class="content">
         <div class="fields">
-          <label class="field"><span class="field-label" data-i18n="countryLabel">Country</span><select id="manualCountry" autocomplete="country" aria-describedby="locationError"></select></label>
-          <label class="field"><span class="field-label" data-i18n="postalLabel">ZIP/postal code</span><input id="manualPostalCode" type="text" maxlength="32" autocomplete="postal-code" aria-describedby="locationError"></label>
-          <label class="field"><span class="field-label" data-i18n="cityLabel">City</span><input id="manualCity" type="text" maxlength="100" autocomplete="address-level2" aria-describedby="locationError"></label>
+          <div class="field"><span class="field-label" id="manualCountryLabel" data-i18n="countryLabel">Country</span><button id="manualCountryButton" class="country-select" type="button" aria-haspopup="dialog" aria-controls="countryDialog" aria-labelledby="manualCountryLabel manualCountryValue" aria-describedby="locationError"><span id="manualCountryValue" class="country-select-value">United States</span><span class="country-select-arrow" aria-hidden="true">▼</span></button><select id="manualCountry" class="visually-hidden" tabindex="-1" aria-hidden="true"></select></div>
+          <label class="field"><span class="field-label" data-i18n="postalLabel">ZIP/postal code</span><span class="input-with-clear"><input id="manualPostalCode" type="text" maxlength="32" autocomplete="postal-code" aria-describedby="locationError"><button id="manualPostalCodeClear" class="field-clear" type="button" data-clear-target="manualPostalCode" aria-label="Clear ZIP/postal code" hidden>×</button></span></label>
+          <label class="field"><span class="field-label" data-i18n="cityLabel">City</span><span class="input-with-clear"><input id="manualCity" type="text" maxlength="100" autocomplete="address-level2" aria-describedby="locationError"><button id="manualCityClear" class="field-clear" type="button" data-clear-target="manualCity" aria-label="Clear city" hidden>×</button></span></label>
           <p id="locationError" class="field-error" role="alert" aria-live="polite"></p>
         </div>
       </div>
@@ -475,6 +523,13 @@
       <p class="palette-copy" data-i18n="pebbleColorCopy">Choose one of the 64 colors supported by Pebble color displays.</p>
       <div class="palette-grid" id="pebbleColorGrid" role="radiogroup" aria-label="Pebble 64-color palette"></div>
       <div class="palette-footer"><span class="palette-value" id="paletteValue">#000000</span><button class="btn primary palette-done" id="paletteDone" type="button" data-i18n="done">Done</button></div>
+    </div>
+  </div>
+
+  <div class="palette-dialog" id="countryDialog" role="dialog" aria-modal="true" aria-labelledby="countryPickerTitle" hidden>
+    <div class="palette-sheet">
+      <div class="palette-head"><h2 id="countryPickerTitle" data-i18n="countryPickerTitle">Choose country</h2><button class="palette-close" id="countryClose" type="button" aria-label="Close">×</button></div>
+      <div class="country-list" id="countryList" role="listbox" aria-labelledby="countryPickerTitle"></div>
     </div>
   </div>
 
@@ -524,7 +579,7 @@
         pebbleColorTitle:'Pebble color',pebbleColorCopy:'Choose one of the 64 colors supported by Pebble color displays.',done:'Done',
         metricsTitle:'Information',metricsCopy:'Customize what information is shown on the watch face.',
         twoSlots:'2 information slots',threeSlots:'3 information slots',
-        locationTitle:'Manual location',countryLabel:'Country',postalLabel:'ZIP/postal code',cityLabel:'City',
+        locationTitle:'Manual location',countryLabel:'Country',postalLabel:'ZIP/postal code',cityLabel:'City',countryPickerTitle:'Choose country',clearPostal:'Clear ZIP/postal code',clearCity:'Clear city',
         locationChecking:'Checking location...',locationNotFound:'That location could not be found. Check the country, ZIP/postal code, and city.',
         locationUnavailable:'The location could not be validated. Check your connection and try again.',
         languageLabel:'Language',languageCopy:'Change the default language for the watch face and the settings page.',
@@ -547,7 +602,7 @@
         pebbleColorTitle:'Color de Pebble',pebbleColorCopy:'Elige uno de los 64 colores compatibles con las pantallas Pebble a color.',done:'Listo',
         metricsTitle:'Información',metricsCopy:'Personaliza la información que aparece en la esfera.',
         twoSlots:'2 espacios de información',threeSlots:'3 espacios de información',
-        locationTitle:'Ubicación manual',countryLabel:'País',postalLabel:'Código postal',cityLabel:'Ciudad',
+        locationTitle:'Ubicación manual',countryLabel:'País',postalLabel:'Código postal',cityLabel:'Ciudad',countryPickerTitle:'Elegir país',clearPostal:'Borrar código postal',clearCity:'Borrar ciudad',
         locationChecking:'Comprobando ubicación...',locationNotFound:'No se encontró esa ubicación. Verifica el país, el código postal y la ciudad.',
         locationUnavailable:'No se pudo validar la ubicación. Comprueba tu conexión e inténtalo de nuevo.',
         languageLabel:'Idioma',languageCopy:'Cambia el idioma predeterminado de la esfera y de la página de ajustes.',
@@ -570,7 +625,7 @@
         pebbleColorTitle:'Couleur Pebble',pebbleColorCopy:'Choisissez l’une des 64 couleurs prises en charge par les écrans Pebble couleur.',done:'Terminé',
         metricsTitle:'Informations',metricsCopy:'Personnalisez les informations affichées sur le cadran.',
         twoSlots:'2 emplacements d’information',threeSlots:'3 emplacements d’information',
-        locationTitle:'Localisation manuelle',countryLabel:'Pays',postalLabel:'Code postal',cityLabel:'Ville',
+        locationTitle:'Localisation manuelle',countryLabel:'Pays',postalLabel:'Code postal',cityLabel:'Ville',countryPickerTitle:'Choisir un pays',clearPostal:'Effacer le code postal',clearCity:'Effacer la ville',
         locationChecking:'Vérification du lieu...',locationNotFound:'Ce lieu est introuvable. Vérifiez le pays, le code postal et la ville.',
         locationUnavailable:'Le lieu n’a pas pu être validé. Vérifiez votre connexion et réessayez.',
         languageLabel:'Langue',languageCopy:'Modifiez la langue par défaut du cadran et de la page des paramètres.',
@@ -593,7 +648,7 @@
         pebbleColorTitle:'Pebble-Farbe',pebbleColorCopy:'Wähle eine der 64 Farben, die von Pebble-Farbdisplays unterstützt werden.',done:'Fertig',
         metricsTitle:'Informationen',metricsCopy:'Passe an, welche Informationen auf dem Zifferblatt angezeigt werden.',
         twoSlots:'2 Informationsplätze',threeSlots:'3 Informationsplätze',
-        locationTitle:'Manueller Standort',countryLabel:'Land',postalLabel:'Postleitzahl',cityLabel:'Stadt',
+        locationTitle:'Manueller Standort',countryLabel:'Land',postalLabel:'Postleitzahl',cityLabel:'Stadt',countryPickerTitle:'Land auswählen',clearPostal:'Postleitzahl löschen',clearCity:'Stadt löschen',
         locationChecking:'Standort wird geprüft...',locationNotFound:'Dieser Standort wurde nicht gefunden. Prüfe Land, Postleitzahl und Stadt.',
         locationUnavailable:'Der Standort konnte nicht geprüft werden. Prüfe deine Verbindung und versuche es erneut.',
         languageLabel:'Sprache',languageCopy:'Ändere die Standardsprache für das Zifferblatt und die Einstellungsseite.',
@@ -616,7 +671,7 @@
         pebbleColorTitle:'Cor Pebble',pebbleColorCopy:'Escolha uma das 64 cores compatíveis com telas coloridas Pebble.',done:'Concluído',
         metricsTitle:'Informações',metricsCopy:'Personalize as informações exibidas no mostrador.',
         twoSlots:'2 espaços de informação',threeSlots:'3 espaços de informação',
-        locationTitle:'Localização manual',countryLabel:'País',postalLabel:'CEP/código postal',cityLabel:'Cidade',
+        locationTitle:'Localização manual',countryLabel:'País',postalLabel:'CEP/código postal',cityLabel:'Cidade',countryPickerTitle:'Escolher país',clearPostal:'Limpar CEP/código postal',clearCity:'Limpar cidade',
         locationChecking:'Verificando localização...',locationNotFound:'Essa localização não foi encontrada. Verifique o país, o CEP/código postal e a cidade.',
         locationUnavailable:'Não foi possível validar a localização. Verifique sua conexão e tente novamente.',
         languageLabel:'Idioma',languageCopy:'Altere o idioma padrão do mostrador e da página de configurações.',
@@ -631,7 +686,7 @@
       }
     };
 
-    var gaLoading=false,gaLoaded=false,locationValidationToken=0,locationErrorKey='',locationInputsInvalid=false,saveInProgress=false;
+    var gaLoading=false,gaLoaded=false,locationValidationToken=0,locationErrorKey='',locationInputsInvalid=false,saveInProgress=false,currentCountry=D.manualCountry;
     function $(id){return document.getElementById(id)}
     function b(v,d){if(v===true||v===1||v==='1'||v==='true')return true;if(v===false||v===0||v==='0'||v==='false')return false;return d}
     function clean(v){return String(v||'').trim()}
@@ -682,7 +737,41 @@
       COUNTRY_CODES.forEach(function(code){
         var o=document.createElement('option');o.value=code;o.textContent=names?names.of(code):code;$('manualCountry').appendChild(o)
       });
-      $('manualCountry').value=validCountry(selected);
+      $('manualCountry').value=validCountry(selected);currentCountry=$('manualCountry').value;syncCountryButton();
+    }
+    function syncCountryButton(){
+      var select=$('manualCountry'),option=select.options[select.selectedIndex];
+      $('manualCountryValue').textContent=option?option.textContent:validCountry(select.value);
+    }
+    function buildCountryList(){
+      var list=$('countryList'),select=$('manualCountry');list.innerHTML='';
+      Array.prototype.forEach.call(select.options,function(option){
+        var button=document.createElement('button'),selected=option.value===select.value;
+        button.type='button';button.className='country-option'+(selected?' selected':'');button.setAttribute('role','option');
+        button.setAttribute('aria-selected',selected?'true':'false');button.setAttribute('data-country',option.value);button.textContent=option.textContent;
+        button.onclick=function(){selectCountry(option.value)};list.appendChild(button)
+      });
+    }
+    function openCountryPicker(){
+      buildCountryList();$('countryDialog').hidden=false;document.body.classList.add('country-open');
+      var selected=$('countryList').querySelector('.country-option.selected');
+      if(selected){try{selected.scrollIntoView({block:'center'})}catch(e){selected.scrollIntoView()};selected.focus()}
+    }
+    function closeCountryPicker(){
+      $('countryDialog').hidden=true;document.body.classList.remove('country-open');$('manualCountryButton').focus();
+    }
+    function selectCountry(code){
+      $('manualCountry').value=validCountry(code);handleCountryChange();closeCountryPicker();
+    }
+    function syncClearButton(id){$(id+'Clear').hidden=!$(id).value.length}
+    function syncLocationClearButtons(){syncClearButton('manualPostalCode');syncClearButton('manualCity')}
+    function clearLocationField(id){$(id).value='';syncClearButton(id);clearLocationValidation();$(id).focus()}
+    function handleLocationInput(id){syncClearButton(id);clearLocationValidation()}
+    function handleCountryChange(){
+      var next=validCountry($('manualCountry').value),changed=next!==currentCountry;
+      $('manualCountry').value=next;currentCountry=next;syncCountryButton();
+      if(changed){$('manualPostalCode').value='';$('manualCity').value='';syncLocationClearButtons()}
+      clearLocationValidation();
     }
     function buildThemes(){
       var html='';
@@ -764,6 +853,7 @@
       setOptions($('middleMetric'),METRIC_VALUES,t.metrics,middle);
       setOptions($('rightMetric'),METRIC_VALUES,t.metrics,right);
       setCountryOptions(country,lang);
+      $('manualPostalCodeClear').setAttribute('aria-label',t.clearPostal);$('manualCityClear').setAttribute('aria-label',t.clearCity);
       document.querySelectorAll('.theme').forEach(function(el,index){el.querySelector('span').textContent=t.themes[index]});
       updateSlotMode();renderLocationError();
     }
@@ -783,7 +873,7 @@
     function setLocationError(key,invalid){
       locationErrorKey=key||'';locationInputsInvalid=!!invalid;
       ['manualCountry','manualPostalCode','manualCity'].forEach(function(id){
-        var el=$(id),mark=locationInputsInvalid&&(id==='manualCountry'||!!clean(el.value));
+        var el=id==='manualCountry'?$('manualCountryButton'):$(id),mark=locationInputsInvalid&&(id==='manualCountry'||!!clean($(id).value));
         el.classList.toggle('invalid',mark);el.setAttribute('aria-invalid',mark?'true':'false');
       });
       renderLocationError();
@@ -840,7 +930,7 @@
       setOptions($('rightMetric'),METRIC_VALUES,I18N.en.metrics,s.rightMetric);
       setCountryOptions(s.manualCountry,'en');
       (document.querySelector('input[name=theme][value="'+s.theme+'"]')||document.querySelector('input[name=theme][value="orange"]')).checked=true;
-      setThemeMode(s.themeMode);applyTranslations();syncTheme();clearLocationValidation();loadGA();
+      setThemeMode(s.themeMode);applyTranslations();syncTheme();syncLocationClearButtons();clearLocationValidation();loadGA();
     }
     function collect(){
       var postal=clean($('manualPostalCode').value),city=clean($('manualCity').value),country=validCountry($('manualCountry').value);
@@ -892,10 +982,18 @@
     document.querySelectorAll('.color-picker-trigger').forEach(function(button){button.onclick=function(){openPebbleColorPicker(button.getAttribute('data-color-target'))}});
     $('paletteClose').onclick=closePebbleColorPicker;$('paletteDone').onclick=closePebbleColorPicker;
     $('paletteDialog').onclick=function(event){if(event.target===$('paletteDialog'))closePebbleColorPicker()};
-    document.addEventListener('keydown',function(event){if(event.key==='Escape'&&!$('paletteDialog').hidden)closePebbleColorPicker()});
+    $('manualCountryButton').onclick=openCountryPicker;$('countryClose').onclick=closeCountryPicker;
+    $('countryDialog').onclick=function(event){if(event.target===$('countryDialog'))closeCountryPicker()};
+    document.addEventListener('keydown',function(event){
+      if(event.key!=='Escape')return;
+      if(!$('countryDialog').hidden){closeCountryPicker();return}
+      if(!$('paletteDialog').hidden)closePebbleColorPicker();
+    });
     $('threeSlots').onchange=updateSlotMode;
     $('language').onchange=function(){applyTranslations();if(saveInProgress)$('status').textContent=I18N[effectiveLanguage($('language').value)].locationChecking};
-    $('manualCountry').onchange=clearLocationValidation;$('manualPostalCode').oninput=clearLocationValidation;$('manualCity').oninput=clearLocationValidation;
+    $('manualCountry').onchange=handleCountryChange;
+    $('manualPostalCode').oninput=function(){handleLocationInput('manualPostalCode')};$('manualCity').oninput=function(){handleLocationInput('manualCity')};
+    $('manualPostalCodeClear').onclick=function(){clearLocationField('manualPostalCode')};$('manualCityClear').onclick=function(){clearLocationField('manualCity')};
     $('analytics').onchange=function(){if(this.checked)loadGA()};
     $('donate').onclick=function(){reduxTrack('donation_clicked',{source:'app_config'})};
     $('reset').onclick=function(){var c=collect();reduxTrack('layout_reset',{source:'app_config'});render(Object.assign({},D,{language:c.language,analyticsEnabled:c.analyticsEnabled}))};
