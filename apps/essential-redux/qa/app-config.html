@@ -186,6 +186,8 @@
       border-radius:0 0 8px 8px;
       box-shadow:0 0 8px rgba(0,0,0,.5);
     }
+    body[data-theme-mode="preset"] #presetPanel{border-radius:8px 0 8px 8px}
+    body[data-theme-mode="custom"] #customPanel{border-radius:0 8px 8px 8px}
     .theme-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
     .theme{
       --theme-bg:#000000;
@@ -447,7 +449,7 @@
       <div class="content">
         <p class="copy" data-i18n="metricsCopy">Customize what information is shown on the watch face.</p>
         <label class="slot-toggle">
-          <strong id="slotCountLabel" data-i18n="twoSlots">2 information slots</strong>
+          <strong id="slotCountLabel" data-i18n="threeSlots">Show 3 informational slots.</strong>
           <span class="switch"><input id="threeSlots" type="checkbox" aria-labelledby="slotCountLabel"><span class="switch-track"></span></span>
         </label>
         <div class="slots">
@@ -520,6 +522,16 @@
     var LANGUAGE_LABEL_OVERRIDES={bs:'Bosnian (BS)',mt:'Maltese (MT)'};
     var METRIC_VALUES=['calendar','weather','battery','calories','activity','sleep','heart','steps','distance','none'];
     var THEME_VALUES=['orange','lightBlue','purple','yellow','green','red','white','black'];
+    var PRESET_CUSTOM_COLORS={
+      orange:{customBackgroundColor:'#ff5500',customTimeBoxColor:'#ffffff',customTimeBorderColor:'#000000',customTimeTextColor:'#000000',customInfo1TextColor:'#000000',customInfo2TextColor:'#000000',customInfo3TextColor:'#000000'},
+      lightBlue:{customBackgroundColor:'#00aaff',customTimeBoxColor:'#ffffff',customTimeBorderColor:'#000000',customTimeTextColor:'#000000',customInfo1TextColor:'#000000',customInfo2TextColor:'#000000',customInfo3TextColor:'#000000'},
+      purple:{customBackgroundColor:'#5500ff',customTimeBoxColor:'#ffffff',customTimeBorderColor:'#000000',customTimeTextColor:'#000000',customInfo1TextColor:'#ffffff',customInfo2TextColor:'#ffffff',customInfo3TextColor:'#ffffff'},
+      yellow:{customBackgroundColor:'#ffaa00',customTimeBoxColor:'#ffffff',customTimeBorderColor:'#000000',customTimeTextColor:'#000000',customInfo1TextColor:'#000000',customInfo2TextColor:'#000000',customInfo3TextColor:'#000000'},
+      green:{customBackgroundColor:'#005500',customTimeBoxColor:'#ffffff',customTimeBorderColor:'#000000',customTimeTextColor:'#000000',customInfo1TextColor:'#ffffff',customInfo2TextColor:'#ffffff',customInfo3TextColor:'#ffffff'},
+      red:{customBackgroundColor:'#ff0000',customTimeBoxColor:'#ffffff',customTimeBorderColor:'#000000',customTimeTextColor:'#000000',customInfo1TextColor:'#ffffff',customInfo2TextColor:'#ffffff',customInfo3TextColor:'#ffffff'},
+      white:{customBackgroundColor:'#ffffff',customTimeBoxColor:'#ffffff',customTimeBorderColor:'#000000',customTimeTextColor:'#000000',customInfo1TextColor:'#000000',customInfo2TextColor:'#000000',customInfo3TextColor:'#000000'},
+      black:{customBackgroundColor:'#000000',customTimeBoxColor:'#000000',customTimeBorderColor:'#ffffff',customTimeTextColor:'#ffffff',customInfo1TextColor:'#ffffff',customInfo2TextColor:'#ffffff',customInfo3TextColor:'#ffffff'}
+    };
     var PEBBLE_LEVELS=['00','55','aa','ff'];
     var PEBBLE_COLORS=[];
     PEBBLE_LEVELS.forEach(function(r){
@@ -544,7 +556,7 @@
         info1Text:'Information 1 text color',info2Text:'Information 2 text color',info3Text:'Information 3 text color',
         pebbleColorTitle:'Pebble color',pebbleColorCopy:'Choose one of the 64 colors supported by Pebble color displays.',done:'Done',
         metricsTitle:'Information',metricsCopy:'Customize what information is shown on the watch face.',
-        twoSlots:'2 information slots',threeSlots:'3 information slots',
+        twoSlots:'2 information slots',threeSlots:'Show 3 informational slots.',
         locationTitle:'Manual location',countryLabel:'Country',postalLabel:'ZIP/postal code',cityLabel:'City',selectCountry:'Select a country',clearCountry:'Clear country',clearPostal:'Clear ZIP/postal code',clearCity:'Clear city',
         locationChecking:'Checking location...',locationNotFound:'That location could not be found. Check the country, ZIP/postal code, and city.',
         locationUnavailable:'The location could not be validated. Check your connection and try again.',
@@ -830,10 +842,18 @@
         html+='<label class="theme '+value+'" data-theme="'+value+'"><input type="radio" name="theme" value="'+value+'"><span></span></label>'
       });
       $('themeGrid').innerHTML=html;
-      document.querySelectorAll('input[name=theme]').forEach(function(i){i.onchange=syncTheme});
+      document.querySelectorAll('input[name=theme]').forEach(function(i){i.onchange=function(){syncTheme(true)}});
     }
-    function syncTheme(){
+    function applyPresetColorsToCustom(theme){
+      var colors=PRESET_CUSTOM_COLORS[validTheme(theme)]||PRESET_CUSTOM_COLORS[D.theme];
+      Object.keys(colors).forEach(function(id){$(id).value=colors[id];syncColorTrigger(id)});
+    }
+    function syncTheme(reflectCustom){
       document.querySelectorAll('.theme').forEach(function(t){t.classList.toggle('selected',!!t.querySelector('input:checked'))});
+      if(reflectCustom){
+        var selected=document.querySelector('input[name=theme]:checked');
+        if(selected)applyPresetColorsToCustom(selected.value);
+      }
     }
     var activeColorTarget='';
     function colorContrast(hex){
@@ -892,7 +912,7 @@
       var three=$('threeSlots').checked;
       $('middleSlotRow').hidden=!three;
       var t=I18N[effectiveLanguage($('language').value||D.language)];
-      $('slotCountLabel').textContent=three?t.threeSlots:t.twoSlots;
+      $('slotCountLabel').textContent=t.threeSlots||I18N.en.threeSlots;
     }
     function applyTranslations(){
       var languageSetting=validLanguage($('language').value||D.language),lang=effectiveLanguage(languageSetting),t=I18N[lang];
@@ -981,7 +1001,8 @@
       setOptions($('rightMetric'),METRIC_VALUES,I18N.en.metrics,s.rightMetric);
       setCountryOptions(s.manualCountry,'en');
       (document.querySelector('input[name=theme][value="'+s.theme+'"]')||document.querySelector('input[name=theme][value="orange"]')).checked=true;
-      activeLocationField='';setThemeMode(s.themeMode);applyTranslations();syncTheme();syncLocationClearButtons();clearLocationValidation();loadGA();
+      if(s.themeMode==='preset')applyPresetColorsToCustom(s.theme);
+      activeLocationField='';setThemeMode(s.themeMode);applyTranslations();syncTheme(false);syncLocationClearButtons();clearLocationValidation();loadGA();
     }
     function collect(){
       var locationValues=locationValuesForSave(),postal=locationValues.postal,city=locationValues.city,country=locationValues.country;
