@@ -3,57 +3,402 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111111">
   <title>Essential Redux Settings</title>
   <style>
-    :root{--black:#000;--white:#fff;--focus:#00aaff;--error:#ff6b6b;--orange:#ff5500;--blue:#00aaff;--purple:#5500ff;--yellow:#ffaa00;--green:#005500;--red:#ff0000;--card-head:rgba(255,255,255,.10);--card-body:rgba(255,255,255,.15);--field-border:rgba(255,255,255,.25)}*{box-sizing:border-box}body{margin:0;min-width:320px;background:var(--black);color:var(--white);font:16px/24px Roboto,Arial,sans-serif}.page{display:flex;flex-direction:column;gap:16px;width:min(100%,390px);margin:auto;padding:16px 16px 107px}.page-header{display:flex;flex-direction:column;gap:8px}.page-header h1{margin:0;font-size:38px;line-height:46px;font-weight:900}.intro{margin:0}.card{width:100%;overflow:hidden;background:var(--black);border-radius:4px}.card-head{display:flex;align-items:center;height:48px;padding:12px 16px;background:var(--card-head)}.card-head h2{margin:0;font-size:18px;line-height:24px;font-weight:700}.card-body{display:flex;flex-direction:column;gap:16px;padding:16px;background:var(--card-body)}.copy{margin:0}.row{display:flex;align-items:center;gap:16px;min-height:34px}.row>span{flex:1}.row input[type=checkbox]{width:32px;height:32px;margin:0;accent-color:var(--focus)}select,input[type=text]{width:100%;min-height:48px;padding:10px 16px;background:var(--black);color:var(--white);border:2px solid var(--field-border);border-radius:4px;font:700 16px/24px Roboto,Arial,sans-serif}select.invalid,input[type=text].invalid{border-color:var(--error)}.field-error{margin:0;color:var(--error);font-size:14px;line-height:20px;font-weight:700}.field-error:empty{display:none}.theme-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}.theme{--theme-bg:#000;--theme-fg:#fff;position:relative;display:flex;height:80px;padding:6px;overflow:hidden;border:2px solid transparent;border-radius:2px;cursor:pointer}.theme input{position:absolute;opacity:0;pointer-events:none}.theme span{display:flex;flex:1;align-items:center;justify-content:center;width:100%;overflow:hidden;border-radius:2px;background:var(--theme-bg);color:var(--theme-fg);font-size:14px;font-weight:700;text-align:center}.theme.selected{border-color:var(--focus)}.orange{--theme-bg:var(--orange);--theme-fg:#fff}.white{--theme-bg:var(--white);--theme-fg:#000}.lightBlue{--theme-bg:var(--blue);--theme-fg:#000}.purple{--theme-bg:var(--purple);--theme-fg:#fff}.yellow{--theme-bg:var(--yellow);--theme-fg:#000}.green{--theme-bg:var(--green);--theme-fg:#fff}.red{--theme-bg:var(--red);--theme-fg:#fff}.black{--theme-bg:var(--black);--theme-fg:#fff}.metrics{display:flex;flex-direction:column;gap:12px}.metric{display:grid;grid-template-columns:120px 1fr;align-items:center;gap:6px}.fields{display:flex;flex-direction:column;gap:12px}.field-label{display:block;margin-bottom:6px;font-weight:700}.analytics-row{padding:8px 12px;background:rgba(0,0,0,.15);border-radius:4px}.donate{display:flex;align-items:center;justify-content:center;min-height:48px;padding:12px 24px;background:var(--card-body);border-radius:4px;color:var(--white);font-weight:700;text-decoration:none}.actions{position:fixed;z-index:10;left:0;right:0;bottom:0;background:var(--black);border-top:1px solid var(--card-body);padding:16px calc(16px + env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left))}.actions-inner{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:min(100%,358px);margin:auto}.btn{min-height:48px;padding:12px 24px;border:0;border-radius:4px;background:var(--card-body);color:var(--white);font:700 16px/24px Roboto,Arial,sans-serif;cursor:pointer}.btn:disabled{opacity:.65;cursor:wait}.primary{background:var(--focus)}.status{grid-column:1/-1;min-height:0;text-align:center;color:#00ff88;font-size:12px;font-weight:700}.status:empty{display:none}@media(max-width:360px){.actions-inner{gap:8px}.btn{padding-left:10px;padding-right:10px}}
-    .row input[type=checkbox]{width:20px;height:20px}
-    .general-settings .card-body{gap:4px}
-    section.card{border:1px solid #555555;border-radius:2px}
-    select{-webkit-appearance:none;appearance:none;padding-right:42px;background-image:linear-gradient(45deg,transparent 50%,var(--focus) 50%),linear-gradient(135deg,var(--focus) 50%,transparent 50%);background-position:calc(100% - 21px) 50%,calc(100% - 16px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+    :root{
+      --black:#000000;
+      --page-top:#333333;
+      --card:#222222;
+      --card-border:#555555;
+      --white:#ffffff;
+      --focus:#00aaff;
+      --error:#ff6b6b;
+      --divider:rgba(255,255,255,.10);
+      --header:rgba(244,244,244,.08);
+      --body-end:rgba(255,255,255,.05);
+      --button:rgba(255,255,255,.15);
+      --orange:#ff5500;
+      --blue:#00aaff;
+      --purple:#5500ff;
+      --yellow:#ffaa00;
+      --green:#005500;
+      --red:#ff0055;
+    }
+
+    *{box-sizing:border-box}
+    html{background:#000000}
+    body{
+      margin:0;
+      min-width:320px;
+      min-height:100vh;
+      font-family:'Roboto',sans-serif;
+      font-size:16px;
+      line-height:24px;
+      color:#ffffff;
+      background:linear-gradient(180deg,#333333 0%,#000000 100%);
+      padding:12px;
+    }
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+
+    .page{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      width:min(100%,390px);
+      min-height:calc(100vh - 24px);
+      margin:0 auto;
+      padding:0 0 95px;
+    }
+    .page-header{padding:12px 12px 0}
+    .page-header h1{margin:0;font-size:38px;line-height:46px;font-weight:900}
+    .intro{margin:0}
+
+    section{
+      width:100%;
+      max-width:390px;
+      overflow:hidden;
+      background-color:#222222;
+      box-shadow:0 0 8px rgba(0,0,0,.5);
+      border-radius:8px;
+      border:1px solid #555555;
+    }
+    section h2{
+      margin:0;
+      padding:16px;
+      background-color:rgba(244,244,244,.08);
+      font-size:18px;
+      line-height:24px;
+      font-weight:700;
+    }
+    section .content{
+      display:flex;
+      flex-direction:column;
+      padding:16px;
+      background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.05));
+    }
+    section .content p{margin:0 0 16px;line-height:1.5}
+    section .content p:last-child{margin-bottom:0}
+    .general-settings .content{gap:0}
+
+    .setting-row{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      min-height:56px;
+      padding:12px 0;
+      border-bottom:1px solid var(--divider);
+    }
+    .setting-row:last-child{border-bottom:0}
+    .setting-row>span:first-child{flex:1;font-weight:500}
+    .check-control{display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px}
+
+    input[type=checkbox]{
+      width:20px;
+      height:20px;
+      margin:0;
+      accent-color:#00aaff;
+    }
+    input[type="text"],select{
+      width:100%;
+      height:48px;
+      padding:0 12px;
+      background-color:#000000;
+      border:2px solid #555555;
+      border-radius:4px;
+      color:#ffffff;
+      display:flex;
+      font-size:16px;
+      font-weight:700;
+    }
+    input[type="text"]:focus,select:focus{
+      outline:none;
+      border-color:#00aaff;
+    }
+    select{
+      -webkit-appearance:none;
+      -moz-appearance:none;
+      appearance:none;
+      padding-right:44px;
+      background-image:url("data:image/svg+xml;utf8,<svg fill='%2300AAFF' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+      background-repeat:no-repeat;
+      background-position:right 10px center;
+      background-size:24px;
+    }
+    select option{background:#000000;color:#ffffff;padding:6px}
+    select.invalid,input[type="text"].invalid{border-color:var(--error)}
+    .field-error{margin:0!important;color:var(--error);font-size:14px;line-height:20px;font-weight:700}
+    .field-error:empty{display:none}
+    .field{display:flex;flex-direction:column;gap:4px}
+    .field-label{font-size:14px;font-weight:700}
+    .fields{display:flex;flex-direction:column;gap:16px}
+
+    .theme-card{
+      overflow:visible;
+      background:transparent;
+      border:0;
+      box-shadow:none;
+    }
+    .tabs{display:grid;grid-template-columns:1fr 1fr}
+    .tab{
+      min-height:48px;
+      border:0;
+      border-bottom:1px solid var(--card-border);
+      background:transparent;
+      color:#ffffff;
+      font-size:18px;
+      font-weight:700;
+    }
+    .tab.active{
+      background:var(--card);
+      border:1px solid var(--card-border);
+      border-bottom-color:var(--card);
+      border-radius:8px 8px 0 0;
+    }
+    .tab:focus-visible,.theme:focus-within,.btn:focus-visible,.switch input:focus-visible+.switch-track,input[type=color]:focus-visible{
+      outline:2px solid var(--focus);
+      outline-offset:2px;
+    }
+    .theme-panel{
+      margin-top:-1px;
+      padding:16px;
+      background:var(--card);
+      border:1px solid var(--card-border);
+      border-radius:0 0 8px 8px;
+      box-shadow:0 0 8px rgba(0,0,0,.5);
+    }
+    .theme-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+    .theme{
+      --theme-bg:#000000;
+      --theme-fg:#ffffff;
+      position:relative;
+      display:flex;
+      height:80px;
+      padding:6px;
+      overflow:hidden;
+      border:2px solid transparent;
+      border-radius:8px;
+      cursor:pointer;
+    }
+    .theme input{position:absolute;opacity:0;pointer-events:none}
+    .theme span{
+      display:flex;
+      flex:1;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      border-radius:6px;
+      background:var(--theme-bg);
+      color:var(--theme-fg);
+      font-size:14px;
+      font-weight:700;
+      text-align:center;
+    }
+    .theme.selected{border-color:var(--focus)}
+    .orange{--theme-bg:var(--orange);--theme-fg:#ffffff}
+    .lightBlue{--theme-bg:var(--blue);--theme-fg:#000000}
+    .purple{--theme-bg:var(--purple);--theme-fg:#ffffff}
+    .yellow{--theme-bg:var(--yellow);--theme-fg:#000000}
+    .green{--theme-bg:var(--green);--theme-fg:#ffffff}
+    .red{--theme-bg:var(--red);--theme-fg:#ffffff}
+    .white{--theme-bg:#ffffff;--theme-fg:#000000}
+    .black{--theme-bg:#000000;--theme-fg:#ffffff}
+
+    .custom-list{display:flex;flex-direction:column}
+    .color-row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 43px 48px;
+      align-items:center;
+      gap:16px;
+      min-height:72px;
+      padding:12px 0;
+      border-bottom:1px solid var(--divider);
+    }
+    .color-row:last-child{border-bottom:0}
+    .color-row label{font-size:18px;line-height:22px;font-weight:700}
+    .preview{width:43px;height:53px;object-fit:contain}
+    input[type=color]{
+      width:48px;
+      height:48px;
+      padding:0;
+      border:2px solid rgba(255,255,255,.3);
+      border-radius:50%;
+      background:transparent;
+      overflow:hidden;
+    }
+    input[type=color]::-webkit-color-swatch-wrapper{padding:0}
+    input[type=color]::-webkit-color-swatch{border:0;border-radius:50%}
+    input[type=color]::-moz-color-swatch{border:0;border-radius:50%}
+
+    .slot-toggle{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      min-height:50px;
+      padding:6px 16px;
+      background:#000000;
+      border-radius:4px;
+      margin-bottom:16px;
+    }
+    .slot-toggle strong{flex:1}
+    .switch{position:relative;width:43px;height:23px;flex:0 0 43px}
+    .switch input{position:absolute;opacity:0}
+    .switch-track{position:absolute;inset:0;border-radius:999px;background:#777777;transition:.15s}
+    .switch-track::after{
+      content:"";
+      position:absolute;
+      top:3px;
+      left:3px;
+      width:17px;
+      height:17px;
+      border-radius:50%;
+      background:#ffffff;
+      transition:.15s;
+    }
+    .switch input:checked+.switch-track{background:#00aa44}
+    .switch input:checked+.switch-track::after{transform:translateX(20px)}
+    .slots{display:flex;flex-direction:column}
+    .slot-row{
+      display:grid;
+      grid-template-columns:43px minmax(0,1fr);
+      align-items:center;
+      gap:16px;
+      min-height:72px;
+      padding:12px 0;
+      border-bottom:1px solid var(--divider);
+    }
+    .slot-row:last-child{border-bottom:0}
+    .slot-row[hidden]{display:none}
+    .slot-icon{width:43px;height:53px;object-fit:contain}
+
+    .analytics-row{padding:8px 12px;background:#000000;border-radius:4px}
+    .donate{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:48px;
+      padding:12px 24px;
+      background:var(--button);
+      border-radius:4px;
+      color:#ffffff;
+      font-weight:700;
+      text-decoration:none;
+    }
+    .actions{
+      position:fixed;
+      z-index:10;
+      left:0;
+      right:0;
+      bottom:0;
+      padding:16px max(16px,env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+      background:rgba(0,0,0,.96);
+      box-shadow:0 0 8px rgba(0,0,0,.5);
+    }
+    .actions-inner{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:min(100%,358px);margin:auto}
+    .btn{
+      min-height:48px;
+      padding:12px 18px;
+      border:0;
+      border-radius:4px;
+      background:var(--button);
+      color:#ffffff;
+      font-weight:700;
+    }
+    .btn.primary{background:var(--focus)}
+    .btn:disabled{opacity:.65;cursor:wait}
+    .status{grid-column:1/-1;text-align:center;color:#00ff88;font-size:12px;font-weight:700}
+    .status:empty{display:none}
+    [hidden]{display:none!important}
+
+    @media(max-width:360px){
+      .actions-inner{gap:8px}
+      .btn{padding-left:10px;padding-right:10px}
+      .color-row{grid-template-columns:minmax(0,1fr) 43px 44px;gap:12px}
+      input[type=color]{width:44px;height:44px}
+    }
   </style>
 </head>
 <body>
   <main class="page">
-    <header class="page-header"><h1>Essential Redux</h1><p class="intro" data-i18n="intro">Use the settings below to customize your Pebble watchface.</p></header>
+    <header class="page-header">
+      <h1>Essential Redux</h1>
+      <p class="intro" data-i18n="intro">Use the settings below to customize your Pebble watchface.</p>
+    </header>
 
     <section class="card general-settings">
-      <div class="card-head"><h2 data-i18n="settingsTitle">General settings</h2></div>
-      <div class="card-body">
-        <label class="row"><span data-i18n="leadingZero">Display leading zero on the hours.</span><input id="leadingZero" type="checkbox"></label>
-        <label class="row"><span data-i18n="hour24">Use 24-hour format</span><input id="hour24" type="checkbox"></label>
-        <label class="row"><span data-i18n="celsius">Use Celsius for temperature</span><input id="celsius" type="checkbox"></label>
-        <label class="row"><span data-i18n="batteryIndicator">Show battery indicator</span><input id="batteryIndicator" type="checkbox" checked></label>
+      <h2 data-i18n="settingsTitle">General settings</h2>
+      <div class="content">
+        <label class="setting-row"><span data-i18n="leadingZero">Display leading zero on the hours.</span><span class="check-control"><input id="leadingZero" type="checkbox"></span></label>
+        <label class="setting-row"><span data-i18n="hour12">Use 12-hour format</span><span class="check-control"><input id="hour12" type="checkbox" checked></span></label>
+        <label class="setting-row"><span data-i18n="celsius">Use Celsius for temperature</span><span class="check-control"><input id="celsius" type="checkbox"></span></label>
+        <label class="setting-row"><span data-i18n="bluetooth">Show Bluetooth connectivity</span><span class="check-control"><input id="bluetooth" type="checkbox"></span></label>
+        <label class="setting-row"><span data-i18n="batteryIndicator">Show battery indicator</span><span class="check-control"><input id="batteryIndicator" type="checkbox" checked></span></label>
+      </div>
+    </section>
+
+    <section class="theme-card" aria-labelledby="themeTab">
+      <div class="tabs" role="tablist" aria-label="Theme mode">
+        <button class="tab active" id="themeTab" type="button" role="tab" aria-selected="true" aria-controls="presetPanel" data-mode="preset" data-i18n="themeTab">Theme</button>
+        <button class="tab" id="customTab" type="button" role="tab" aria-selected="false" aria-controls="customPanel" data-mode="custom" data-i18n="customTab">Custom</button>
+      </div>
+      <div class="theme-panel" id="presetPanel" role="tabpanel" aria-labelledby="themeTab">
+        <div class="theme-grid" role="radiogroup" aria-label="Theme" id="themeGrid"></div>
+      </div>
+      <div class="theme-panel" id="customPanel" role="tabpanel" aria-labelledby="customTab" hidden>
+        <div class="custom-list">
+          <div class="color-row"><label for="customBackgroundColor" data-i18n="customBackground">Background color</label><img class="preview" src="./images/screen_background.png" alt=""><input id="customBackgroundColor" type="color" value="#ff5500"></div>
+          <div class="color-row"><label for="customTimeBoxColor" data-i18n="customTimeBox">Time box color</label><img class="preview" src="./images/time_box_background.png" alt=""><input id="customTimeBoxColor" type="color" value="#ffffff"></div>
+          <div class="color-row"><label for="customTimeBorderColor" data-i18n="customBorders">Time box borders color</label><img class="preview" src="./images/time_box_borders.png" alt=""><input id="customTimeBorderColor" type="color" value="#000000"></div>
+          <div class="color-row"><label for="customTimeTextColor" data-i18n="customTimeText">Time box text color</label><img class="preview" src="./images/time_box_text.png" alt=""><input id="customTimeTextColor" type="color" value="#000000"></div>
+          <div class="color-row"><label for="customInfo1TextColor" data-i18n="info1Text">Information 1 text color</label><img class="preview" src="./images/informational_1_text.png" alt=""><input id="customInfo1TextColor" type="color" value="#ffffff"></div>
+          <div class="color-row"><label for="customInfo2TextColor" data-i18n="info2Text">Information 2 text color</label><img class="preview" src="./images/informational_2_text.png" alt=""><input id="customInfo2TextColor" type="color" value="#ffffff"></div>
+          <div class="color-row"><label for="customInfo3TextColor" data-i18n="info3Text">Information 3 text color</label><img class="preview" src="./images/informational_3_text.png" alt=""><input id="customInfo3TextColor" type="color" value="#ffffff"></div>
+        </div>
       </div>
     </section>
 
     <section class="card">
-      <div class="card-head"><h2 data-i18n="themeTitle">Theme</h2></div>
-      <div class="card-body"><div class="theme-grid" role="radiogroup" aria-label="Theme" id="themeGrid"></div></div>
-    </section>
-
-    <section class="card">
-      <div class="card-head"><h2 data-i18n="metricsTitle">Information</h2></div>
-      <div class="card-body"><p class="copy" data-i18n="metricsCopy">Customize what information is shown on the watch face.</p><div class="metrics"><div class="metric"><b data-i18n="left">Slot 1</b><select id="leftMetric"></select></div><div class="metric"><b data-i18n="right">Slot 2</b><select id="rightMetric"></select></div></div></div>
+      <h2 data-i18n="metricsTitle">Information</h2>
+      <div class="content">
+        <p class="copy" data-i18n="metricsCopy">Customize what information is shown on the watch face.</p>
+        <label class="slot-toggle">
+          <strong id="slotCountLabel" data-i18n="twoSlots">2 information slots</strong>
+          <span class="switch"><input id="threeSlots" type="checkbox" aria-labelledby="slotCountLabel"><span class="switch-track"></span></span>
+        </label>
+        <div class="slots">
+          <div class="slot-row"><img class="slot-icon" src="./images/informational_1_text.png" alt=""><select id="leftMetric" aria-label="Slot 1"></select></div>
+          <div class="slot-row" id="middleSlotRow" hidden><img class="slot-icon" src="./images/informational_2_text.png" alt=""><select id="middleMetric" aria-label="Slot 2"></select></div>
+          <div class="slot-row"><img class="slot-icon" src="./images/informational_3_text.png" alt=""><select id="rightMetric" aria-label="Slot 3"></select></div>
+        </div>
+      </div>
     </section>
 
     <section class="card" id="locationCard">
-      <div class="card-head"><h2 data-i18n="locationTitle">Manual location</h2></div>
-      <div class="card-body"><div class="fields"><label><span class="field-label" data-i18n="countryLabel">Country</span><select id="manualCountry" autocomplete="country" aria-describedby="locationError"></select></label><label><span class="field-label" data-i18n="postalLabel">ZIP/postal code</span><input id="manualPostalCode" type="text" maxlength="32" autocomplete="postal-code" aria-describedby="locationError"></label><label><span class="field-label" data-i18n="cityLabel">City</span><input id="manualCity" type="text" maxlength="100" autocomplete="address-level2" aria-describedby="locationError"></label><p id="locationError" class="field-error" role="alert" aria-live="polite"></p></div></div>
+      <h2 data-i18n="locationTitle">Manual location</h2>
+      <div class="content">
+        <div class="fields">
+          <label class="field"><span class="field-label" data-i18n="countryLabel">Country</span><select id="manualCountry" autocomplete="country" aria-describedby="locationError"></select></label>
+          <label class="field"><span class="field-label" data-i18n="postalLabel">ZIP/postal code</span><input id="manualPostalCode" type="text" maxlength="32" autocomplete="postal-code" aria-describedby="locationError"></label>
+          <label class="field"><span class="field-label" data-i18n="cityLabel">City</span><input id="manualCity" type="text" maxlength="100" autocomplete="address-level2" aria-describedby="locationError"></label>
+          <p id="locationError" class="field-error" role="alert" aria-live="polite"></p>
+        </div>
+      </div>
     </section>
 
     <section class="card">
-      <div class="card-head"><h2 data-i18n="languageLabel">Language</h2></div>
-      <div class="card-body"><p class="copy" data-i18n="languageCopy">Change the default language for the watch face and the settings page.</p><select id="language"></select></div>
+      <h2 data-i18n="languageLabel">Language</h2>
+      <div class="content"><p class="copy" data-i18n="languageCopy">Change the default language for the watch face and the settings page.</p><select id="language"></select></div>
     </section>
 
     <section class="card">
-      <div class="card-head"><h2 data-i18n="analyticsTitle">Analytics</h2></div>
-      <div class="card-body"><p class="copy" data-i18n="analyticsCopy">This watch face uses anonymous data to help track and improve the experience. No personal or health data is collected.</p><label class="row analytics-row"><span data-i18n="analyticsLabel">Share anonymous usage analytics</span><input id="analytics" type="checkbox" checked></label></div>
+      <h2 data-i18n="analyticsTitle">Analytics</h2>
+      <div class="content"><p class="copy" data-i18n="analyticsCopy">This watch face uses anonymous data to help track and improve the experience. No personal or health data is collected.</p><label class="setting-row analytics-row"><span data-i18n="analyticsLabel">Share anonymous usage analytics</span><span class="check-control"><input id="analytics" type="checkbox" checked></span></label></div>
     </section>
 
     <section class="card">
-      <div class="card-head"><h2 data-i18n="supportTitle">Support</h2></div>
-      <div class="card-body"><p class="copy" data-i18n="supportCopy">This watch face is free to use and built with care. If it makes your day a little easier, consider leaving a small tip to help support future updates and improvements.</p><a class="donate" id="donate" href="https://ko-fi.com/lylemorris" target="_blank" rel="noopener" data-i18n="donate">Support</a></div>
+      <h2 data-i18n="supportTitle">Support</h2>
+      <div class="content"><p class="copy" data-i18n="supportCopy">This watch face is free to use and built with care. If it makes your day a little easier, consider leaving a small tip to help support future updates and improvements.</p><a class="donate" id="donate" href="https://ko-fi.com/lylemorris" target="_blank" rel="noopener" data-i18n="donate">Support</a></div>
     </section>
   </main>
 
@@ -67,74 +412,352 @@
 
   <script>
     var GA_ID='G-37VYMTXT5S';
-    var D={theme:'orange',reverse:false,hour24:false,showLeadingZero:false,showBatteryIndicator:true,celsius:false,layoutTest:false,leftMetric:'calendar',rightMetric:'weather',language:'auto',manualLocation:false,manualPostalCode:'',manualCity:'',manualCountry:'US',analyticsEnabled:true};
+    var D={
+      themeMode:'preset',theme:'orange',reverse:false,hour24:false,showLeadingZero:false,
+      showBatteryIndicator:true,showBluetooth:false,celsius:false,layoutTest:false,
+      leftMetric:'calendar',middleMetric:'steps',rightMetric:'weather',showMiddleSlot:false,
+      language:'auto',manualLocation:false,manualPostalCode:'',manualCity:'',manualCountry:'US',
+      analyticsEnabled:true,customBackgroundColor:'#ff5500',customTimeBoxColor:'#ffffff',
+      customTimeBorderColor:'#000000',customTimeTextColor:'#000000',
+      customInfo1TextColor:'#ffffff',customInfo2TextColor:'#ffffff',customInfo3TextColor:'#ffffff'
+    };
     var LANGUAGE_VALUES=['auto','en','es','fr','de','pt'];
     var METRIC_VALUES=['calendar','weather','battery','calories','activity','sleep','heart','steps','distance','none'];
     var THEME_VALUES=['orange','lightBlue','purple','yellow','green','red','white','black'];
-    var COUNTRIES=[["US","United States"],["AF","Afghanistan"],["AX","Åland Islands"],["AL","Albania"],["DZ","Algeria"],["AD","Andorra"],["AO","Angola"],["AI","Anguilla"],["AQ","Antarctica"],["AG","Antigua & Barbuda"],["AR","Argentina"],["AM","Armenia"],["AW","Aruba"],["AU","Australia"],["AT","Austria"],["AZ","Azerbaijan"],["BS","Bahamas"],["BH","Bahrain"],["BD","Bangladesh"],["BB","Barbados"],["BY","Belarus"],["BE","Belgium"],["BZ","Belize"],["BJ","Benin"],["BM","Bermuda"],["BT","Bhutan"],["BO","Bolivia"],["BA","Bosnia & Herzegovina"],["BW","Botswana"],["BV","Bouvet Island"],["BR","Brazil"],["GB","Britain (UK)"],["IO","British Indian Ocean Territory"],["BN","Brunei"],["BG","Bulgaria"],["BF","Burkina Faso"],["BI","Burundi"],["KH","Cambodia"],["CM","Cameroon"],["CA","Canada"],["CV","Cape Verde"],["BQ","Caribbean NL"],["KY","Cayman Islands"],["CF","Central African Rep."],["TD","Chad"],["CL","Chile"],["CN","China"],["CX","Christmas Island"],["CC","Cocos (Keeling) Islands"],["CO","Colombia"],["KM","Comoros"],["CD","Congo (Dem. Rep.)"],["CG","Congo (Rep.)"],["CK","Cook Islands"],["CR","Costa Rica"],["CI","Côte d'Ivoire"],["HR","Croatia"],["CU","Cuba"],["CW","Curaçao"],["CY","Cyprus"],["CZ","Czech Republic"],["DK","Denmark"],["DJ","Djibouti"],["DM","Dominica"],["DO","Dominican Republic"],["TL","East Timor"],["EC","Ecuador"],["EG","Egypt"],["SV","El Salvador"],["GQ","Equatorial Guinea"],["ER","Eritrea"],["EE","Estonia"],["SZ","Eswatini (Swaziland)"],["ET","Ethiopia"],["FK","Falkland Islands"],["FO","Faroe Islands"],["FJ","Fiji"],["FI","Finland"],["FR","France"],["GF","French Guiana"],["PF","French Polynesia"],["TF","French S. Terr."],["GA","Gabon"],["GM","Gambia"],["GE","Georgia"],["DE","Germany"],["GH","Ghana"],["GI","Gibraltar"],["GR","Greece"],["GL","Greenland"],["GD","Grenada"],["GP","Guadeloupe"],["GU","Guam"],["GT","Guatemala"],["GG","Guernsey"],["GN","Guinea"],["GW","Guinea-Bissau"],["GY","Guyana"],["HT","Haiti"],["HM","Heard Island & McDonald Islands"],["HN","Honduras"],["HK","Hong Kong"],["HU","Hungary"],["IS","Iceland"],["IN","India"],["ID","Indonesia"],["IR","Iran"],["IQ","Iraq"],["IE","Ireland"],["IM","Isle of Man"],["IL","Israel"],["IT","Italy"],["JM","Jamaica"],["JP","Japan"],["JE","Jersey"],["JO","Jordan"],["KZ","Kazakhstan"],["KE","Kenya"],["KI","Kiribati"],["KP","Korea (North)"],["KR","Korea (South)"],["KW","Kuwait"],["KG","Kyrgyzstan"],["LA","Laos"],["LV","Latvia"],["LB","Lebanon"],["LS","Lesotho"],["LR","Liberia"],["LY","Libya"],["LI","Liechtenstein"],["LT","Lithuania"],["LU","Luxembourg"],["MO","Macau"],["MG","Madagascar"],["MW","Malawi"],["MY","Malaysia"],["MV","Maldives"],["ML","Mali"],["MT","Malta"],["MH","Marshall Islands"],["MQ","Martinique"],["MR","Mauritania"],["MU","Mauritius"],["YT","Mayotte"],["MX","Mexico"],["FM","Micronesia"],["MD","Moldova"],["MC","Monaco"],["MN","Mongolia"],["ME","Montenegro"],["MS","Montserrat"],["MA","Morocco"],["MZ","Mozambique"],["MM","Myanmar (Burma)"],["NA","Namibia"],["NR","Nauru"],["NP","Nepal"],["NL","Netherlands"],["NC","New Caledonia"],["NZ","New Zealand"],["NI","Nicaragua"],["NE","Niger"],["NG","Nigeria"],["NU","Niue"],["NF","Norfolk Island"],["MK","North Macedonia"],["MP","Northern Mariana Islands"],["NO","Norway"],["OM","Oman"],["PK","Pakistan"],["PW","Palau"],["PS","Palestine"],["PA","Panama"],["PG","Papua New Guinea"],["PY","Paraguay"],["PE","Peru"],["PH","Philippines"],["PN","Pitcairn"],["PL","Poland"],["PT","Portugal"],["PR","Puerto Rico"],["QA","Qatar"],["RE","Réunion"],["RO","Romania"],["RU","Russia"],["RW","Rwanda"],["AS","Samoa (American)"],["WS","Samoa (western)"],["SM","San Marino"],["ST","Sao Tome & Principe"],["SA","Saudi Arabia"],["SN","Senegal"],["RS","Serbia"],["SC","Seychelles"],["SL","Sierra Leone"],["SG","Singapore"],["SK","Slovakia"],["SI","Slovenia"],["SB","Solomon Islands"],["SO","Somalia"],["ZA","South Africa"],["GS","South Georgia & the South Sandwich Islands"],["SS","South Sudan"],["ES","Spain"],["LK","Sri Lanka"],["BL","St Barthelemy"],["SH","St Helena"],["KN","St Kitts & Nevis"],["LC","St Lucia"],["SX","St Maarten (Dutch)"],["MF","St Martin (French)"],["PM","St Pierre & Miquelon"],["VC","St Vincent"],["SD","Sudan"],["SR","Suriname"],["SJ","Svalbard & Jan Mayen"],["SE","Sweden"],["CH","Switzerland"],["SY","Syria"],["TW","Taiwan"],["TJ","Tajikistan"],["TZ","Tanzania"],["TH","Thailand"],["TG","Togo"],["TK","Tokelau"],["TO","Tonga"],["TT","Trinidad & Tobago"],["TN","Tunisia"],["TR","Turkey"],["TM","Turkmenistan"],["TC","Turks & Caicos Is"],["TV","Tuvalu"],["UG","Uganda"],["UA","Ukraine"],["AE","United Arab Emirates"],["UY","Uruguay"],["UM","US minor outlying islands"],["UZ","Uzbekistan"],["VU","Vanuatu"],["VA","Vatican City"],["VE","Venezuela"],["VN","Vietnam"],["VG","Virgin Islands (UK)"],["VI","Virgin Islands (US)"],["WF","Wallis & Futuna"],["EH","Western Sahara"],["YE","Yemen"],["ZM","Zambia"],["ZW","Zimbabwe"]];
-    var COUNTRY_VALUES=COUNTRIES.map(function(country){return country[0]});
+    var COUNTRY_CODES=('US AF AX AL DZ AD AO AI AQ AG AR AM AW AU AT AZ BS BH BD BB BY BE BZ BJ BM BT BO BA BW BV BR GB IO BN BG BF BI KH CM CA CV BQ KY CF TD CL CN CX CC CO KM CD CG CK CR CI HR CU CW CY CZ DK DJ DM DO TL EC EG SV GQ ER EE SZ ET FK FO FJ FI FR GF PF TF GA GM GE DE GH GI GR GL GD GP GU GT GG GN GW GY HT HM HN HK HU IS IN ID IR IQ IE IM IL IT JM JP JE JO KZ KE KI KP KR KW KG LA LV LB LS LR LY LI LT LU MO MG MW MY MV ML MT MH MQ MR MU YT MX FM MD MC MN ME MS MA MZ MM NA NR NP NL NC NZ NI NE NG NU NF MK MP NO OM PK PW PS PA PG PY PE PH PN PL PT PR QA RE RO RU RW AS WS SM ST SA SN RS SC SL SG SK SI SB SO ZA GS SS ES LK BL SH KN LC SX MF PM VC SD SR SJ SE CH SY TW TJ TZ TH TG TK TO TT TN TR TM TC TV UG UA AE UY UM UZ VU VA VE VN VG VI WF EH YE ZM ZW').split(' ');
     var I18N={
-      en:{pageTitle:'Essential Redux Settings',intro:'Use the settings below to customize your Pebble watchface.',supportTitle:'Support',supportCopy:'This watch face is free to use and built with care. If it makes your day a little easier, consider leaving a small tip to help support future updates and improvements.',donate:'Support',analyticsTitle:'Analytics',analyticsLabel:'Share anonymous usage analytics',analyticsCopy:'This watch face uses anonymous data to help track and improve the experience. No personal or health data is collected.',settingsTitle:'General settings',languageLabel:'Language',languageCopy:'Change the default language for the watch face and the settings page.',hour24:'Use 24-hour format',leadingZero:'Display leading zero on the hours.',celsius:'Use Celsius for temperature',batteryIndicator:'Show battery indicator',locationTitle:'Manual location',countryLabel:'Country',postalLabel:'ZIP/postal code',cityLabel:'City',locationChecking:'Checking location...',locationNotFound:'That location could not be found. Check the country, ZIP/postal code, and city.',locationUnavailable:'The location could not be validated. Check your connection and try again.',themeTitle:'Theme',metricsTitle:'Information',metricsCopy:'Customize what information is shown on the watch face.',left:'Slot 1',right:'Slot 2',reset:'Reset layout',save:'Save settings',saving:'Saving...',saved:'Saved. If this window stays open, close it and rerun the emulator.',languages:['Automatic (device)','English','Spanish','French','German','Portuguese'],metrics:['Calendar','Weather','Battery','Calories','Activity time','Sleep time','Heart rate','Steps','Distance','None'],themes:['Orange','Blue','Purple','Yellow','Green','Red','White','Black']},
-      es:{pageTitle:'Configuración de Essential Redux',intro:'Usa los ajustes siguientes para personalizar la esfera de tu Pebble.',supportTitle:'Apoyo',supportCopy:'Esta esfera es gratuita y está hecha con cuidado. Si te facilita el día, considera dejar una pequeña propina para apoyar futuras mejoras.',donate:'Apoyar',analyticsTitle:'Analítica',analyticsLabel:'Compartir análisis de uso anónimos',analyticsCopy:'Esta esfera usa datos anónimos para mejorar la experiencia. No se recopilan datos personales ni de salud.',settingsTitle:'Ajustes generales',languageLabel:'Idioma',languageCopy:'Cambia el idioma predeterminado de la esfera y de la página de ajustes.',hour24:'Usar formato de 24 horas',leadingZero:'Mostrar cero inicial en la hora.',celsius:'Usar Celsius para la temperatura',batteryIndicator:'Mostrar indicador de batería',locationTitle:'Ubicación manual',countryLabel:'País',postalLabel:'Código postal',cityLabel:'Ciudad',locationChecking:'Comprobando ubicación...',locationNotFound:'No se encontró esa ubicación. Verifica el país, el código postal y la ciudad.',locationUnavailable:'No se pudo validar la ubicación. Comprueba tu conexión e inténtalo de nuevo.',themeTitle:'Tema',metricsTitle:'Información',metricsCopy:'Personaliza la información que aparece en la esfera.',left:'Espacio 1',right:'Espacio 2',reset:'Restablecer diseño',save:'Guardar ajustes',saving:'Guardando...',saved:'Guardado. Si esta ventana sigue abierta, ciérrala y vuelve a ejecutar el emulador.',languages:['Automático (dispositivo)','Inglés','Español','Francés','Alemán','Portugués'],metrics:['Calendario','Clima','Batería','Calorías','Tiempo activo','Tiempo de sueño','Frecuencia cardíaca','Pasos','Distancia','Ninguno'],themes:['Naranja','Azul','Morado','Amarillo','Verde','Rojo','Blanco','Negro']},
-      fr:{pageTitle:'Paramètres Essential Redux',intro:'Utilisez les paramètres ci-dessous pour personnaliser votre cadran Pebble.',supportTitle:'Soutien',supportCopy:'Ce cadran est gratuit et conçu avec soin. S’il vous facilite la journée, vous pouvez laisser un petit pourboire pour soutenir les futures améliorations.',donate:'Soutenir',analyticsTitle:'Analyse',analyticsLabel:'Partager des données d’utilisation anonymes',analyticsCopy:'Ce cadran utilise des données anonymes pour améliorer l’expérience. Aucune donnée personnelle ou de santé n’est collectée.',settingsTitle:'Paramètres généraux',languageLabel:'Langue',languageCopy:'Modifiez la langue par défaut du cadran et de la page des paramètres.',hour24:'Utiliser le format 24 heures',leadingZero:'Afficher le zéro initial de l’heure.',celsius:'Utiliser Celsius pour la température',batteryIndicator:'Afficher l’indicateur de batterie',locationTitle:'Localisation manuelle',countryLabel:'Pays',postalLabel:'Code postal',cityLabel:'Ville',locationChecking:'Vérification du lieu...',locationNotFound:'Ce lieu est introuvable. Vérifiez le pays, le code postal et la ville.',locationUnavailable:'Le lieu n’a pas pu être validé. Vérifiez votre connexion et réessayez.',themeTitle:'Thème',metricsTitle:'Informations',metricsCopy:'Personnalisez les informations affichées sur le cadran.',left:'Emplacement 1',right:'Emplacement 2',reset:'Réinitialiser',save:'Enregistrer',saving:'Enregistrement...',saved:'Enregistré. Si cette fenêtre reste ouverte, fermez-la et relancez l’émulateur.',languages:['Automatique (appareil)','Anglais','Espagnol','Français','Allemand','Portugais'],metrics:['Calendrier','Météo','Batterie','Calories','Temps d’activité','Temps de sommeil','Fréquence cardiaque','Pas','Distance','Aucun'],themes:['Orange','Bleu','Violet','Jaune','Vert','Rouge','Blanc','Noir']},
-      de:{pageTitle:'Essential Redux Einstellungen',intro:'Passe dein Pebble-Zifferblatt mit den folgenden Einstellungen an.',supportTitle:'Unterstützung',supportCopy:'Dieses Zifferblatt ist kostenlos und wurde mit Sorgfalt erstellt. Wenn es deinen Alltag erleichtert, kannst du zukünftige Verbesserungen mit einem kleinen Beitrag unterstützen.',donate:'Unterstützen',analyticsTitle:'Analyse',analyticsLabel:'Anonyme Nutzungsdaten teilen',analyticsCopy:'Dieses Zifferblatt verwendet anonyme Daten, um die Nutzung zu verbessern. Es werden keine persönlichen oder Gesundheitsdaten erfasst.',settingsTitle:'Allgemeine Einstellungen',languageLabel:'Sprache',languageCopy:'Ändere die Standardsprache für das Zifferblatt und die Einstellungsseite.',hour24:'24-Stunden-Format verwenden',leadingZero:'Führende Null bei der Stunde anzeigen.',celsius:'Celsius für die Temperatur verwenden',batteryIndicator:'Batterieanzeige anzeigen',locationTitle:'Manueller Standort',countryLabel:'Land',postalLabel:'Postleitzahl',cityLabel:'Stadt',locationChecking:'Standort wird geprüft...',locationNotFound:'Dieser Standort wurde nicht gefunden. Prüfe Land, Postleitzahl und Stadt.',locationUnavailable:'Der Standort konnte nicht geprüft werden. Prüfe deine Verbindung und versuche es erneut.',themeTitle:'Design',metricsTitle:'Informationen',metricsCopy:'Passe an, welche Informationen auf dem Zifferblatt angezeigt werden.',left:'Platz 1',right:'Platz 2',reset:'Layout zurücksetzen',save:'Einstellungen speichern',saving:'Wird gespeichert...',saved:'Gespeichert. Wenn dieses Fenster geöffnet bleibt, schließe es und starte den Emulator erneut.',languages:['Automatisch (Gerät)','Englisch','Spanisch','Französisch','Deutsch','Portugiesisch'],metrics:['Kalender','Wetter','Batterie','Kalorien','Aktivzeit','Schlafzeit','Herzfrequenz','Schritte','Distanz','Keine'],themes:['Orange','Blau','Violett','Gelb','Grün','Rot','Weiß','Schwarz']},
-      pt:{pageTitle:'Configurações do Essential Redux',intro:'Use as configurações abaixo para personalizar o mostrador do Pebble.',supportTitle:'Apoio',supportCopy:'Este mostrador é gratuito e foi criado com cuidado. Se ele facilitar o seu dia, considere deixar uma pequena contribuição para apoiar futuras melhorias.',donate:'Apoiar',analyticsTitle:'Análise',analyticsLabel:'Compartilhar dados anônimos de uso',analyticsCopy:'Este mostrador usa dados anônimos para melhorar a experiência. Nenhum dado pessoal ou de saúde é coletado.',settingsTitle:'Configurações gerais',languageLabel:'Idioma',languageCopy:'Altere o idioma padrão do mostrador e da página de configurações.',hour24:'Usar formato de 24 horas',leadingZero:'Exibir zero inicial na hora.',celsius:'Usar Celsius para a temperatura',batteryIndicator:'Mostrar indicador de bateria',locationTitle:'Localização manual',countryLabel:'País',postalLabel:'CEP/código postal',cityLabel:'Cidade',locationChecking:'Verificando localização...',locationNotFound:'Essa localização não foi encontrada. Verifique o país, o CEP/código postal e a cidade.',locationUnavailable:'Não foi possível validar a localização. Verifique sua conexão e tente novamente.',themeTitle:'Tema',metricsTitle:'Informações',metricsCopy:'Personalize as informações exibidas no mostrador.',left:'Espaço 1',right:'Espaço 2',reset:'Redefinir layout',save:'Salvar configurações',saving:'Salvando...',saved:'Salvo. Se esta janela continuar aberta, feche-a e execute o emulador novamente.',languages:['Automático (dispositivo)','Inglês','Espanhol','Francês','Alemão','Português'],metrics:['Calendário','Clima','Bateria','Calorias','Tempo ativo','Tempo de sono','Frequência cardíaca','Passos','Distância','Nenhum'],themes:['Laranja','Azul','Roxo','Amarelo','Verde','Vermelho','Branco','Preto']}
+      en:{
+        pageTitle:'Essential Redux Settings',intro:'Use the settings below to customize your Pebble watchface.',
+        settingsTitle:'General settings',leadingZero:'Display leading zero on the hours.',hour12:'Use 12-hour format',
+        celsius:'Use Celsius for temperature',bluetooth:'Show Bluetooth connectivity',batteryIndicator:'Show battery indicator',
+        themeTab:'Theme',customTab:'Custom',customBackground:'Background color',customTimeBox:'Time box color',
+        customBorders:'Time box borders color',customTimeText:'Time box text color',
+        info1Text:'Information 1 text color',info2Text:'Information 2 text color',info3Text:'Information 3 text color',
+        metricsTitle:'Information',metricsCopy:'Customize what information is shown on the watch face.',
+        twoSlots:'2 information slots',threeSlots:'3 information slots',
+        locationTitle:'Manual location',countryLabel:'Country',postalLabel:'ZIP/postal code',cityLabel:'City',
+        locationChecking:'Checking location...',locationNotFound:'That location could not be found. Check the country, ZIP/postal code, and city.',
+        locationUnavailable:'The location could not be validated. Check your connection and try again.',
+        languageLabel:'Language',languageCopy:'Change the default language for the watch face and the settings page.',
+        analyticsTitle:'Analytics',analyticsLabel:'Share anonymous usage analytics',
+        analyticsCopy:'This watch face uses anonymous data to help track and improve the experience. No personal or health data is collected.',
+        supportTitle:'Support',supportCopy:'This watch face is free to use and built with care. If it makes your day a little easier, consider leaving a small tip to help support future updates and improvements.',
+        donate:'Support',reset:'Reset layout',save:'Save settings',saving:'Saving...',
+        saved:'Saved. If this window stays open, close it and rerun the emulator.',
+        languages:['Automatic (device)','English','Spanish','French','German','Portuguese'],
+        metrics:['Calendar','Weather','Battery','Calories','Activity time','Sleep time','Heart rate','Steps','Distance','None'],
+        themes:['Orange','Blue','Purple','Yellow','Green','Red','White','Black']
+      },
+      es:{
+        pageTitle:'Configuración de Essential Redux',intro:'Usa los ajustes siguientes para personalizar la esfera de tu Pebble.',
+        settingsTitle:'Ajustes generales',leadingZero:'Mostrar cero inicial en la hora.',hour12:'Usar formato de 12 horas',
+        celsius:'Usar Celsius para la temperatura',bluetooth:'Mostrar conectividad Bluetooth',batteryIndicator:'Mostrar indicador de batería',
+        themeTab:'Tema',customTab:'Personalizado',customBackground:'Color de fondo',customTimeBox:'Color del cuadro de hora',
+        customBorders:'Color de los bordes de la hora',customTimeText:'Color del texto de la hora',
+        info1Text:'Color del texto de información 1',info2Text:'Color del texto de información 2',info3Text:'Color del texto de información 3',
+        metricsTitle:'Información',metricsCopy:'Personaliza la información que aparece en la esfera.',
+        twoSlots:'2 espacios de información',threeSlots:'3 espacios de información',
+        locationTitle:'Ubicación manual',countryLabel:'País',postalLabel:'Código postal',cityLabel:'Ciudad',
+        locationChecking:'Comprobando ubicación...',locationNotFound:'No se encontró esa ubicación. Verifica el país, el código postal y la ciudad.',
+        locationUnavailable:'No se pudo validar la ubicación. Comprueba tu conexión e inténtalo de nuevo.',
+        languageLabel:'Idioma',languageCopy:'Cambia el idioma predeterminado de la esfera y de la página de ajustes.',
+        analyticsTitle:'Analítica',analyticsLabel:'Compartir análisis de uso anónimos',
+        analyticsCopy:'Esta esfera usa datos anónimos para mejorar la experiencia. No se recopilan datos personales ni de salud.',
+        supportTitle:'Apoyo',supportCopy:'Esta esfera es gratuita y está hecha con cuidado. Si te facilita el día, considera dejar una pequeña propina para apoyar futuras mejoras.',
+        donate:'Apoyar',reset:'Restablecer diseño',save:'Guardar ajustes',saving:'Guardando...',
+        saved:'Guardado. Si esta ventana sigue abierta, ciérrala y vuelve a ejecutar el emulador.',
+        languages:['Automático (dispositivo)','Inglés','Español','Francés','Alemán','Portugués'],
+        metrics:['Calendario','Clima','Batería','Calorías','Tiempo activo','Tiempo de sueño','Frecuencia cardíaca','Pasos','Distancia','Ninguno'],
+        themes:['Naranja','Azul','Morado','Amarillo','Verde','Rojo','Blanco','Negro']
+      },
+      fr:{
+        pageTitle:'Paramètres Essential Redux',intro:'Utilisez les paramètres ci-dessous pour personnaliser votre cadran Pebble.',
+        settingsTitle:'Paramètres généraux',leadingZero:'Afficher le zéro initial de l’heure.',hour12:'Utiliser le format 12 heures',
+        celsius:'Utiliser Celsius pour la température',bluetooth:'Afficher la connectivité Bluetooth',batteryIndicator:'Afficher l’indicateur de batterie',
+        themeTab:'Thème',customTab:'Personnalisé',customBackground:'Couleur de fond',customTimeBox:'Couleur du cadre horaire',
+        customBorders:'Couleur des bordures horaires',customTimeText:'Couleur du texte horaire',
+        info1Text:'Couleur du texte d’information 1',info2Text:'Couleur du texte d’information 2',info3Text:'Couleur du texte d’information 3',
+        metricsTitle:'Informations',metricsCopy:'Personnalisez les informations affichées sur le cadran.',
+        twoSlots:'2 emplacements d’information',threeSlots:'3 emplacements d’information',
+        locationTitle:'Localisation manuelle',countryLabel:'Pays',postalLabel:'Code postal',cityLabel:'Ville',
+        locationChecking:'Vérification du lieu...',locationNotFound:'Ce lieu est introuvable. Vérifiez le pays, le code postal et la ville.',
+        locationUnavailable:'Le lieu n’a pas pu être validé. Vérifiez votre connexion et réessayez.',
+        languageLabel:'Langue',languageCopy:'Modifiez la langue par défaut du cadran et de la page des paramètres.',
+        analyticsTitle:'Analyse',analyticsLabel:'Partager des données d’utilisation anonymes',
+        analyticsCopy:'Ce cadran utilise des données anonymes pour améliorer l’expérience. Aucune donnée personnelle ou de santé n’est collectée.',
+        supportTitle:'Soutien',supportCopy:'Ce cadran est gratuit et conçu avec soin. S’il vous facilite la journée, vous pouvez laisser un petit pourboire pour soutenir les futures améliorations.',
+        donate:'Soutenir',reset:'Réinitialiser',save:'Enregistrer',saving:'Enregistrement...',
+        saved:'Enregistré. Si cette fenêtre reste ouverte, fermez-la et relancez l’émulateur.',
+        languages:['Automatique (appareil)','Anglais','Espagnol','Français','Allemand','Portugais'],
+        metrics:['Calendrier','Météo','Batterie','Calories','Temps d’activité','Temps de sommeil','Fréquence cardiaque','Pas','Distance','Aucun'],
+        themes:['Orange','Bleu','Violet','Jaune','Vert','Rouge','Blanc','Noir']
+      },
+      de:{
+        pageTitle:'Essential Redux Einstellungen',intro:'Passe dein Pebble-Zifferblatt mit den folgenden Einstellungen an.',
+        settingsTitle:'Allgemeine Einstellungen',leadingZero:'Führende Null bei der Stunde anzeigen.',hour12:'12-Stunden-Format verwenden',
+        celsius:'Celsius für die Temperatur verwenden',bluetooth:'Bluetooth-Verbindung anzeigen',batteryIndicator:'Batterieanzeige anzeigen',
+        themeTab:'Design',customTab:'Benutzerdefiniert',customBackground:'Hintergrundfarbe',customTimeBox:'Farbe des Zeitfelds',
+        customBorders:'Rahmenfarbe des Zeitfelds',customTimeText:'Textfarbe des Zeitfelds',
+        info1Text:'Textfarbe Information 1',info2Text:'Textfarbe Information 2',info3Text:'Textfarbe Information 3',
+        metricsTitle:'Informationen',metricsCopy:'Passe an, welche Informationen auf dem Zifferblatt angezeigt werden.',
+        twoSlots:'2 Informationsplätze',threeSlots:'3 Informationsplätze',
+        locationTitle:'Manueller Standort',countryLabel:'Land',postalLabel:'Postleitzahl',cityLabel:'Stadt',
+        locationChecking:'Standort wird geprüft...',locationNotFound:'Dieser Standort wurde nicht gefunden. Prüfe Land, Postleitzahl und Stadt.',
+        locationUnavailable:'Der Standort konnte nicht geprüft werden. Prüfe deine Verbindung und versuche es erneut.',
+        languageLabel:'Sprache',languageCopy:'Ändere die Standardsprache für das Zifferblatt und die Einstellungsseite.',
+        analyticsTitle:'Analyse',analyticsLabel:'Anonyme Nutzungsdaten teilen',
+        analyticsCopy:'Dieses Zifferblatt verwendet anonyme Daten, um die Nutzung zu verbessern. Es werden keine persönlichen oder Gesundheitsdaten erfasst.',
+        supportTitle:'Unterstützung',supportCopy:'Dieses Zifferblatt ist kostenlos und wurde mit Sorgfalt erstellt. Wenn es deinen Alltag erleichtert, kannst du zukünftige Verbesserungen mit einem kleinen Beitrag unterstützen.',
+        donate:'Unterstützen',reset:'Layout zurücksetzen',save:'Einstellungen speichern',saving:'Wird gespeichert...',
+        saved:'Gespeichert. Wenn dieses Fenster geöffnet bleibt, schließe es und starte den Emulator erneut.',
+        languages:['Automatisch (Gerät)','Englisch','Spanisch','Französisch','Deutsch','Portugiesisch'],
+        metrics:['Kalender','Wetter','Batterie','Kalorien','Aktivzeit','Schlafzeit','Herzfrequenz','Schritte','Distanz','Keine'],
+        themes:['Orange','Blau','Violett','Gelb','Grün','Rot','Weiß','Schwarz']
+      },
+      pt:{
+        pageTitle:'Configurações do Essential Redux',intro:'Use as configurações abaixo para personalizar o mostrador do Pebble.',
+        settingsTitle:'Configurações gerais',leadingZero:'Exibir zero inicial na hora.',hour12:'Usar formato de 12 horas',
+        celsius:'Usar Celsius para a temperatura',bluetooth:'Mostrar conectividade Bluetooth',batteryIndicator:'Mostrar indicador de bateria',
+        themeTab:'Tema',customTab:'Personalizado',customBackground:'Cor de fundo',customTimeBox:'Cor da caixa de hora',
+        customBorders:'Cor das bordas da hora',customTimeText:'Cor do texto da hora',
+        info1Text:'Cor do texto da informação 1',info2Text:'Cor do texto da informação 2',info3Text:'Cor do texto da informação 3',
+        metricsTitle:'Informações',metricsCopy:'Personalize as informações exibidas no mostrador.',
+        twoSlots:'2 espaços de informação',threeSlots:'3 espaços de informação',
+        locationTitle:'Localização manual',countryLabel:'País',postalLabel:'CEP/código postal',cityLabel:'Cidade',
+        locationChecking:'Verificando localização...',locationNotFound:'Essa localização não foi encontrada. Verifique o país, o CEP/código postal e a cidade.',
+        locationUnavailable:'Não foi possível validar a localização. Verifique sua conexão e tente novamente.',
+        languageLabel:'Idioma',languageCopy:'Altere o idioma padrão do mostrador e da página de configurações.',
+        analyticsTitle:'Análise',analyticsLabel:'Compartilhar dados anônimos de uso',
+        analyticsCopy:'Este mostrador usa dados anônimos para melhorar a experiência. Nenhum dado pessoal ou de saúde é coletado.',
+        supportTitle:'Apoio',supportCopy:'Este mostrador é gratuito e foi criado com cuidado. Se ele facilitar o seu dia, considere deixar uma pequena contribuição para apoiar futuras melhorias.',
+        donate:'Apoiar',reset:'Redefinir layout',save:'Salvar configurações',saving:'Salvando...',
+        saved:'Salvo. Se esta janela continuar aberta, feche-a e execute o emulador novamente.',
+        languages:['Automático (dispositivo)','Inglês','Espanhol','Francês','Alemão','Português'],
+        metrics:['Calendário','Clima','Bateria','Calorias','Tempo ativo','Tempo de sono','Frequência cardíaca','Passos','Distância','Nenhum'],
+        themes:['Laranja','Azul','Roxo','Amarelo','Verde','Vermelho','Branco','Preto']
+      }
     };
+
     var gaLoading=false,gaLoaded=false,locationValidationToken=0,locationErrorKey='',locationInputsInvalid=false,saveInProgress=false;
     function $(id){return document.getElementById(id)}
     function b(v,d){if(v===true||v===1||v==='1'||v==='true')return true;if(v===false||v===0||v==='0'||v==='false')return false;return d}
     function clean(v){return String(v||'').trim()}
-    function validTheme(v){if(v==='pink')v='black';return THEME_VALUES.indexOf(v)>=0?v:D.theme}
+    function validTheme(v){return THEME_VALUES.indexOf(v)>=0?v:D.theme}
     function validLanguage(v){return LANGUAGE_VALUES.indexOf(v)>=0?v:D.language}
-    function validCountry(v){v=String(v||'').toUpperCase();return COUNTRY_VALUES.indexOf(v)>=0?v:D.manualCountry}
+    function validCountry(v){v=String(v||'').toUpperCase();return COUNTRY_CODES.indexOf(v)>=0?v:D.manualCountry}
+    function validColor(v,d){return /^#[0-9a-f]{6}$/i.test(String(v||''))?String(v).toLowerCase():d}
     function deviceLanguage(){var raw=(navigator.language||navigator.userLanguage||'en').toLowerCase().split(/[-_]/)[0];return I18N[raw]?raw:'en'}
     function effectiveLanguage(v){v=validLanguage(v);return v==='auto'?deviceLanguage():v}
     function norm(s){
       s=Object.assign({},D,s||{});
-      var postal=clean(s.manualPostalCode),city=clean(s.manualCity),country=validCountry(s.manualCountry),manual=b(s.manualLocation,D.manualLocation)&&!!country&&!!(postal||city);
-      return{theme:validTheme(String(s.theme||D.theme)),reverse:false,hour24:b(s.hour24,D.hour24),showLeadingZero:b(s.showLeadingZero,D.showLeadingZero),showBatteryIndicator:b(s.showBatteryIndicator,D.showBatteryIndicator),celsius:b(s.celsius,D.celsius),layoutTest:false,leftMetric:String(s.leftMetric||D.leftMetric),rightMetric:String(s.rightMetric||D.rightMetric),language:validLanguage(String(s.language||D.language)),manualLocation:manual,manualPostalCode:postal,manualCity:city,manualCountry:country,analyticsEnabled:b(s.analyticsEnabled,D.analyticsEnabled)}
+      var postal=clean(s.manualPostalCode),city=clean(s.manualCity),country=validCountry(s.manualCountry);
+      var manual=b(s.manualLocation,D.manualLocation)&&!!country&&!!(postal||city);
+      var showMiddle=b(s.showMiddleSlot,Number(s.slotCount)===3);
+      return{
+        themeMode:s.themeMode==='custom'?'custom':'preset',theme:validTheme(String(s.theme||D.theme)),
+        reverse:false,hour24:b(s.hour24,D.hour24),showLeadingZero:b(s.showLeadingZero,D.showLeadingZero),
+        showBatteryIndicator:b(s.showBatteryIndicator,D.showBatteryIndicator),showBluetooth:b(s.showBluetooth,D.showBluetooth),
+        celsius:b(s.celsius,D.celsius),layoutTest:false,leftMetric:String(s.leftMetric||D.leftMetric),
+        middleMetric:String(s.middleMetric||D.middleMetric),rightMetric:String(s.rightMetric||D.rightMetric),
+        showMiddleSlot:showMiddle,slotCount:showMiddle?3:2,language:validLanguage(String(s.language||D.language)),
+        manualLocation:manual,manualPostalCode:postal,manualCity:city,manualCountry:country,
+        analyticsEnabled:b(s.analyticsEnabled,D.analyticsEnabled),
+        customBackgroundColor:validColor(s.customBackgroundColor,D.customBackgroundColor),
+        customTimeBoxColor:validColor(s.customTimeBoxColor,D.customTimeBoxColor),
+        customTimeBorderColor:validColor(s.customTimeBorderColor,D.customTimeBorderColor),
+        customTimeTextColor:validColor(s.customTimeTextColor,D.customTimeTextColor),
+        customInfo1TextColor:validColor(s.customInfo1TextColor,D.customInfo1TextColor),
+        customInfo2TextColor:validColor(s.customInfo2TextColor,D.customInfo2TextColor),
+        customInfo3TextColor:validColor(s.customInfo3TextColor,D.customInfo3TextColor)
+      }
     }
-    function incoming(){var p=new URLSearchParams(location.search),u=p.get('donation_url'),r=p.get('settings');if(u)$('donate').href=u;if(!r)return norm(D);try{return norm(JSON.parse(decodeURIComponent(r)))}catch(e){return norm(D)}}
-    function setOptions(el,values,labels,selected){el.innerHTML='';values.forEach(function(value,index){var o=document.createElement('option');o.value=value;o.textContent=labels[index];el.appendChild(o)});el.value=selected}
-    function setCountryOptions(selected,lang){var names=null;try{if(typeof Intl!=='undefined'&&Intl.DisplayNames)names=new Intl.DisplayNames([lang],{type:'region'})}catch(e){}$('manualCountry').innerHTML='';COUNTRIES.forEach(function(country){var o=document.createElement('option');o.value=country[0];o.textContent=names?names.of(country[0]):country[1];$('manualCountry').appendChild(o)});$('manualCountry').value=validCountry(selected)}
-    function buildThemes(){var html='';THEME_VALUES.forEach(function(value){html+='<label class="theme '+value+'" data-theme="'+value+'"><input type="radio" name="theme" value="'+value+'"><span></span></label>'});$('themeGrid').innerHTML=html;document.querySelectorAll('input[name=theme]').forEach(function(i){i.onchange=syncTheme})}
-    function syncTheme(){document.querySelectorAll('.theme').forEach(function(t){t.classList.toggle('selected',!!t.querySelector('input:checked'))})}
+    function incoming(){
+      var p=new URLSearchParams(location.search),u=p.get('donation_url'),r=p.get('settings');
+      if(u)$('donate').href=u;
+      if(!r)return norm(D);
+      try{return norm(JSON.parse(decodeURIComponent(r)))}catch(e){return norm(D)}
+    }
+    function setOptions(el,values,labels,selected){
+      el.innerHTML='';
+      values.forEach(function(value,index){var o=document.createElement('option');o.value=value;o.textContent=labels[index];el.appendChild(o)});
+      el.value=selected;
+    }
+    function setCountryOptions(selected,lang){
+      var names=null;
+      try{if(typeof Intl!=='undefined'&&Intl.DisplayNames)names=new Intl.DisplayNames([lang],{type:'region'})}catch(e){}
+      $('manualCountry').innerHTML='';
+      COUNTRY_CODES.forEach(function(code){
+        var o=document.createElement('option');o.value=code;o.textContent=names?names.of(code):code;$('manualCountry').appendChild(o)
+      });
+      $('manualCountry').value=validCountry(selected);
+    }
+    function buildThemes(){
+      var html='';
+      THEME_VALUES.forEach(function(value){
+        html+='<label class="theme '+value+'" data-theme="'+value+'"><input type="radio" name="theme" value="'+value+'"><span></span></label>'
+      });
+      $('themeGrid').innerHTML=html;
+      document.querySelectorAll('input[name=theme]').forEach(function(i){i.onchange=syncTheme});
+    }
+    function syncTheme(){
+      document.querySelectorAll('.theme').forEach(function(t){t.classList.toggle('selected',!!t.querySelector('input:checked'))});
+    }
+    function setThemeMode(mode){
+      mode=mode==='custom'?'custom':'preset';
+      document.querySelectorAll('.tab').forEach(function(tab){
+        var active=tab.getAttribute('data-mode')===mode;
+        tab.classList.toggle('active',active);tab.setAttribute('aria-selected',active?'true':'false');
+      });
+      $('presetPanel').hidden=mode!=='preset';$('customPanel').hidden=mode!=='custom';
+      document.body.setAttribute('data-theme-mode',mode);
+    }
+    function updateSlotMode(){
+      var three=$('threeSlots').checked;
+      $('middleSlotRow').hidden=!three;
+      var t=I18N[effectiveLanguage($('language').value||D.language)];
+      $('slotCountLabel').textContent=three?t.threeSlots:t.twoSlots;
+    }
     function applyTranslations(){
       var languageSetting=validLanguage($('language').value||D.language),lang=effectiveLanguage(languageSetting),t=I18N[lang];
-      var left=$('leftMetric').value||D.leftMetric,right=$('rightMetric').value||D.rightMetric,country=$('manualCountry').value||D.manualCountry;
+      var left=$('leftMetric').value||D.leftMetric,middle=$('middleMetric').value||D.middleMetric,right=$('rightMetric').value||D.rightMetric,country=$('manualCountry').value||D.manualCountry;
       document.documentElement.lang=lang;document.title=t.pageTitle;
       document.querySelectorAll('[data-i18n]').forEach(function(el){var key=el.getAttribute('data-i18n');if(t[key])el.textContent=t[key]});
       setOptions($('language'),LANGUAGE_VALUES,t.languages,languageSetting);
       setOptions($('leftMetric'),METRIC_VALUES,t.metrics,left);
+      setOptions($('middleMetric'),METRIC_VALUES,t.metrics,middle);
       setOptions($('rightMetric'),METRIC_VALUES,t.metrics,right);
       setCountryOptions(country,lang);
       document.querySelectorAll('.theme').forEach(function(el,index){el.querySelector('span').textContent=t.themes[index]});
+      updateSlotMode();renderLocationError();
+    }
+    function loadGA(){
+      if(gaLoaded||gaLoading||!$('analytics').checked)return;
+      gaLoading=true;window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};
+      var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
+      s.onload=function(){gaLoading=false;gaLoaded=true;gtag('js',new Date());gtag('config',GA_ID,{send_page_view:true})};
+      s.onerror=function(){gaLoading=false};document.head.appendChild(s);
+    }
+    function reduxTrack(name,data,tries){
+      if(!$('analytics').checked)return;
+      if(gaLoaded&&window.gtag){gtag('event',name,data||{});return}
+      loadGA();if((tries||0)<10)setTimeout(function(){reduxTrack(name,data,(tries||0)+1)},300);
+    }
+    function renderLocationError(){var t=I18N[effectiveLanguage($('language').value||D.language)];$('locationError').textContent=locationErrorKey?t[locationErrorKey]:''}
+    function setLocationError(key,invalid){
+      locationErrorKey=key||'';locationInputsInvalid=!!invalid;
+      ['manualCountry','manualPostalCode','manualCity'].forEach(function(id){
+        var el=$(id),mark=locationInputsInvalid&&(id==='manualCountry'||!!clean(el.value));
+        el.classList.toggle('invalid',mark);el.setAttribute('aria-invalid',mark?'true':'false');
+      });
       renderLocationError();
     }
-    function loadGA(){if(gaLoaded||gaLoading||!$('analytics').checked)return;gaLoading=true;window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);s.onload=function(){gaLoading=false;gaLoaded=true;gtag('js',new Date());gtag('config',GA_ID,{send_page_view:true})};s.onerror=function(){gaLoading=false};document.head.appendChild(s)}
-    function reduxTrack(name,data,tries){if(!$('analytics').checked)return;if(gaLoaded&&window.gtag){gtag('event',name,data||{});return}loadGA();if((tries||0)<10)setTimeout(function(){reduxTrack(name,data,(tries||0)+1)},300)}
-    function renderLocationError(){var t=I18N[effectiveLanguage($('language').value||D.language)];$('locationError').textContent=locationErrorKey?t[locationErrorKey]:''}
-    function setLocationError(key,invalid){locationErrorKey=key||'';locationInputsInvalid=!!invalid;['manualCountry','manualPostalCode','manualCity'].forEach(function(id){var el=$(id),mark=locationInputsInvalid&&(id==='manualCountry'||!!clean(el.value));el.classList.toggle('invalid',mark);el.setAttribute('aria-invalid',mark?'true':'false')});renderLocationError()}
     function clearLocationValidation(){locationValidationToken++;saveInProgress=false;$('save').disabled=false;$('status').textContent='';setLocationError('',false)}
     function locationQueries(s){var queries=[];if(s.manualPostalCode)queries.push(s.manualPostalCode);if(s.manualCity&&(!queries.length||s.manualCity.toLowerCase()!==queries[0].toLowerCase()))queries.push(s.manualCity);return queries}
-    function postalFallbackTarget(s){var q=clean(s.manualPostalCode).toUpperCase();if(s.manualCountry==='US'&&/^\d{5}(-\d{4})?$/.test(q))return['us',q.split('-')[0]];var compact=q.replace(/ /g,'');if(s.manualCountry==='CA'&&/^[A-Z]\d[A-Z](\d[A-Z]\d)?$/.test(compact))return['ca',compact.substring(0,3)];return null}
-    function requestJson(url,onSuccess,onFailure){var request=new XMLHttpRequest();request.open('GET',url,true);request.onload=function(){if(request.status<200||request.status>=300){onFailure(true);return}try{onSuccess(JSON.parse(request.responseText))}catch(e){onFailure(true)}};request.onerror=function(){onFailure(false)};request.ontimeout=function(){onFailure(false)};request.timeout=15000;request.send()}
-    function validatePostalFallback(s,token,hadResponse,done){var target=postalFallbackTarget(s);if(!target){done(false,hadResponse?'locationNotFound':'locationUnavailable');return}var url='https://api.zippopotam.us/'+target[0]+'/'+encodeURIComponent(target[1]);requestJson(url,function(data){if(token!==locationValidationToken)return;done(!!(data&&data.places&&data.places.length),(data&&data.places&&data.places.length)?'':'locationNotFound')},function(responded){if(token!==locationValidationToken)return;done(false,(hadResponse||responded)?'locationNotFound':'locationUnavailable')})}
-    function validateLocation(s,done){var token=++locationValidationToken,queries=locationQueries(s);if(!s.manualLocation||!queries.length){done(true,'');return}function next(index,hadResponse){if(token!==locationValidationToken)return;if(index>=queries.length){validatePostalFallback(s,token,hadResponse,done);return}var url='https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(queries[index])+'&count=5&language=en&format=json&countryCode='+encodeURIComponent(s.manualCountry);requestJson(url,function(data){if(token!==locationValidationToken)return;var results=data&&data.results?data.results:[],matched=results.some(function(result){return String(result.country_code||'').toUpperCase()===s.manualCountry});if(matched){done(true,'');return}next(index+1,true)},function(responded){if(token!==locationValidationToken)return;next(index+1,hadResponse||responded)})}next(0,false)}
+    function postalFallbackTarget(s){
+      var q=clean(s.manualPostalCode).toUpperCase();
+      if(s.manualCountry==='US'&&/^\d{5}(-\d{4})?$/.test(q))return['us',q.split('-')[0]];
+      var compact=q.replace(/ /g,'');
+      if(s.manualCountry==='CA'&&/^[A-Z]\d[A-Z](\d[A-Z]\d)?$/.test(compact))return['ca',compact.substring(0,3)];
+      return null;
+    }
+    function requestJson(url,onSuccess,onFailure){
+      var request=new XMLHttpRequest();request.open('GET',url,true);
+      request.onload=function(){if(request.status<200||request.status>=300){onFailure(true);return}try{onSuccess(JSON.parse(request.responseText))}catch(e){onFailure(true)}};
+      request.onerror=function(){onFailure(false)};request.ontimeout=function(){onFailure(false)};request.timeout=15000;request.send();
+    }
+    function validatePostalFallback(s,token,hadResponse,done){
+      var target=postalFallbackTarget(s);
+      if(!target){done(false,hadResponse?'locationNotFound':'locationUnavailable');return}
+      var url='https://api.zippopotam.us/'+target[0]+'/'+encodeURIComponent(target[1]);
+      requestJson(url,function(data){
+        if(token!==locationValidationToken)return;
+        done(!!(data&&data.places&&data.places.length),(data&&data.places&&data.places.length)?'':'locationNotFound')
+      },function(responded){
+        if(token!==locationValidationToken)return;
+        done(false,(hadResponse||responded)?'locationNotFound':'locationUnavailable')
+      });
+    }
+    function validateLocation(s,done){
+      var token=++locationValidationToken,queries=locationQueries(s);
+      if(!s.manualLocation||!queries.length){done(true,'');return}
+      function next(index,hadResponse){
+        if(token!==locationValidationToken)return;
+        if(index>=queries.length){validatePostalFallback(s,token,hadResponse,done);return}
+        var url='https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(queries[index])+'&count=5&language=en&format=json&countryCode='+encodeURIComponent(s.manualCountry);
+        requestJson(url,function(data){
+          if(token!==locationValidationToken)return;
+          var results=data&&data.results?data.results:[],matched=results.some(function(result){return String(result.country_code||'').toUpperCase()===s.manualCountry});
+          if(matched){done(true,'');return}next(index+1,true)
+        },function(responded){if(token!==locationValidationToken)return;next(index+1,hadResponse||responded)});
+      }
+      next(0,false);
+    }
     function render(s){
-      $('hour24').checked=s.hour24;$('leadingZero').checked=s.showLeadingZero;$('batteryIndicator').checked=s.showBatteryIndicator;$('celsius').checked=s.celsius;$('manualPostalCode').value=s.manualPostalCode;$('manualCity').value=s.manualCity;$('analytics').checked=s.analyticsEnabled;
+      $('hour12').checked=!s.hour24;$('leadingZero').checked=s.showLeadingZero;$('batteryIndicator').checked=s.showBatteryIndicator;
+      $('bluetooth').checked=s.showBluetooth;$('celsius').checked=s.celsius;$('manualPostalCode').value=s.manualPostalCode;
+      $('manualCity').value=s.manualCity;$('analytics').checked=s.analyticsEnabled;$('threeSlots').checked=s.showMiddleSlot;
+      ['customBackgroundColor','customTimeBoxColor','customTimeBorderColor','customTimeTextColor','customInfo1TextColor','customInfo2TextColor','customInfo3TextColor'].forEach(function(id){$(id).value=s[id]});
       setOptions($('language'),LANGUAGE_VALUES,I18N.en.languages,s.language);
       setOptions($('leftMetric'),METRIC_VALUES,I18N.en.metrics,s.leftMetric);
+      setOptions($('middleMetric'),METRIC_VALUES,I18N.en.metrics,s.middleMetric);
       setOptions($('rightMetric'),METRIC_VALUES,I18N.en.metrics,s.rightMetric);
       setCountryOptions(s.manualCountry,'en');
       (document.querySelector('input[name=theme][value="'+s.theme+'"]')||document.querySelector('input[name=theme][value="orange"]')).checked=true;
-      applyTranslations();syncTheme();clearLocationValidation();loadGA()
+      setThemeMode(s.themeMode);applyTranslations();syncTheme();clearLocationValidation();loadGA();
     }
-    function collect(){var postal=clean($('manualPostalCode').value),city=clean($('manualCity').value),country=validCountry($('manualCountry').value);return norm({theme:document.querySelector('input[name=theme]:checked').value,hour24:$('hour24').checked,showLeadingZero:$('leadingZero').checked,showBatteryIndicator:$('batteryIndicator').checked,celsius:$('celsius').checked,leftMetric:$('leftMetric').value,rightMetric:$('rightMetric').value,language:$('language').value,manualLocation:!!country&&!!(postal||city),manualPostalCode:postal,manualCity:city,manualCountry:country,analyticsEnabled:$('analytics').checked})}
-    function closeConfig(encoded){var t=I18N[effectiveLanguage($('language').value)],closeUrl='pebblejs://close#'+encoded;$('status').textContent=t.saving;try{document.location=closeUrl}catch(e){$('status').textContent=t.saved}}
-    function finishSave(s){reduxTrack('settings_saved',{theme:s.theme,language:s.language,use_24_hour:s.hour24?1:0,leading_zero:s.showLeadingZero?1:0,battery_indicator:s.showBatteryIndicator?1:0,use_celsius:s.celsius?1:0,manual_location:s.manualLocation?1:0,left_metric:s.leftMetric,right_metric:s.rightMetric});closeConfig(encodeURIComponent(JSON.stringify(s)))}
-    function save(){if(saveInProgress)return;var s=collect(),t=I18N[effectiveLanguage(s.language)];saveInProgress=true;$('save').disabled=true;if(!s.manualLocation){finishSave(s);return}$('status').textContent=t.locationChecking;setLocationError('',false);validateLocation(s,function(valid,errorKey){if(valid){finishSave(s);return}saveInProgress=false;$('save').disabled=false;$('status').textContent='';setLocationError(errorKey,errorKey==='locationNotFound');$('locationCard').scrollIntoView()})}
-    buildThemes();render(incoming());$('language').onchange=function(){applyTranslations();if(saveInProgress)$('status').textContent=I18N[effectiveLanguage($('language').value)].locationChecking};$('manualCountry').onchange=clearLocationValidation;$('manualPostalCode').oninput=clearLocationValidation;$('manualCity').oninput=clearLocationValidation;$('analytics').onchange=function(){if(this.checked)loadGA()};$('donate').onclick=function(){reduxTrack('donation_clicked',{source:'app_config'})};$('reset').onclick=function(){var c=collect();reduxTrack('layout_reset',{source:'app_config'});render(Object.assign({},D,{language:c.language,analyticsEnabled:c.analyticsEnabled}))};$('save').onclick=save;
+    function collect(){
+      var postal=clean($('manualPostalCode').value),city=clean($('manualCity').value),country=validCountry($('manualCountry').value);
+      return norm({
+        themeMode:document.body.getAttribute('data-theme-mode')||'preset',
+        theme:document.querySelector('input[name=theme]:checked').value,
+        hour24:!$('hour12').checked,showLeadingZero:$('leadingZero').checked,
+        showBatteryIndicator:$('batteryIndicator').checked,showBluetooth:$('bluetooth').checked,
+        celsius:$('celsius').checked,leftMetric:$('leftMetric').value,middleMetric:$('middleMetric').value,
+        rightMetric:$('rightMetric').value,showMiddleSlot:$('threeSlots').checked,slotCount:$('threeSlots').checked?3:2,
+        language:$('language').value,manualLocation:!!country&&!!(postal||city),manualPostalCode:postal,
+        manualCity:city,manualCountry:country,analyticsEnabled:$('analytics').checked,
+        customBackgroundColor:$('customBackgroundColor').value,customTimeBoxColor:$('customTimeBoxColor').value,
+        customTimeBorderColor:$('customTimeBorderColor').value,customTimeTextColor:$('customTimeTextColor').value,
+        customInfo1TextColor:$('customInfo1TextColor').value,customInfo2TextColor:$('customInfo2TextColor').value,
+        customInfo3TextColor:$('customInfo3TextColor').value
+      });
+    }
+    function closeConfig(encoded){
+      var t=I18N[effectiveLanguage($('language').value)],closeUrl='pebblejs://close#'+encoded;
+      $('status').textContent=t.saving;try{document.location=closeUrl}catch(e){$('status').textContent=t.saved}
+    }
+    function finishSave(s){
+      reduxTrack('settings_saved',{
+        theme:s.theme,theme_mode:s.themeMode,language:s.language,use_24_hour:s.hour24?1:0,
+        leading_zero:s.showLeadingZero?1:0,battery_indicator:s.showBatteryIndicator?1:0,
+        bluetooth:s.showBluetooth?1:0,use_celsius:s.celsius?1:0,manual_location:s.manualLocation?1:0,
+        slot_count:s.slotCount,left_metric:s.leftMetric,middle_metric:s.middleMetric,right_metric:s.rightMetric
+      });
+      closeConfig(encodeURIComponent(JSON.stringify(s)));
+    }
+    function save(){
+      if(saveInProgress)return;
+      var s=collect(),t=I18N[effectiveLanguage(s.language)];
+      saveInProgress=true;$('save').disabled=true;
+      if(!s.manualLocation){finishSave(s);return}
+      $('status').textContent=t.locationChecking;setLocationError('',false);
+      validateLocation(s,function(valid,errorKey){
+        if(valid){finishSave(s);return}
+        saveInProgress=false;$('save').disabled=false;$('status').textContent='';
+        setLocationError(errorKey,errorKey==='locationNotFound');$('locationCard').scrollIntoView();
+      });
+    }
+
+    buildThemes();
+    render(incoming());
+    document.querySelectorAll('.tab').forEach(function(tab){tab.onclick=function(){setThemeMode(tab.getAttribute('data-mode'))}});
+    $('threeSlots').onchange=updateSlotMode;
+    $('language').onchange=function(){applyTranslations();if(saveInProgress)$('status').textContent=I18N[effectiveLanguage($('language').value)].locationChecking};
+    $('manualCountry').onchange=clearLocationValidation;$('manualPostalCode').oninput=clearLocationValidation;$('manualCity').oninput=clearLocationValidation;
+    $('analytics').onchange=function(){if(this.checked)loadGA()};
+    $('donate').onclick=function(){reduxTrack('donation_clicked',{source:'app_config'})};
+    $('reset').onclick=function(){var c=collect();reduxTrack('layout_reset',{source:'app_config'});render(Object.assign({},D,{language:c.language,analyticsEnabled:c.analyticsEnabled}))};
+    $('save').onclick=save;
   </script>
 </body>
 </html>
