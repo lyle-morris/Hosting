@@ -156,7 +156,7 @@
       border-bottom-color:var(--card);
       border-radius:8px 8px 0 0;
     }
-    .tab:focus-visible,.theme:focus-within,.btn:focus-visible,.switch input:focus-visible+.switch-track,input[type=color]:focus-visible{
+    .tab:focus-visible,.theme:focus-within,.btn:focus-visible,.switch input:focus-visible+.switch-track,.color-picker-trigger:focus-visible,.palette-swatch:focus-visible{
       outline:2px solid var(--focus);
       outline-offset:2px;
     }
@@ -218,18 +218,85 @@
     .color-row:last-child{border-bottom:0}
     .color-row label{font-size:18px;line-height:22px;font-weight:700}
     .preview{width:43px;height:53px;object-fit:contain}
-    input[type=color]{
+    .color-picker-trigger{
       width:48px;
       height:48px;
       padding:0;
       border:2px solid rgba(255,255,255,.3);
       border-radius:50%;
-      background:transparent;
-      overflow:hidden;
+      background:var(--selected-color,#000000);
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);
     }
-    input[type=color]::-webkit-color-swatch-wrapper{padding:0}
-    input[type=color]::-webkit-color-swatch{border:0;border-radius:50%}
-    input[type=color]::-moz-color-swatch{border:0;border-radius:50%}
+    .visually-hidden{
+      position:absolute!important;
+      width:1px!important;
+      height:1px!important;
+      padding:0!important;
+      margin:-1px!important;
+      overflow:hidden!important;
+      clip:rect(0,0,0,0)!important;
+      white-space:nowrap!important;
+      border:0!important;
+    }
+    .palette-dialog{
+      position:fixed;
+      z-index:30;
+      inset:0;
+      display:grid;
+      place-items:center;
+      padding:20px;
+      background:rgba(0,0,0,.78);
+    }
+    .palette-sheet{
+      width:min(100%,366px);
+      max-height:calc(100vh - 40px);
+      overflow:auto;
+      padding:16px;
+      background:#222222;
+      border:1px solid #555555;
+      border-radius:8px;
+      box-shadow:0 0 16px rgba(0,0,0,.7);
+    }
+    .palette-head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+    .palette-head h2{flex:1;margin:0;font-size:20px;line-height:28px}
+    .palette-close{
+      width:40px;
+      height:40px;
+      border:0;
+      border-radius:4px;
+      background:rgba(255,255,255,.15);
+      color:#ffffff;
+      font-size:24px;
+      line-height:1;
+    }
+    .palette-copy{margin:0 0 16px;color:rgba(255,255,255,.8);font-size:14px;line-height:20px}
+    .palette-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px}
+    .palette-swatch{
+      position:relative;
+      aspect-ratio:1;
+      min-width:0;
+      padding:0;
+      border:2px solid rgba(255,255,255,.22);
+      border-radius:5px;
+      background:var(--swatch);
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.32);
+    }
+    .palette-swatch.selected{border-color:#00aaff;box-shadow:0 0 0 2px #000000,0 0 0 4px #00aaff}
+    .palette-swatch.selected::after{
+      content:'✓';
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      color:var(--check,#ffffff);
+      font-size:18px;
+      font-weight:900;
+      text-shadow:0 1px 2px rgba(0,0,0,.8);
+    }
+    .palette-footer{display:flex;align-items:center;gap:12px;margin-top:16px}
+    .palette-value{flex:1;font-family:monospace;font-size:16px;font-weight:700}
+    .palette-done{min-width:96px}
+    body.palette-open{overflow:hidden}
 
     .slot-toggle{
       display:flex;
@@ -315,7 +382,7 @@
       .actions-inner{gap:8px}
       .btn{padding-left:10px;padding-right:10px}
       .color-row{grid-template-columns:minmax(0,1fr) 43px 44px;gap:12px}
-      input[type=color]{width:44px;height:44px}
+      .color-picker-trigger{width:44px;height:44px}
     }
   </style>
 </head>
@@ -347,13 +414,13 @@
       </div>
       <div class="theme-panel" id="customPanel" role="tabpanel" aria-labelledby="customTab" hidden>
         <div class="custom-list">
-          <div class="color-row"><label for="customBackgroundColor" data-i18n="customBackground">Background color</label><img class="preview" src="./images/screen_background.png" alt=""><input id="customBackgroundColor" type="color" value="#ff5500"></div>
-          <div class="color-row"><label for="customTimeBoxColor" data-i18n="customTimeBox">Time box color</label><img class="preview" src="./images/time_box_background.png" alt=""><input id="customTimeBoxColor" type="color" value="#ffffff"></div>
-          <div class="color-row"><label for="customTimeBorderColor" data-i18n="customBorders">Time box borders color</label><img class="preview" src="./images/time_box_borders.png" alt=""><input id="customTimeBorderColor" type="color" value="#000000"></div>
-          <div class="color-row"><label for="customTimeTextColor" data-i18n="customTimeText">Time box text color</label><img class="preview" src="./images/time_box_text.png" alt=""><input id="customTimeTextColor" type="color" value="#000000"></div>
-          <div class="color-row"><label for="customInfo1TextColor" data-i18n="info1Text">Information 1 text color</label><img class="preview" src="./images/informational_1_text.png" alt=""><input id="customInfo1TextColor" type="color" value="#ffffff"></div>
-          <div class="color-row"><label for="customInfo2TextColor" data-i18n="info2Text">Information 2 text color</label><img class="preview" src="./images/informational_2_text.png" alt=""><input id="customInfo2TextColor" type="color" value="#ffffff"></div>
-          <div class="color-row"><label for="customInfo3TextColor" data-i18n="info3Text">Information 3 text color</label><img class="preview" src="./images/informational_3_text.png" alt=""><input id="customInfo3TextColor" type="color" value="#ffffff"></div>
+          <div class="color-row"><label for="customBackgroundColorButton" data-i18n="customBackground">Background color</label><img class="preview" src="./images/screen_background.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/screen_background.png'" alt=""><input id="customBackgroundColor" type="hidden" value="#ff5500"><button id="customBackgroundColorButton" class="color-picker-trigger" type="button" data-color-target="customBackgroundColor" style="--selected-color:#ff5500" aria-label="Choose background color"><span class="visually-hidden">Background color</span></button></div>
+          <div class="color-row"><label for="customTimeBoxColorButton" data-i18n="customTimeBox">Time box color</label><img class="preview" src="./images/time_box_background.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/time_box_background.png'" alt=""><input id="customTimeBoxColor" type="hidden" value="#ffffff"><button id="customTimeBoxColorButton" class="color-picker-trigger" type="button" data-color-target="customTimeBoxColor" style="--selected-color:#ffffff" aria-label="Choose time box color"><span class="visually-hidden">Time box color</span></button></div>
+          <div class="color-row"><label for="customTimeBorderColorButton" data-i18n="customBorders">Time box borders color</label><img class="preview" src="./images/time_box_borders.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/time_box_borders.png'" alt=""><input id="customTimeBorderColor" type="hidden" value="#000000"><button id="customTimeBorderColorButton" class="color-picker-trigger" type="button" data-color-target="customTimeBorderColor" style="--selected-color:#000000" aria-label="Choose time box borders color"><span class="visually-hidden">Time box borders color</span></button></div>
+          <div class="color-row"><label for="customTimeTextColorButton" data-i18n="customTimeText">Time box text color</label><img class="preview" src="./images/time_box_text.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/time_box_text.png'" alt=""><input id="customTimeTextColor" type="hidden" value="#000000"><button id="customTimeTextColorButton" class="color-picker-trigger" type="button" data-color-target="customTimeTextColor" style="--selected-color:#000000" aria-label="Choose time box text color"><span class="visually-hidden">Time box text color</span></button></div>
+          <div class="color-row"><label for="customInfo1TextColorButton" data-i18n="info1Text">Information 1 text color</label><img class="preview" src="./images/informational_1_text.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/informational_1_text.png'" alt=""><input id="customInfo1TextColor" type="hidden" value="#ffffff"><button id="customInfo1TextColorButton" class="color-picker-trigger" type="button" data-color-target="customInfo1TextColor" style="--selected-color:#ffffff" aria-label="Choose information 1 text color"><span class="visually-hidden">Information 1 text color</span></button></div>
+          <div class="color-row"><label for="customInfo2TextColorButton" data-i18n="info2Text">Information 2 text color</label><img class="preview" src="./images/informational_2_text.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/informational_2_text.png'" alt=""><input id="customInfo2TextColor" type="hidden" value="#ffffff"><button id="customInfo2TextColorButton" class="color-picker-trigger" type="button" data-color-target="customInfo2TextColor" style="--selected-color:#ffffff" aria-label="Choose information 2 text color"><span class="visually-hidden">Information 2 text color</span></button></div>
+          <div class="color-row"><label for="customInfo3TextColorButton" data-i18n="info3Text">Information 3 text color</label><img class="preview" src="./images/informational_3_text.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/informational_3_text.png'" alt=""><input id="customInfo3TextColor" type="hidden" value="#ffffff"><button id="customInfo3TextColorButton" class="color-picker-trigger" type="button" data-color-target="customInfo3TextColor" style="--selected-color:#ffffff" aria-label="Choose information 3 text color"><span class="visually-hidden">Information 3 text color</span></button></div>
         </div>
       </div>
     </section>
@@ -367,9 +434,9 @@
           <span class="switch"><input id="threeSlots" type="checkbox" aria-labelledby="slotCountLabel"><span class="switch-track"></span></span>
         </label>
         <div class="slots">
-          <div class="slot-row"><img class="slot-icon" src="./images/informational_1_text.png" alt=""><select id="leftMetric" aria-label="Slot 1"></select></div>
-          <div class="slot-row" id="middleSlotRow" hidden><img class="slot-icon" src="./images/informational_2_text.png" alt=""><select id="middleMetric" aria-label="Slot 2"></select></div>
-          <div class="slot-row"><img class="slot-icon" src="./images/informational_3_text.png" alt=""><select id="rightMetric" aria-label="Slot 3"></select></div>
+          <div class="slot-row"><img class="slot-icon" src="./images/informational_1_text.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/informational_1_text.png'" alt=""><select id="leftMetric" aria-label="Slot 1"></select></div>
+          <div class="slot-row" id="middleSlotRow" hidden><img class="slot-icon" src="./images/informational_2_text.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/informational_2_text.png'" alt=""><select id="middleMetric" aria-label="Slot 2"></select></div>
+          <div class="slot-row"><img class="slot-icon" src="./images/informational_3_text.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/informational_3_text.png'" alt=""><select id="rightMetric" aria-label="Slot 3"></select></div>
         </div>
       </div>
     </section>
@@ -402,6 +469,15 @@
     </section>
   </main>
 
+  <div class="palette-dialog" id="paletteDialog" role="dialog" aria-modal="true" aria-labelledby="paletteTitle" hidden>
+    <div class="palette-sheet">
+      <div class="palette-head"><h2 id="paletteTitle" data-i18n="pebbleColorTitle">Pebble color</h2><button class="palette-close" id="paletteClose" type="button" aria-label="Close">×</button></div>
+      <p class="palette-copy" data-i18n="pebbleColorCopy">Choose one of the 64 colors supported by Pebble color displays.</p>
+      <div class="palette-grid" id="pebbleColorGrid" role="radiogroup" aria-label="Pebble 64-color palette"></div>
+      <div class="palette-footer"><span class="palette-value" id="paletteValue">#000000</span><button class="btn primary palette-done" id="paletteDone" type="button" data-i18n="done">Done</button></div>
+    </div>
+  </div>
+
   <div class="actions">
     <div class="actions-inner">
       <div id="status" class="status"></div>
@@ -424,6 +500,18 @@
     var LANGUAGE_VALUES=['auto','en','es','fr','de','pt'];
     var METRIC_VALUES=['calendar','weather','battery','calories','activity','sleep','heart','steps','distance','none'];
     var THEME_VALUES=['orange','lightBlue','purple','yellow','green','red','white','black'];
+    var PEBBLE_LEVELS=['00','55','aa','ff'];
+    var PEBBLE_COLORS=[];
+    PEBBLE_LEVELS.forEach(function(r){
+      for(var gPair=0;gPair<2;gPair++){
+        for(var gOffset=0;gOffset<2;gOffset++){
+          var g=PEBBLE_LEVELS[gPair*2+gOffset];
+          PEBBLE_LEVELS.forEach(function(b){PEBBLE_COLORS.push('#'+r+g+b)});
+        }
+      }
+    });
+    var PEBBLE_COLOR_LOOKUP={};
+    PEBBLE_COLORS.forEach(function(color){PEBBLE_COLOR_LOOKUP[color]=true});
     var COUNTRY_CODES=('US AF AX AL DZ AD AO AI AQ AG AR AM AW AU AT AZ BS BH BD BB BY BE BZ BJ BM BT BO BA BW BV BR GB IO BN BG BF BI KH CM CA CV BQ KY CF TD CL CN CX CC CO KM CD CG CK CR CI HR CU CW CY CZ DK DJ DM DO TL EC EG SV GQ ER EE SZ ET FK FO FJ FI FR GF PF TF GA GM GE DE GH GI GR GL GD GP GU GT GG GN GW GY HT HM HN HK HU IS IN ID IR IQ IE IM IL IT JM JP JE JO KZ KE KI KP KR KW KG LA LV LB LS LR LY LI LT LU MO MG MW MY MV ML MT MH MQ MR MU YT MX FM MD MC MN ME MS MA MZ MM NA NR NP NL NC NZ NI NE NG NU NF MK MP NO OM PK PW PS PA PG PY PE PH PN PL PT PR QA RE RO RU RW AS WS SM ST SA SN RS SC SL SG SK SI SB SO ZA GS SS ES LK BL SH KN LC SX MF PM VC SD SR SJ SE CH SY TW TJ TZ TH TG TK TO TT TN TR TM TC TV UG UA AE UY UM UZ VU VA VE VN VG VI WF EH YE ZM ZW').split(' ');
     var I18N={
       en:{
@@ -433,6 +521,7 @@
         themeTab:'Theme',customTab:'Custom',customBackground:'Background color',customTimeBox:'Time box color',
         customBorders:'Time box borders color',customTimeText:'Time box text color',
         info1Text:'Information 1 text color',info2Text:'Information 2 text color',info3Text:'Information 3 text color',
+        pebbleColorTitle:'Pebble color',pebbleColorCopy:'Choose one of the 64 colors supported by Pebble color displays.',done:'Done',
         metricsTitle:'Information',metricsCopy:'Customize what information is shown on the watch face.',
         twoSlots:'2 information slots',threeSlots:'3 information slots',
         locationTitle:'Manual location',countryLabel:'Country',postalLabel:'ZIP/postal code',cityLabel:'City',
@@ -455,6 +544,7 @@
         themeTab:'Tema',customTab:'Personalizado',customBackground:'Color de fondo',customTimeBox:'Color del cuadro de hora',
         customBorders:'Color de los bordes de la hora',customTimeText:'Color del texto de la hora',
         info1Text:'Color del texto de información 1',info2Text:'Color del texto de información 2',info3Text:'Color del texto de información 3',
+        pebbleColorTitle:'Color de Pebble',pebbleColorCopy:'Elige uno de los 64 colores compatibles con las pantallas Pebble a color.',done:'Listo',
         metricsTitle:'Información',metricsCopy:'Personaliza la información que aparece en la esfera.',
         twoSlots:'2 espacios de información',threeSlots:'3 espacios de información',
         locationTitle:'Ubicación manual',countryLabel:'País',postalLabel:'Código postal',cityLabel:'Ciudad',
@@ -477,6 +567,7 @@
         themeTab:'Thème',customTab:'Personnalisé',customBackground:'Couleur de fond',customTimeBox:'Couleur du cadre horaire',
         customBorders:'Couleur des bordures horaires',customTimeText:'Couleur du texte horaire',
         info1Text:'Couleur du texte d’information 1',info2Text:'Couleur du texte d’information 2',info3Text:'Couleur du texte d’information 3',
+        pebbleColorTitle:'Couleur Pebble',pebbleColorCopy:'Choisissez l’une des 64 couleurs prises en charge par les écrans Pebble couleur.',done:'Terminé',
         metricsTitle:'Informations',metricsCopy:'Personnalisez les informations affichées sur le cadran.',
         twoSlots:'2 emplacements d’information',threeSlots:'3 emplacements d’information',
         locationTitle:'Localisation manuelle',countryLabel:'Pays',postalLabel:'Code postal',cityLabel:'Ville',
@@ -499,6 +590,7 @@
         themeTab:'Design',customTab:'Benutzerdefiniert',customBackground:'Hintergrundfarbe',customTimeBox:'Farbe des Zeitfelds',
         customBorders:'Rahmenfarbe des Zeitfelds',customTimeText:'Textfarbe des Zeitfelds',
         info1Text:'Textfarbe Information 1',info2Text:'Textfarbe Information 2',info3Text:'Textfarbe Information 3',
+        pebbleColorTitle:'Pebble-Farbe',pebbleColorCopy:'Wähle eine der 64 Farben, die von Pebble-Farbdisplays unterstützt werden.',done:'Fertig',
         metricsTitle:'Informationen',metricsCopy:'Passe an, welche Informationen auf dem Zifferblatt angezeigt werden.',
         twoSlots:'2 Informationsplätze',threeSlots:'3 Informationsplätze',
         locationTitle:'Manueller Standort',countryLabel:'Land',postalLabel:'Postleitzahl',cityLabel:'Stadt',
@@ -521,6 +613,7 @@
         themeTab:'Tema',customTab:'Personalizado',customBackground:'Cor de fundo',customTimeBox:'Cor da caixa de hora',
         customBorders:'Cor das bordas da hora',customTimeText:'Cor do texto da hora',
         info1Text:'Cor do texto da informação 1',info2Text:'Cor do texto da informação 2',info3Text:'Cor do texto da informação 3',
+        pebbleColorTitle:'Cor Pebble',pebbleColorCopy:'Escolha uma das 64 cores compatíveis com telas coloridas Pebble.',done:'Concluído',
         metricsTitle:'Informações',metricsCopy:'Personalize as informações exibidas no mostrador.',
         twoSlots:'2 espaços de informação',threeSlots:'3 espaços de informação',
         locationTitle:'Localização manual',countryLabel:'País',postalLabel:'CEP/código postal',cityLabel:'Cidade',
@@ -545,7 +638,7 @@
     function validTheme(v){return THEME_VALUES.indexOf(v)>=0?v:D.theme}
     function validLanguage(v){return LANGUAGE_VALUES.indexOf(v)>=0?v:D.language}
     function validCountry(v){v=String(v||'').toUpperCase();return COUNTRY_CODES.indexOf(v)>=0?v:D.manualCountry}
-    function validColor(v,d){return /^#[0-9a-f]{6}$/i.test(String(v||''))?String(v).toLowerCase():d}
+    function validColor(v,d){v=String(v||'').toLowerCase();return PEBBLE_COLOR_LOOKUP[v]?v:d}
     function deviceLanguage(){var raw=(navigator.language||navigator.userLanguage||'en').toLowerCase().split(/[-_]/)[0];return I18N[raw]?raw:'en'}
     function effectiveLanguage(v){v=validLanguage(v);return v==='auto'?deviceLanguage():v}
     function norm(s){
@@ -601,6 +694,50 @@
     }
     function syncTheme(){
       document.querySelectorAll('.theme').forEach(function(t){t.classList.toggle('selected',!!t.querySelector('input:checked'))});
+    }
+    var activeColorTarget='';
+    function colorContrast(hex){
+      var r=parseInt(hex.substr(1,2),16),g=parseInt(hex.substr(3,2),16),b=parseInt(hex.substr(5,2),16);
+      return (r*299+g*587+b*114)/1000>150?'#000000':'#ffffff';
+    }
+    function syncColorTrigger(id){
+      var value=validColor($(id).value,D[id]);
+      $(id).value=value;
+      var button=$(id+'Button');
+      if(button){button.style.setProperty('--selected-color',value);button.setAttribute('aria-label',button.textContent.trim()+' '+value)}
+    }
+    function buildPebblePalette(){
+      var html='';
+      PEBBLE_COLORS.forEach(function(color){
+        html+='<button class="palette-swatch" type="button" role="radio" aria-checked="false" aria-label="'+color.toUpperCase()+'" data-pebble-color="'+color+'" style="--swatch:'+color+';--check:'+colorContrast(color)+'"></button>';
+      });
+      $('pebbleColorGrid').innerHTML=html;
+      document.querySelectorAll('.palette-swatch').forEach(function(button){
+        button.onclick=function(){selectPebbleColor(button.getAttribute('data-pebble-color'))};
+      });
+    }
+    function updatePaletteSelection(value){
+      value=validColor(value,'#000000');
+      $('paletteValue').textContent=value.toUpperCase();
+      document.querySelectorAll('.palette-swatch').forEach(function(button){
+        var selected=button.getAttribute('data-pebble-color')===value;
+        button.classList.toggle('selected',selected);button.setAttribute('aria-checked',selected?'true':'false');
+      });
+    }
+    function openPebbleColorPicker(id){
+      activeColorTarget=id;updatePaletteSelection($(id).value);
+      $('paletteDialog').hidden=false;document.body.classList.add('palette-open');
+      var selected=document.querySelector('.palette-swatch.selected');if(selected)selected.focus();
+    }
+    function closePebbleColorPicker(){
+      $('paletteDialog').hidden=true;document.body.classList.remove('palette-open');
+      if(activeColorTarget&&$(activeColorTarget+'Button'))$(activeColorTarget+'Button').focus();
+      activeColorTarget='';
+    }
+    function selectPebbleColor(value){
+      if(!activeColorTarget)return;
+      $(activeColorTarget).value=validColor(value,D[activeColorTarget]);
+      syncColorTrigger(activeColorTarget);updatePaletteSelection($(activeColorTarget).value);
     }
     function setThemeMode(mode){
       mode=mode==='custom'?'custom':'preset';
@@ -696,7 +833,7 @@
       $('hour12').checked=!s.hour24;$('leadingZero').checked=s.showLeadingZero;$('batteryIndicator').checked=s.showBatteryIndicator;
       $('bluetooth').checked=s.showBluetooth;$('celsius').checked=s.celsius;$('manualPostalCode').value=s.manualPostalCode;
       $('manualCity').value=s.manualCity;$('analytics').checked=s.analyticsEnabled;$('threeSlots').checked=s.showMiddleSlot;
-      ['customBackgroundColor','customTimeBoxColor','customTimeBorderColor','customTimeTextColor','customInfo1TextColor','customInfo2TextColor','customInfo3TextColor'].forEach(function(id){$(id).value=s[id]});
+      ['customBackgroundColor','customTimeBoxColor','customTimeBorderColor','customTimeTextColor','customInfo1TextColor','customInfo2TextColor','customInfo3TextColor'].forEach(function(id){$(id).value=s[id];syncColorTrigger(id)});
       setOptions($('language'),LANGUAGE_VALUES,I18N.en.languages,s.language);
       setOptions($('leftMetric'),METRIC_VALUES,I18N.en.metrics,s.leftMetric);
       setOptions($('middleMetric'),METRIC_VALUES,I18N.en.metrics,s.middleMetric);
@@ -749,8 +886,13 @@
     }
 
     buildThemes();
+    buildPebblePalette();
     render(incoming());
     document.querySelectorAll('.tab').forEach(function(tab){tab.onclick=function(){setThemeMode(tab.getAttribute('data-mode'))}});
+    document.querySelectorAll('.color-picker-trigger').forEach(function(button){button.onclick=function(){openPebbleColorPicker(button.getAttribute('data-color-target'))}});
+    $('paletteClose').onclick=closePebbleColorPicker;$('paletteDone').onclick=closePebbleColorPicker;
+    $('paletteDialog').onclick=function(event){if(event.target===$('paletteDialog'))closePebbleColorPicker()};
+    document.addEventListener('keydown',function(event){if(event.key==='Escape'&&!$('paletteDialog').hidden)closePebbleColorPicker()});
     $('threeSlots').onchange=updateSlotMode;
     $('language').onchange=function(){applyTranslations();if(saveInProgress)$('status').textContent=I18N[effectiveLanguage($('language').value)].locationChecking};
     $('manualCountry').onchange=clearLocationValidation;$('manualPostalCode').oninput=clearLocationValidation;$('manualCity').oninput=clearLocationValidation;
