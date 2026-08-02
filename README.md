@@ -22,7 +22,9 @@ Hosting/
     │   └── releases/
     │       ├── 1.3.0/
     │       │   └── app-config.html
-    │       └── 1.6.0/
+    │       ├── 1.6.0/
+    │       │   └── app-config.html
+    │       └── 2.0.0/
     │           └── app-config.html
     └── daypal/
         ├── prod/
@@ -43,6 +45,7 @@ Hosting/
 | Essential Redux | Legacy production | `https://lyle-morris.github.io/Hosting/app-config.html` |
 | Essential Redux | Production | `https://lyle-morris.github.io/Hosting/apps/essential-redux/prod/app-config.html` |
 | Essential Redux | QA | `https://lyle-morris.github.io/Hosting/apps/essential-redux/qa/app-config.html` |
+| Essential Redux | 2.0.0 snapshot | `https://lyle-morris.github.io/Hosting/apps/essential-redux/releases/2.0.0/app-config.html` |
 | DayPal | Production | `https://lyle-morris.github.io/Hosting/apps/daypal/prod/app-config.html` |
 | DayPal | QA | `https://lyle-morris.github.io/Hosting/apps/daypal/qa/app-config.html` |
 | App directory | Production and QA links | `https://lyle-morris.github.io/Hosting/apps/` |
@@ -72,8 +75,8 @@ Release directories are immutable records of the configuration shipped with a wa
 ## Migration status
 
 - Essential Redux 1.3.0 passed QA and is promoted to the canonical production path.
-- Essential Redux 2.0.0 is a release candidate in the app-specific QA path only; production and a 2.0.0 release snapshot have not been promoted.
-- The canonical Essential Redux production, QA, 1.3.0 snapshot, and existing 1.6.0 snapshot paths are available under `apps/essential-redux/`.
+- Essential Redux 2.0.0 is promoted to production and archived at `apps/essential-redux/releases/2.0.0/app-config.html`; QA, production, and the snapshot share blob SHA `b89c153c032bcdd89bdd476ec7951c4563a5fbcf`.
+- The canonical Essential Redux production, QA, 1.3.0, 1.6.0, and 2.0.0 snapshot paths are available under `apps/essential-redux/`.
 - The obsolete shared root QA page was removed; all future QA work uses the app-specific paths under `apps/`.
 - DayPal 1.6.0 and earlier continue to use `DayPal-Hosting`; the open DayPal 1.6.1 release moves to the canonical production path after validation.
 - The canonical DayPal production, QA, 1.6.0, and 1.6.1 snapshot paths are available under `apps/daypal/`.
