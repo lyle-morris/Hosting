@@ -560,6 +560,7 @@
       var STORAGE_KEY = "redux-qa-settings";
       var IMAGE_ROOT = "./images/";
       var IMAGE_FALLBACK_ROOT = "https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/redux/qa/images/";
+      var BOTTOM_SLOT_PREVIEW = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACsAAAA1CAYAAADYgRIrAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAAAsxJREFUeAHtmkuKKjEUho/VtuIbFdGxCOLAsWPX4KJciVtwMQ5Fwff7/bqXP5eEGFN205doAv1BKC3Lyp/fnJNUYqBYLP4hDaFQiJLJJKVSKZrNZjSfz8kU6XSa1bNcLmm73dLpdNJeF1RPfH5+Urlcpo+PD3Fus9mQSWAMxKIAiO10OnS9Xump2EKhcCcU4H0kEmFHNAZHufAKVVSHULlczuczO6r14V5wezKZ+Iv1PE+0TiaXy7HySqBDFeupF6itfBfxeJwVmTuxmUyGbAIBLiPEoi+qLXk3apcUYm0TChBocuCKANMFFggEAhSLxdiXEIAmQFZAelRTFUBX4IEmxCI1qSDYstksBYNBMgmMgCHr9ZoVGVkXs4o7p/IKoTKJROJBB8Tycx6Sb6lUevhiOBx+qVCOmgEgtlKpsKOncxQgO7wDvzz/VCwCyzbMhLcB8Ev7Omsb6B7OOMvEOuWsLbOsr3BPbL/f147JNoF5A3R6mCTs93uyGf4I9Prx9AdgRshGMHIENkUlh2BiXckI7ol1hV+xpnBGLNbNnBgUMMJ2u103nMW67eFw+CfW9okM1uDEcGu7WAy1+XzesccacgSRDfw2HDj1ep2q1SqZpNVq0XQ69f0cXfVbqavRaJBparUatdtt388h1okAA0/F2taA2+32PbGveEbDxqBar4wIMN0Fx+ORFSx9NptNtlZrCpjR6/XYa+ww6oQKsX7OLRYLJhKt5i03yWq10mrhu41PUxcuGI1GFI1GmcOm9hQulwsTqdOB8/yXZ2LRebGQ4Ldjs9vtWHkHstPCKtObyT9F3o0XYsfjMdkGuoVsohDLu4JNqAbeDbeDwUC7c8NTB0feute9V+Fb9uo9OepOIgfZwVcs/xeF+kWkreFwSKbAXBX/c1DrVLPDQy6CuzagM+dh1oXoQ4vwGIFUBpe/mkL+L7g/UpRcdHX+BbXMZcwgM4xyAAAAAElFTkSuQmCC";
       var METRICS = [
         { value: "calendar", label: "Calendar" },
         { value: "weather", label: "Weather" },
@@ -774,6 +775,11 @@
       }
 
       function setPreview(preview, filename) {
+        if (filename.indexOf("data:") === 0) {
+          preview.onerror = null;
+          preview.src = filename;
+          return;
+        }
         preview.onerror = function () {
           preview.onerror = null;
           preview.src = IMAGE_FALLBACK_ROOT + filename;
@@ -839,7 +845,7 @@
         rows.push({
           key: "batteryIndicator",
           label: "Battery indicator",
-          image: "time_box_horizontal_bottom_border.png",
+          image: BOTTOM_SLOT_PREVIEW,
           disabled: !state.showBatteryIndicator
         });
         return rows;
@@ -851,7 +857,7 @@
           { key: "trayBackground", label: "Tray background", image: "tray_vertical_background.png" },
           { key: "divider", label: "Divider", image: "time_box_vertical_border.png" },
           { key: "timeText", label: "Time text", image: "time_box_vertical_text.png" },
-          { key: "dateText", label: "Date text", image: "time_box_horizontal_bottom_border.png" },
+          { key: "dateText", label: "Date text", image: BOTTOM_SLOT_PREVIEW },
           { key: "slot1Text", label: "Slot #1 text", image: "vertical-slot-1.png" },
           { key: "slot2Text", label: "Slot #2 text", image: "vertical-slot-2.png" },
           { key: "slot3Text", label: "Slot #3 text", image: "vertical-slot-3.png" }
