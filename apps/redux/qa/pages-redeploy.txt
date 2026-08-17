@@ -1,0 +1,2 @@
+Redux QA GitHub Pages redeployment marker.
+Created after the 2026-08-17 GitHub service incident.
