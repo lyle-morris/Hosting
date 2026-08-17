@@ -255,7 +255,9 @@
 
     .theme-tab:focus-visible,
     .theme-choice:focus-visible,
-    .color-select:focus-visible {
+    .color-picker-trigger:focus-visible,
+    .palette-swatch:focus-visible,
+    .palette-close:focus-visible {
       position: relative;
       z-index: 1;
       outline: 2px solid var(--focus);
@@ -349,25 +351,131 @@
       background: var(--control-border);
     }
 
-    select.color-select {
+    .color-picker-trigger {
       width: 48px;
       height: 48px;
       padding: 0;
       border: 2px solid rgba(255, 255, 255, 0.3);
       border-radius: 50%;
-      background-image: none;
-      color: transparent;
-      font-size: 0;
+      background: var(--selected-color, #000000);
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
       cursor: pointer;
     }
 
-    select.color-select:disabled {
+    .color-picker-trigger:disabled {
       cursor: not-allowed;
     }
 
-    select.color-select option {
+    .palette-dialog {
+      position: fixed;
+      z-index: 30;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.78);
+    }
+
+    .palette-sheet {
+      width: min(100%, 366px);
+      max-height: calc(100vh - 40px);
+      overflow: auto;
+      padding: 16px;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      background: var(--card);
+      box-shadow: 0 0 16px rgba(0, 0, 0, 0.7);
+    }
+
+    .palette-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .palette-head h2 {
+      flex: 1;
+      margin: 0;
+      font-size: 20px;
+      line-height: 28px;
+    }
+
+    .palette-close {
+      width: 40px;
+      height: 40px;
+      padding: 0;
+      border: 0;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.15);
       color: var(--white);
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .palette-copy {
+      margin: 0 0 16px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .palette-swatch {
+      position: relative;
+      aspect-ratio: 1;
+      min-width: 0;
+      padding: 0;
+      border: 2px solid rgba(255, 255, 255, 0.22);
+      border-radius: 5px;
+      background: var(--swatch);
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.32);
+      cursor: pointer;
+    }
+
+    .palette-swatch.selected {
+      border-color: var(--focus);
+      box-shadow: 0 0 0 2px var(--black), 0 0 0 4px var(--focus);
+    }
+
+    .palette-swatch.selected::after {
+      content: "✓";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: var(--check, var(--white));
+      font-size: 18px;
+      font-weight: 900;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    }
+
+    .palette-footer {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .palette-value {
+      flex: 1;
+      font-family: monospace;
       font-size: 16px;
+      font-weight: 700;
+    }
+
+    .palette-done {
+      min-width: 96px;
+    }
+
+    body.palette-open {
+      overflow: hidden;
     }
 
     .visually-hidden {
@@ -545,6 +653,21 @@
     </section>
   </main>
 
+  <div class="palette-dialog" id="paletteDialog" role="dialog" aria-modal="true" aria-labelledby="paletteTitle" hidden>
+    <div class="palette-sheet">
+      <div class="palette-head">
+        <h2 id="paletteTitle">Pebble color</h2>
+        <button class="palette-close" id="paletteClose" type="button" aria-label="Close">×</button>
+      </div>
+      <p class="palette-copy">Choose one of the 64 colors supported by Pebble color displays.</p>
+      <div class="palette-grid" id="pebbleColorGrid" role="radiogroup" aria-label="Pebble 64-color palette"></div>
+      <div class="palette-footer">
+        <span class="palette-value" id="paletteValue">#000000</span>
+        <button class="button primary palette-done" id="paletteDone" type="button">Done</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="actions">
     <div class="actions-inner">
       <div class="status" id="status" role="status" aria-live="polite"></div>
@@ -584,6 +707,18 @@
         { value: "white", label: "White", color: "#ffffff", text: "#000000" },
         { value: "black", label: "Black", color: "#000000", text: "#ffffff" }
       ];
+      var PEBBLE_LEVELS = ["00", "55", "aa", "ff"];
+      var PEBBLE_COLORS = [];
+      var PEBBLE_COLOR_LOOKUP = {};
+      PEBBLE_LEVELS.forEach(function (red) {
+        PEBBLE_LEVELS.forEach(function (green) {
+          PEBBLE_LEVELS.forEach(function (blue) {
+            var color = "#" + red + green + blue;
+            PEBBLE_COLORS.push(color);
+            PEBBLE_COLOR_LOOKUP[color] = true;
+          });
+        });
+      });
       var DEFAULTS = {
         verticalLayout: true,
         slot1Metric: "calendar",
@@ -617,6 +752,7 @@
         }
       };
       var state;
+      var activeColorTarget = null;
 
       function byId(id) {
         return document.getElementById(id);
@@ -658,10 +794,7 @@
 
       function validColor(value, fallback) {
         var normalized = String(value || "").toLowerCase();
-        for (var index = 0; index < THEMES.length; index += 1) {
-          if (THEMES[index].color === normalized) return normalized;
-        }
-        return fallback;
+        return PEBBLE_COLOR_LOOKUP[normalized] ? normalized : fallback;
       }
 
       function normalizeColorGroup(source, defaults) {
@@ -787,13 +920,6 @@
         preview.src = IMAGE_ROOT + filename;
       }
 
-      function colorLabel(value) {
-        for (var index = 0; index < THEMES.length; index += 1) {
-          if (THEMES[index].color === value) return THEMES[index].label;
-        }
-        return value;
-      }
-
       function buildThemeGrid() {
         var grid = byId("themeGrid");
         grid.innerHTML = "";
@@ -864,28 +990,92 @@
         ];
       }
 
-      function createColorSelect(row, orientation) {
-        var select = document.createElement("select");
+      function colorContrast(hex) {
+        var red = parseInt(hex.substr(1, 2), 16);
+        var green = parseInt(hex.substr(3, 2), 16);
+        var blue = parseInt(hex.substr(5, 2), 16);
+        return (red * 299 + green * 587 + blue * 114) / 1000 > 150 ? "#000000" : "#ffffff";
+      }
+
+      function buildPebblePalette() {
+        var grid = byId("pebbleColorGrid");
+        grid.innerHTML = "";
+        PEBBLE_COLORS.forEach(function (color) {
+          var button = document.createElement("button");
+          button.type = "button";
+          button.className = "palette-swatch";
+          button.setAttribute("role", "radio");
+          button.setAttribute("aria-checked", "false");
+          button.setAttribute("aria-label", color.toUpperCase());
+          button.dataset.pebbleColor = color;
+          button.style.setProperty("--swatch", color);
+          button.style.setProperty("--check", colorContrast(color));
+          button.addEventListener("click", function () {
+            selectPebbleColor(color);
+          });
+          grid.appendChild(button);
+        });
+      }
+
+      function updatePaletteSelection(value) {
+        value = validColor(value, "#000000");
+        byId("paletteValue").textContent = value.toUpperCase();
+        Array.prototype.forEach.call(document.querySelectorAll(".palette-swatch"), function (button) {
+          var selected = button.dataset.pebbleColor === value;
+          button.classList.toggle("selected", selected);
+          button.setAttribute("aria-checked", selected ? "true" : "false");
+        });
+      }
+
+      function syncColorButton(button, label, value) {
+        button.style.setProperty("--selected-color", value);
+        button.setAttribute("aria-label", label + " color, " + value.toUpperCase());
+        button.title = label + ": " + value.toUpperCase();
+      }
+
+      function openPebbleColorPicker(orientation, row, button) {
+        activeColorTarget = {
+          orientation: orientation,
+          key: row.key,
+          label: row.label,
+          button: button
+        };
+        byId("paletteTitle").textContent = row.label + " color";
+        updatePaletteSelection(state.customTheme[orientation][row.key]);
+        byId("paletteDialog").hidden = false;
+        document.body.classList.add("palette-open");
+        var selected = document.querySelector(".palette-swatch.selected");
+        if (selected) selected.focus();
+      }
+
+      function closePebbleColorPicker() {
+        byId("paletteDialog").hidden = true;
+        document.body.classList.remove("palette-open");
+        if (activeColorTarget && activeColorTarget.button) activeColorTarget.button.focus();
+        activeColorTarget = null;
+      }
+
+      function selectPebbleColor(value) {
+        if (!activeColorTarget) return;
+        var target = activeColorTarget;
+        var selected = validColor(value, state.customTheme[target.orientation][target.key]);
+        state.themeMode = "custom";
+        state.customTheme[target.orientation][target.key] = selected;
+        syncColorButton(target.button, target.label, selected);
+        updatePaletteSelection(selected);
+      }
+
+      function createColorButton(row, orientation) {
+        var button = document.createElement("button");
         var current = state.customTheme[orientation][row.key];
-        select.className = "color-select";
-        select.setAttribute("aria-label", row.label + " color");
-        select.disabled = Boolean(row.disabled);
-        THEMES.forEach(function (theme) {
-          var option = document.createElement("option");
-          option.value = theme.color;
-          option.textContent = theme.label;
-          select.appendChild(option);
+        button.type = "button";
+        button.className = "color-picker-trigger";
+        button.disabled = Boolean(row.disabled);
+        syncColorButton(button, row.label, current);
+        button.addEventListener("click", function () {
+          openPebbleColorPicker(orientation, row, button);
         });
-        select.value = current;
-        select.style.backgroundColor = current;
-        select.title = row.label + ": " + colorLabel(current);
-        select.addEventListener("change", function () {
-          state.themeMode = "custom";
-          state.customTheme[orientation][row.key] = select.value;
-          select.style.backgroundColor = select.value;
-          select.title = row.label + ": " + colorLabel(select.value);
-        });
-        return select;
+        return button;
       }
 
       function renderCustomRows() {
@@ -911,7 +1101,7 @@
           element.appendChild(label);
           element.appendChild(preview);
           element.appendChild(divider);
-          element.appendChild(createColorSelect(row, details.orientation));
+          element.appendChild(createColorButton(row, details.orientation));
           container.appendChild(element);
         });
       }
@@ -1061,8 +1251,17 @@
         byId("status").textContent = "Layout reset.";
       });
       byId("saveButton").addEventListener("click", saveSettings);
+      byId("paletteClose").addEventListener("click", closePebbleColorPicker);
+      byId("paletteDone").addEventListener("click", closePebbleColorPicker);
+      byId("paletteDialog").addEventListener("click", function (event) {
+        if (event.target === byId("paletteDialog")) closePebbleColorPicker();
+      });
+      document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && !byId("paletteDialog").hidden) closePebbleColorPicker();
+      });
 
       buildThemeGrid();
+      buildPebblePalette();
       render(readIncomingSettings());
     }());
   </script>
