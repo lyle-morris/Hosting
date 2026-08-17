@@ -1,2 +1,582 @@
 <!doctype html>
-<title>Redux Settings</title>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#ececec">
+  <title>Redux Settings</title>
+  <style>
+    :root {
+      --page: #ececec;
+      --card: #222222;
+      --card-border: #555555;
+      --card-header: rgba(255, 255, 255, 0.08);
+      --card-body-end: rgba(255, 255, 255, 0.05);
+      --black: #000000;
+      --white: #ffffff;
+      --divider: rgba(255, 255, 255, 0.10);
+      --control-border: rgba(255, 255, 255, 0.25);
+      --focus: #00aaff;
+      --switch-on: #00ee33;
+      --switch-off: #777777;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-width: 320px;
+      min-height: 100%;
+      background: var(--page);
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px 12px 112px;
+      color: var(--white);
+      background: var(--page);
+      font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: normal;
+    }
+
+    button,
+    select,
+    input {
+      font: inherit;
+    }
+
+    button,
+    label,
+    select {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .page {
+      width: min(100%, 366px);
+      margin: 0 auto;
+    }
+
+    .page-heading {
+      margin: 0 0 12px;
+      padding: 0 4px;
+      color: #333333;
+    }
+
+    .page-heading h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 34px;
+      font-weight: 800;
+    }
+
+    .page-heading p {
+      margin: 4px 0 0;
+      color: #555555;
+      line-height: 22px;
+    }
+
+    .card {
+      width: 100%;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      background: var(--card);
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      min-height: 53px;
+      margin: 0;
+      padding: 16px;
+      background: var(--card-header);
+      color: var(--white);
+      font-size: 18px;
+      line-height: 21px;
+      font-weight: 700;
+    }
+
+    .card-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 16px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--card-body-end));
+    }
+
+    .card-copy {
+      display: flex;
+      align-items: center;
+      min-height: 38px;
+      margin: 0;
+      color: var(--white);
+      font-size: 16px;
+      line-height: normal;
+      font-weight: 400;
+    }
+
+    .layout-toggle {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-height: 50px;
+      padding: 6px 16px;
+      overflow: hidden;
+      border-radius: 4px;
+      background: var(--black);
+      cursor: pointer;
+    }
+
+    .layout-toggle strong {
+      flex: 1;
+      min-width: 0;
+      color: var(--white);
+      font-size: 16px;
+      line-height: 38px;
+      font-weight: 700;
+    }
+
+    .switch {
+      position: relative;
+      flex: 0 0 43px;
+      width: 43px;
+      height: 23px;
+    }
+
+    .switch input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .switch-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: var(--switch-off);
+      transition: background 150ms ease;
+    }
+
+    .switch-track::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 23px;
+      height: 23px;
+      border-radius: 50%;
+      background: var(--white);
+      transition: transform 150ms ease;
+    }
+
+    .switch input:checked + .switch-track {
+      background: var(--switch-on);
+    }
+
+    .switch input:checked + .switch-track::after {
+      transform: translateX(20px);
+    }
+
+    .switch input:focus-visible + .switch-track,
+    select:focus-visible,
+    .button:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .slots {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slot-row {
+      display: grid;
+      grid-template-columns: 43px minmax(0, 1fr);
+      align-items: center;
+      gap: 16px;
+      min-height: 77px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--divider);
+    }
+
+    .slot-row:last-child {
+      border-bottom: 0;
+    }
+
+    .slot-preview {
+      display: block;
+      width: 43px;
+      height: 53px;
+      object-fit: contain;
+      transition: opacity 150ms ease;
+    }
+
+    .slot-row.optional .slot-preview {
+      opacity: 0.35;
+    }
+
+    select {
+      width: 100%;
+      height: 48px;
+      padding: 0 48px 0 16px;
+      appearance: none;
+      -webkit-appearance: none;
+      border: 2px solid var(--control-border);
+      border-radius: 4px;
+      background-color: var(--black);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%2300AAFF' d='m7 10 5 5 5-5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 24px 24px;
+      color: var(--white);
+      font-size: 16px;
+      line-height: normal;
+      font-weight: 700;
+    }
+
+    select:focus-visible {
+      border-color: var(--focus);
+      outline-offset: 0;
+    }
+
+    select option {
+      color: var(--white);
+      background: var(--black);
+    }
+
+    .actions {
+      position: fixed;
+      z-index: 10;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 16px max(16px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+      background: rgba(0, 0, 0, 0.94);
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+    }
+
+    .actions-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: min(100%, 334px);
+      margin: 0 auto;
+    }
+
+    .button {
+      min-height: 48px;
+      padding: 12px 16px;
+      border: 0;
+      border-radius: 4px;
+      background: #444444;
+      color: var(--white);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .button.primary {
+      background: var(--focus);
+      color: #000000;
+    }
+
+    .status {
+      grid-column: 1 / -1;
+      min-height: 0;
+      color: #00dd66;
+      font-size: 13px;
+      line-height: 18px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .status:empty {
+      display: none;
+    }
+
+    @media (max-width: 360px) {
+      body {
+        padding-right: 8px;
+        padding-left: 8px;
+      }
+
+      .card-form,
+      .card-title {
+        padding-right: 14px;
+        padding-left: 14px;
+      }
+
+      .slot-row,
+      .layout-toggle {
+        gap: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="page-heading">
+      <h1>Redux</h1>
+      <p>Customize your Pebble watch face.</p>
+    </header>
+
+    <section class="card" aria-labelledby="informationTitle">
+      <h2 class="card-title" id="informationTitle">Information</h2>
+      <div class="card-form">
+        <p class="card-copy">Customize what information is shown on the watch face.</p>
+
+        <label class="layout-toggle" for="verticalLayout">
+          <strong>Vertical layout</strong>
+          <span class="switch">
+            <input id="verticalLayout" type="checkbox" checked>
+            <span class="switch-track" aria-hidden="true"></span>
+          </span>
+        </label>
+
+        <div class="slots">
+          <div class="slot-row" data-slot="1">
+            <img class="slot-preview" id="slot1Preview" src="./images/vertical-slot-1.png" alt="First information position">
+            <select id="slot1Metric" aria-label="Information slot 1"></select>
+          </div>
+          <div class="slot-row" data-slot="2">
+            <img class="slot-preview" id="slot2Preview" src="./images/vertical-slot-2.png" alt="Second information position">
+            <select id="slot2Metric" aria-label="Information slot 2"></select>
+          </div>
+          <div class="slot-row" id="slot3Row" data-slot="3">
+            <img class="slot-preview" id="slot3Preview" src="./images/vertical-slot-3.png" alt="Third information position">
+            <select id="slot3Metric" aria-label="Information slot 3"></select>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="actions">
+    <div class="actions-inner">
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+      <button class="button" id="resetButton" type="button">Reset layout</button>
+      <button class="button primary" id="saveButton" type="button">Save settings</button>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var STORAGE_KEY = "redux-qa-settings";
+      var IMAGE_ROOT = "./images/";
+      var IMAGE_FALLBACK_ROOT = "https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/redux/qa/images/";
+      var METRICS = [
+        { value: "calendar", label: "Calendar" },
+        { value: "weather", label: "Weather" },
+        { value: "battery", label: "Battery" },
+        { value: "calories", label: "Calories" },
+        { value: "activity", label: "Activity time" },
+        { value: "sleep", label: "Sleep score" },
+        { value: "heart", label: "Heart rate" },
+        { value: "steps", label: "Steps" },
+        { value: "distance", label: "Distance" }
+      ];
+      var DEFAULTS = {
+        verticalLayout: true,
+        slot1Metric: "calendar",
+        slot2Metric: "weather",
+        slot3Metric: "steps"
+      };
+
+      function byId(id) {
+        return document.getElementById(id);
+      }
+
+      function asBoolean(value, fallback) {
+        if (value === true || value === 1 || value === "1" || value === "true") return true;
+        if (value === false || value === 0 || value === "0" || value === "false") return false;
+        return fallback;
+      }
+
+      function validMetric(value, allowNone, fallback) {
+        if (allowNone && value === "none") return "none";
+        for (var index = 0; index < METRICS.length; index += 1) {
+          if (METRICS[index].value === value) return value;
+        }
+        return fallback;
+      }
+
+      function normalize(raw) {
+        raw = raw || {};
+        var vertical = asBoolean(
+          raw.verticalLayout !== undefined ? raw.verticalLayout : raw.vertical_layout,
+          DEFAULTS.verticalLayout
+        );
+        var slot1 = validMetric(
+          raw.slot1Metric || raw.slot_1_metric || raw.leftMetric,
+          false,
+          DEFAULTS.slot1Metric
+        );
+        var slot2 = validMetric(
+          raw.slot2Metric || raw.slot_2_metric || raw.rightMetric,
+          false,
+          DEFAULTS.slot2Metric
+        );
+        var slot3 = validMetric(
+          raw.slot3Metric || raw.slot_3_metric || raw.middleMetric,
+          true,
+          DEFAULTS.slot3Metric
+        );
+
+        if (vertical && slot3 === "none") slot3 = DEFAULTS.slot3Metric;
+
+        return {
+          verticalLayout: vertical,
+          slot1Metric: slot1,
+          slot2Metric: slot2,
+          slot3Metric: slot3
+        };
+      }
+
+      function readIncomingSettings() {
+        var parameters = new URLSearchParams(window.location.search);
+        var encoded = parameters.get("settings");
+        if (encoded) {
+          try {
+            return normalize(JSON.parse(encoded));
+          } catch (error) {
+            try {
+              return normalize(JSON.parse(decodeURIComponent(encoded)));
+            } catch (decodeError) {
+              return normalize(DEFAULTS);
+            }
+          }
+        }
+
+        try {
+          var stored = window.localStorage.getItem(STORAGE_KEY);
+          return stored ? normalize(JSON.parse(stored)) : normalize(DEFAULTS);
+        } catch (error) {
+          return normalize(DEFAULTS);
+        }
+      }
+
+      function populateSelect(select, selected, allowNone) {
+        select.innerHTML = "";
+        METRICS.forEach(function (metric) {
+          var option = document.createElement("option");
+          option.value = metric.value;
+          option.textContent = metric.label;
+          select.appendChild(option);
+        });
+
+        if (allowNone) {
+          var noneOption = document.createElement("option");
+          noneOption.value = "none";
+          noneOption.textContent = "None";
+          select.appendChild(noneOption);
+        }
+
+        select.value = selected;
+      }
+
+      function setPreview(preview, filename) {
+        preview.onerror = function () {
+          preview.onerror = null;
+          preview.src = IMAGE_FALLBACK_ROOT + filename;
+        };
+        preview.src = IMAGE_ROOT + filename;
+      }
+
+      function updatePreviewImages() {
+        var vertical = byId("verticalLayout").checked;
+        var thirdEnabled = byId("slot3Metric").value !== "none";
+        var slot3Row = byId("slot3Row");
+
+        if (vertical && !thirdEnabled) {
+          byId("slot3Metric").value = DEFAULTS.slot3Metric;
+          thirdEnabled = true;
+        }
+
+        if (vertical) {
+          setPreview(byId("slot1Preview"), "vertical-slot-1.png");
+          setPreview(byId("slot2Preview"), "vertical-slot-2.png");
+          setPreview(byId("slot3Preview"), "vertical-slot-3.png");
+        } else if (thirdEnabled) {
+          setPreview(byId("slot1Preview"), "horizontal-3-slot-1.png");
+          setPreview(byId("slot2Preview"), "horizontal-3-slot-2.png");
+          setPreview(byId("slot3Preview"), "horizontal-3-slot-3.png");
+        } else {
+          setPreview(byId("slot1Preview"), "horizontal-2-slot-1.png");
+          setPreview(byId("slot2Preview"), "horizontal-2-slot-2.png");
+          setPreview(byId("slot3Preview"), "horizontal-3-slot-3.png");
+        }
+
+        slot3Row.classList.toggle("optional", !thirdEnabled);
+      }
+
+      function render(settings) {
+        settings = normalize(settings);
+        byId("verticalLayout").checked = settings.verticalLayout;
+        populateSelect(byId("slot1Metric"), settings.slot1Metric, false);
+        populateSelect(byId("slot2Metric"), settings.slot2Metric, false);
+        populateSelect(byId("slot3Metric"), settings.slot3Metric, true);
+        updatePreviewImages();
+      }
+
+      function collectSettings() {
+        var vertical = byId("verticalLayout").checked;
+        var slot3 = byId("slot3Metric").value;
+        if (vertical && slot3 === "none") slot3 = DEFAULTS.slot3Metric;
+
+        var slotCount = slot3 === "none" ? 2 : 3;
+        var layout = vertical ? "vertical_3" : (slotCount === 3 ? "horizontal_3" : "horizontal_2");
+
+        return {
+          verticalLayout: vertical,
+          vertical_layout: vertical,
+          layout: layout,
+          slotCount: slotCount,
+          slot_count: slotCount,
+          slot1Metric: byId("slot1Metric").value,
+          slot2Metric: byId("slot2Metric").value,
+          slot3Metric: slot3,
+          slot_1_metric: byId("slot1Metric").value,
+          slot_2_metric: byId("slot2Metric").value,
+          slot_3_metric: slot3
+        };
+      }
+
+      function saveSettings() {
+        var settings = collectSettings();
+        var encoded = encodeURIComponent(JSON.stringify(settings));
+        var parameters = new URLSearchParams(window.location.search);
+
+        try {
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+        } catch (error) {
+          // The Pebble webview can disable local storage; saving still continues.
+        }
+
+        if (parameters.get("preview") === "1") {
+          byId("status").textContent = "Saved for browser preview.";
+          return;
+        }
+
+        byId("status").textContent = "Saving…";
+        window.location.href = "pebblejs://close#" + encoded;
+      }
+
+      byId("verticalLayout").addEventListener("change", updatePreviewImages);
+      byId("slot3Metric").addEventListener("change", updatePreviewImages);
+      byId("resetButton").addEventListener("click", function () {
+        render(DEFAULTS);
+        byId("status").textContent = "Layout reset.";
+      });
+      byId("saveButton").addEventListener("click", saveSettings);
+
+      render(readIncomingSettings());
+    }());
+  </script>
+</body>
+</html>
