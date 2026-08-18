@@ -142,6 +142,15 @@
       font-weight: 700;
     }
 
+    .setting-list { display: flex; flex-direction: column; gap: 10px; }
+    .setting-row { display: flex; align-items: center; gap: 16px; min-height: 50px; padding: 6px 16px; border-radius: 4px; background: var(--black); }
+    .setting-row strong { flex: 1; min-width: 0; font-size: 16px; line-height: 22px; }
+    .field-label { display: block; margin: 0 0 7px; font-weight: 700; }
+    .text-input { width: 100%; height: 48px; padding: 0 16px; border: 2px solid var(--control-border); border-radius: 4px; background: var(--black); color: var(--white); }
+    .text-input:focus { border-color: var(--focus); outline: none; }
+    .section-gap { margin-top: 12px; }
+    .support-link { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 16px; border-radius: 4px; background: var(--focus); color: var(--black); font-weight: 800; text-decoration: none; }
+
     .switch {
       position: relative;
       flex: 0 0 43px;
@@ -612,7 +621,18 @@
       <p>Customize your Pebble watch face.</p>
     </header>
 
-    <section class="card" aria-labelledby="informationTitle">
+    <section class="card" aria-labelledby="generalTitle">
+      <h2 class="card-title" id="generalTitle">General settings</h2>
+      <div class="card-form setting-list">
+        <label class="setting-row" for="leadingZero"><strong>Display leading zero on the hours</strong><span class="switch"><input id="leadingZero" type="checkbox" checked><span class="switch-track" aria-hidden="true"></span></span></label>
+        <label class="setting-row" for="hour12"><strong>Use 12-hour format</strong><span class="switch"><input id="hour12" type="checkbox" checked><span class="switch-track" aria-hidden="true"></span></span></label>
+        <label class="setting-row" for="celsius"><strong>Use Celsius for temperature</strong><span class="switch"><input id="celsius" type="checkbox"><span class="switch-track" aria-hidden="true"></span></span></label>
+        <label class="setting-row" for="bluetooth"><strong>Show Bluetooth connectivity</strong><span class="switch"><input id="bluetooth" type="checkbox"><span class="switch-track" aria-hidden="true"></span></span></label>
+        <label class="setting-row" for="batteryIndicator"><strong>Show battery indicator</strong><span class="switch"><input id="batteryIndicator" type="checkbox" checked><span class="switch-track" aria-hidden="true"></span></span></label>
+      </div>
+    </section>
+
+    <section class="card section-gap" aria-labelledby="informationTitle">
       <h2 class="card-title" id="informationTitle">Information</h2>
       <div class="card-form">
         <p class="card-copy">Customize what information is shown on the watch face.</p>
@@ -654,6 +674,31 @@
       <div class="theme-panel" id="customThemePanel" role="tabpanel" aria-labelledby="customThemeTab" hidden>
         <div class="custom-theme-list" id="customThemeRows"></div>
       </div>
+    </section>
+
+    <section class="card section-gap" id="locationCard" aria-labelledby="locationTitle">
+      <h2 class="card-title" id="locationTitle">Manual location</h2>
+      <div class="card-form">
+        <p class="card-copy">Enter either a ZIP/postal code or city to override the phone location.</p>
+        <div><label class="field-label" for="manualCountry">Country code</label><input class="text-input" id="manualCountry" type="text" maxlength="2" placeholder="US"></div>
+        <div><label class="field-label" for="manualPostalCode">ZIP/postal code</label><input class="text-input" id="manualPostalCode" type="text" autocomplete="postal-code"></div>
+        <div><label class="field-label" for="manualCity">City</label><input class="text-input" id="manualCity" type="text" autocomplete="address-level2"></div>
+      </div>
+    </section>
+
+    <section class="card section-gap" aria-labelledby="languageTitle">
+      <h2 class="card-title" id="languageTitle">Language</h2>
+      <div class="card-form"><p class="card-copy">Change the watch face language.</p><select id="language" aria-label="Language"></select></div>
+    </section>
+
+    <section class="card section-gap" aria-labelledby="analyticsTitle">
+      <h2 class="card-title" id="analyticsTitle">Analytics</h2>
+      <div class="card-form"><label class="setting-row" for="analytics"><strong>Share anonymous usage analytics</strong><span class="switch"><input id="analytics" type="checkbox" checked><span class="switch-track" aria-hidden="true"></span></span></label><p class="card-copy">No personal or health data is collected.</p></div>
+    </section>
+
+    <section class="card section-gap" aria-labelledby="supportTitle">
+      <h2 class="card-title" id="supportTitle">Support</h2>
+      <div class="card-form"><p class="card-copy">Redux is free and built with care. Consider supporting future improvements.</p><a class="support-link" id="supportLink" href="https://ko-fi.com/lylemorris" target="_blank" rel="noopener">Support Redux</a></div>
     </section>
   </main>
 
@@ -699,6 +744,14 @@
         { value: "steps", label: "Steps" },
         { value: "distance", label: "Distance" }
       ];
+      var LANGUAGES = [
+        ["en","English"],["es","Spanish"],["fr","French"],["de","German"],["pt","Portuguese"],
+        ["it","Italian"],["nl","Dutch"],["da","Danish"],["nb","Norwegian"],["sv","Swedish"],
+        ["fi","Finnish"],["is","Icelandic"],["ca","Catalan"],["eu","Basque"],["gl","Galician"],
+        ["pl","Polish"],["cs","Czech"],["sk","Slovak"],["sl","Slovenian"],["hr","Croatian"],
+        ["bs","Bosnian (BS)"],["sr-Latn","Serbian (Latin)"],["ro","Romanian"],["hu","Hungarian"],
+        ["et","Estonian"],["lv","Latvian"],["lt","Lithuanian"],["tr","Turkish"],["sq","Albanian"],["mt","Maltese (MS)"]
+      ];
       var THEMES = [
         { value: "orange", label: "Orange", color: "#ff5400", text: "#ffffff" },
         { value: "blue", label: "Blue", color: "#00aaff", text: "#000000" },
@@ -724,6 +777,16 @@
         });
       });
       var DEFAULTS = {
+        showLeadingZero: true,
+        hour24: false,
+        celsius: false,
+        showBluetooth: false,
+        manualLocation: false,
+        manualPostalCode: "",
+        manualCity: "",
+        manualCountry: "",
+        language: "en",
+        analyticsEnabled: true,
         verticalLayout: true,
         slot1Metric: "calendar",
         slot2Metric: "weather",
@@ -852,6 +915,16 @@
         verticalSource.dateText = firstValue(raw.dateTextColor, raw.date_text_color, verticalSource.dateText);
 
         return {
+          showLeadingZero: asBoolean(firstValue(raw.showLeadingZero, raw.show_leading_zero), DEFAULTS.showLeadingZero),
+          hour24: asBoolean(firstValue(raw.hour24, raw.use_24_hour), DEFAULTS.hour24),
+          celsius: asBoolean(firstValue(raw.celsius, raw.use_celsius), DEFAULTS.celsius),
+          showBluetooth: asBoolean(firstValue(raw.showBluetooth, raw.show_bluetooth), DEFAULTS.showBluetooth),
+          manualLocation: asBoolean(firstValue(raw.manualLocation, raw.manual_location), DEFAULTS.manualLocation),
+          manualPostalCode: String(firstValue(raw.manualPostalCode, raw.manual_postal_code, DEFAULTS.manualPostalCode) || "").trim(),
+          manualCity: String(firstValue(raw.manualCity, raw.manual_city, DEFAULTS.manualCity) || "").trim(),
+          manualCountry: String(firstValue(raw.manualCountry, raw.manual_country, DEFAULTS.manualCountry) || "").trim().toUpperCase().slice(0,2),
+          language: LANGUAGES.some(function(item){ return item[0] === raw.language; }) ? raw.language : DEFAULTS.language,
+          analyticsEnabled: asBoolean(firstValue(raw.analyticsEnabled, raw.analytics_enabled), DEFAULTS.analyticsEnabled),
           verticalLayout: vertical,
           slot1Metric: slot1,
           slot2Metric: slot2,
@@ -1152,6 +1225,17 @@
 
       function render(settings) {
         state = normalize(settings);
+        byId("leadingZero").checked = state.showLeadingZero;
+        byId("hour12").checked = !state.hour24;
+        byId("celsius").checked = state.celsius;
+        byId("bluetooth").checked = state.showBluetooth;
+        byId("batteryIndicator").checked = state.showBatteryIndicator;
+        byId("manualPostalCode").value = state.manualPostalCode;
+        byId("manualCity").value = state.manualCity;
+        byId("manualCountry").value = state.manualCountry;
+        byId("analytics").checked = state.analyticsEnabled;
+        byId("language").innerHTML = LANGUAGES.map(function(item){ return '<option value="'+item[0]+'">'+item[1]+'</option>'; }).join("");
+        byId("language").value = state.language;
         byId("verticalLayout").checked = state.verticalLayout;
         populateSelect(byId("slot1Metric"), state.slot1Metric, false);
         populateSelect(byId("slot2Metric"), state.slot2Metric, false);
@@ -1171,6 +1255,25 @@
         var customTheme = clone(state.customTheme);
         var activeCustom = vertical ? customTheme.vertical : customTheme.horizontal;
         return {
+          showLeadingZero: byId("leadingZero").checked,
+          show_leading_zero: byId("leadingZero").checked,
+          hour24: !byId("hour12").checked,
+          use_24_hour: !byId("hour12").checked,
+          celsius: byId("celsius").checked,
+          use_celsius: byId("celsius").checked,
+          showBluetooth: byId("bluetooth").checked,
+          show_bluetooth: byId("bluetooth").checked,
+          manualLocation: !!(byId("manualPostalCode").value.trim() || byId("manualCity").value.trim()),
+          manual_location: !!(byId("manualPostalCode").value.trim() || byId("manualCity").value.trim()),
+          manualPostalCode: byId("manualPostalCode").value.trim(),
+          manual_postal_code: byId("manualPostalCode").value.trim(),
+          manualCity: byId("manualCity").value.trim(),
+          manual_city: byId("manualCity").value.trim(),
+          manualCountry: byId("manualCountry").value.trim().toUpperCase().slice(0,2),
+          manual_country: byId("manualCountry").value.trim().toUpperCase().slice(0,2),
+          language: byId("language").value,
+          analyticsEnabled: byId("analytics").checked,
+          analytics_enabled: byId("analytics").checked,
           verticalLayout: vertical,
           vertical_layout: vertical,
           layout: layout,
@@ -1185,8 +1288,8 @@
           themeMode: state.themeMode,
           theme_mode: state.themeMode,
           theme: state.theme,
-          showBatteryIndicator: state.showBatteryIndicator,
-          show_battery_indicator: state.showBatteryIndicator,
+          showBatteryIndicator: byId("batteryIndicator").checked,
+          show_battery_indicator: byId("batteryIndicator").checked,
           customTheme: customTheme,
           custom_theme: customTheme,
           watchfaceBackground: activeCustom.background,
