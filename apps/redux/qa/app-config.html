@@ -1,1375 +1,370 @@
 <!doctype html>
-<!-- Redux QA app configuration -->
+<!-- Redux 2.1.0 QA app configuration -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#ececec">
+  <meta name="theme-color" content="#333333">
   <title>Redux Settings</title>
   <style>
     :root {
-      --page: #ececec;
+      --page-top: #333333;
+      --page-bottom: #000000;
       --card: #222222;
       --card-border: #555555;
-      --card-header: rgba(255, 255, 255, 0.08);
-      --card-body-end: rgba(255, 255, 255, 0.05);
+      --card-header: rgba(255,255,255,.08);
+      --card-body-end: rgba(255,255,255,.05);
       --black: #000000;
       --white: #ffffff;
-      --divider: rgba(255, 255, 255, 0.10);
-      --control-border: rgba(255, 255, 255, 0.25);
+      --divider: rgba(255,255,255,.10);
+      --control-border: rgba(255,255,255,.25);
       --focus: #00aaff;
       --switch-on: #00ee33;
       --switch-off: #777777;
+      --button-muted: rgba(255,255,255,.15);
     }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      min-width: 320px;
-      min-height: 100%;
-      background: var(--page);
-    }
-
+    * { box-sizing: border-box; }
+    html { min-width: 320px; min-height: 100%; background: var(--page-bottom); }
     body {
       min-width: 320px;
       min-height: 100vh;
       margin: 0;
-      padding: 24px 12px 112px;
+      padding: 0 0 107px;
       color: var(--white);
-      background: var(--page);
-      font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg,var(--page-top) 0%,var(--page-bottom) 100%);
+      background-attachment: fixed;
+      font-family: Roboto,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       font-size: 16px;
       line-height: normal;
     }
-
-    button,
-    select,
-    input {
-      font: inherit;
-    }
-
-    button,
-    label,
-    select {
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .page {
-      width: min(100%, 366px);
-      margin: 0 auto;
-    }
-
-    .page-heading {
-      margin: 0 0 12px;
-      padding: 0 4px;
-      color: #333333;
-    }
-
-    .page-heading h1 {
-      margin: 0;
-      font-size: 28px;
-      line-height: 34px;
-      font-weight: 800;
-    }
-
-    .page-heading p {
-      margin: 4px 0 0;
-      color: #555555;
-      line-height: 22px;
-    }
-
+    button,select,input { font: inherit; }
+    button,label,select { -webkit-tap-highlight-color: transparent; }
+    .shell { width: min(100%,390px); margin: 0 auto; }
+    .page-heading { padding: 24px 24px 0; margin: 0 0 56px; color: var(--white); }
+    .page-heading h1 { margin: 0; font-size: 38px; line-height: 46px; font-weight: 900; letter-spacing: -.5px; }
+    .page-heading p { margin: 0; color: var(--white); font-size: 16px; line-height: 24px; font-weight: 400; }
+    .page-content { display: flex; flex-direction: column; gap: 16px; padding: 0 12px; }
     .card {
-      width: 100%;
-      overflow: hidden;
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      background: var(--card);
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+      width: 100%; overflow: hidden; border: 1px solid var(--card-border); border-radius: 8px;
+      background: var(--card); box-shadow: 0 0 12px rgba(0,0,0,.5);
     }
-
     .card-title {
-      display: flex;
-      align-items: center;
-      min-height: 53px;
-      margin: 0;
-      padding: 16px;
-      background: var(--card-header);
-      color: var(--white);
-      font-size: 18px;
-      line-height: 21px;
-      font-weight: 700;
+      display:flex; align-items:center; min-height:53px; margin:0; padding:16px;
+      background:var(--card-header); color:var(--white); font-size:18px; line-height:21px; font-weight:700;
     }
-
     .card-form {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      padding: 16px;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 0), var(--card-body-end));
+      display:flex; flex-direction:column; gap:16px; padding:16px;
+      background:linear-gradient(180deg,rgba(255,255,255,0),var(--card-body-end));
     }
-
-    .card-copy {
-      display: flex;
-      align-items: center;
-      min-height: 38px;
-      margin: 0;
-      color: var(--white);
-      font-size: 16px;
-      line-height: normal;
-      font-weight: 400;
+    .card-copy { margin:0; color:var(--white); font-size:16px; line-height:24px; font-weight:400; }
+    .setting-list { gap:0; }
+    .setting-row {
+      display:flex; align-items:center; gap:16px; min-height:56px; padding:12px 0;
+      border-bottom:1px solid var(--divider); background:transparent; cursor:pointer;
     }
-
+    .setting-row:last-child { border-bottom:0; }
+    .setting-row strong { flex:1; min-width:0; font-size:16px; line-height:22px; font-weight:500; }
+    .checkbox {
+      position:relative; flex:0 0 32px; width:32px; height:32px; display:grid; place-items:center; cursor:pointer;
+    }
+    .checkbox input { position:absolute; opacity:0; pointer-events:none; }
+    .checkbox-box {
+      position:relative; width:18px; height:18px; border:2px solid rgba(255,255,255,.28); border-radius:2px; background:transparent;
+    }
+    .checkbox input:checked + .checkbox-box { border-color:var(--focus); background:var(--focus); }
+    .checkbox input:checked + .checkbox-box::after {
+      content:""; position:absolute; left:4px; top:0px; width:5px; height:10px;
+      border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg);
+    }
+    .checkbox input:focus-visible + .checkbox-box { outline:2px solid #fff; outline-offset:3px; }
     .layout-toggle {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      min-height: 50px;
-      padding: 6px 16px;
-      overflow: hidden;
-      border-radius: 4px;
-      background: var(--black);
-      cursor: pointer;
+      display:flex; align-items:center; gap:16px; min-height:50px; padding:6px 16px; overflow:hidden;
+      border-radius:4px; background:var(--black); cursor:pointer;
     }
-
-    .layout-toggle strong {
-      flex: 1;
-      min-width: 0;
-      color: var(--white);
-      font-size: 16px;
-      line-height: 38px;
-      font-weight: 700;
-    }
-
-    .setting-list { display: flex; flex-direction: column; gap: 10px; }
-    .setting-row { display: flex; align-items: center; gap: 16px; min-height: 50px; padding: 6px 16px; border-radius: 4px; background: var(--black); }
-    .setting-row strong { flex: 1; min-width: 0; font-size: 16px; line-height: 22px; }
-    .field-label { display: block; margin: 0 0 7px; font-weight: 700; }
-    .text-input { width: 100%; height: 48px; padding: 0 16px; border: 2px solid var(--control-border); border-radius: 4px; background: var(--black); color: var(--white); }
-    .text-input:focus { border-color: var(--focus); outline: none; }
-    .section-gap { margin-top: 12px; }
-    .support-link { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 16px; border-radius: 4px; background: var(--focus); color: var(--black); font-weight: 800; text-decoration: none; }
-
-    .switch {
-      position: relative;
-      flex: 0 0 43px;
-      width: 43px;
-      height: 23px;
-    }
-
-    .switch input {
-      position: absolute;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .switch-track {
-      position: absolute;
-      inset: 0;
-      border-radius: 999px;
-      background: var(--switch-off);
-      transition: background 150ms ease;
-    }
-
-    .switch-track::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 23px;
-      height: 23px;
-      border-radius: 50%;
-      background: var(--white);
-      transition: transform 150ms ease;
-    }
-
-    .switch input:checked + .switch-track {
-      background: var(--switch-on);
-    }
-
-    .switch input:checked + .switch-track::after {
-      transform: translateX(20px);
-    }
-
-    .switch input:focus-visible + .switch-track,
-    select:focus-visible,
-    .button:focus-visible {
-      outline: 2px solid var(--focus);
-      outline-offset: 2px;
-    }
-
-    .slots {
-      display: flex;
-      flex-direction: column;
-    }
-
+    .layout-toggle strong { flex:1; min-width:0; color:#fff; font-size:16px; line-height:38px; font-weight:700; }
+    .switch { position:relative; flex:0 0 43px; width:43px; height:23px; }
+    .switch input { position:absolute; opacity:0; pointer-events:none; }
+    .switch-track { position:absolute; inset:0; border-radius:999px; background:var(--switch-off); transition:background 150ms ease; }
+    .switch-track::after { content:""; position:absolute; top:0; left:0; width:23px; height:23px; border-radius:50%; background:#fff; transition:transform 150ms ease; }
+    .switch input:checked + .switch-track { background:var(--switch-on); }
+    .switch input:checked + .switch-track::after { transform:translateX(20px); }
+    .switch input:focus-visible + .switch-track { outline:2px solid var(--focus); outline-offset:2px; }
+    .slots { display:flex; flex-direction:column; }
     .slot-row {
-      display: grid;
-      grid-template-columns: 43px minmax(0, 1fr);
-      align-items: center;
-      gap: 16px;
-      min-height: 77px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--divider);
+      display:grid; grid-template-columns:43px minmax(0,1fr); align-items:center; gap:16px; min-height:77px;
+      padding:12px 0; border-bottom:1px solid var(--divider);
     }
-
-    .slot-row:last-child {
-      border-bottom: 0;
+    .slot-row:last-child { border-bottom:0; }
+    .slot-preview { display:block; width:43px; height:53px; object-fit:contain; transition:opacity 150ms ease; }
+    .slot-row.optional .slot-preview { opacity:.35; }
+    .slot-count {
+      display:none; width:100%; height:50px; overflow:hidden; border:1px solid var(--control-border); border-radius:4px;
     }
-
-    .slot-preview {
-      display: block;
-      width: 43px;
-      height: 53px;
-      object-fit: contain;
-      transition: opacity 150ms ease;
+    .slot-count.is-visible { display:flex; }
+    .slot-count button {
+      flex:1; border:0; background:transparent; color:rgba(255,255,255,.25); font-weight:700; cursor:not-allowed;
     }
-
-    .slot-row.optional .slot-preview {
-      opacity: 0.35;
+    .slot-count button[aria-pressed="true"] { background:#000; color:#fff; }
+    .field-group { display:flex; flex-direction:column; gap:4px; }
+    .field-label { display:block; margin:0; font-size:14px; line-height:20px; font-weight:700; }
+    .text-input {
+      width:100%; height:48px; padding:0 16px; border:2px solid var(--control-border); border-radius:4px;
+      background:#000; color:#fff;
     }
-
-    .theme-card {
-      margin-top: 24px;
-      color: var(--white);
-    }
-
-    .theme-tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      min-height: 48px;
-    }
-
-    .theme-tab {
-      min-width: 0;
-      min-height: 48px;
-      padding: 12px 16px;
-      border: 0;
-      border-radius: 0;
-      background: transparent;
-      color: var(--white);
-      font-size: 18px;
-      line-height: 23px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .theme-tab[aria-selected="true"] {
-      border: 1px solid var(--card-border);
-      border-bottom: 0;
-      border-radius: 8px 8px 0 0;
-      background: var(--card);
-    }
-
-    .theme-tab:focus-visible,
-    .theme-choice:focus-visible,
-    .color-picker-trigger:focus-visible,
-    .palette-swatch:focus-visible,
-    .palette-close:focus-visible {
-      position: relative;
-      z-index: 1;
-      outline: 2px solid var(--focus);
-      outline-offset: 2px;
-    }
-
-    .theme-panel {
-      overflow: hidden;
-      border: 1px solid var(--card-border);
-      border-radius: 0 0 8px 8px;
-      background: var(--card);
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
-    }
-
-    .theme-panel[hidden] {
-      display: none;
-    }
-
-    .theme-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 4px;
-      padding: 16px;
-    }
-
-    .theme-choice {
-      height: 80px;
-      padding: 6px;
-      overflow: hidden;
-      border: 2px solid transparent;
-      border-radius: 8px;
-      background: transparent;
-      cursor: pointer;
-    }
-
-    .theme-choice[aria-pressed="true"] {
-      border-color: var(--focus);
-    }
-
-    .theme-choice-swatch {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-      border-radius: 6px;
-      font-size: 14px;
-      line-height: normal;
-      font-weight: 700;
-    }
-
-    .custom-theme-list {
-      padding: 0 16px;
-    }
-
-    .theme-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 43px 1px 48px;
-      align-items: center;
-      gap: 16px;
-      min-height: 85px;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--control-border);
-    }
-
-    .theme-row:last-child {
-      border-bottom: 0;
-    }
-
-    .theme-row.is-disabled {
-      opacity: 0.4;
-    }
-
-    .theme-row-label {
-      min-width: 0;
-      font-size: 18px;
-      line-height: normal;
-      font-weight: 700;
-    }
-
-    .theme-row-preview {
-      display: block;
-      width: 43px;
-      height: 53px;
-      object-fit: contain;
-    }
-
-    .theme-row-divider {
-      width: 1px;
-      height: 53px;
-      background: var(--control-border);
-    }
-
-    .color-picker-trigger {
-      width: 48px;
-      height: 48px;
-      padding: 0;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      background: var(--selected-color, #000000);
-      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
-      cursor: pointer;
-    }
-
-    .color-picker-trigger:disabled {
-      cursor: not-allowed;
-    }
-
-    .palette-dialog {
-      position: fixed;
-      z-index: 30;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.78);
-    }
-
-    .palette-dialog[hidden] {
-      display: none;
-    }
-
-    .palette-sheet {
-      width: min(100%, 366px);
-      max-height: calc(100vh - 40px);
-      overflow: auto;
-      padding: 16px;
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      background: var(--card);
-      box-shadow: 0 0 16px rgba(0, 0, 0, 0.7);
-    }
-
-    .palette-head {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-
-    .palette-head h2 {
-      flex: 1;
-      margin: 0;
-      font-size: 20px;
-      line-height: 28px;
-    }
-
-    .palette-close {
-      width: 40px;
-      height: 40px;
-      padding: 0;
-      border: 0;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.15);
-      color: var(--white);
-      font-size: 24px;
-      line-height: 1;
-      cursor: pointer;
-    }
-
-    .palette-copy {
-      margin: 0 0 16px;
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 14px;
-      line-height: 20px;
-    }
-
-    .palette-grid {
-      display: grid;
-      grid-template-columns: repeat(8, minmax(0, 1fr));
-      gap: 6px;
-    }
-
-    .palette-swatch {
-      position: relative;
-      aspect-ratio: 1;
-      min-width: 0;
-      padding: 0;
-      border: 2px solid rgba(255, 255, 255, 0.22);
-      border-radius: 5px;
-      background: var(--swatch);
-      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.32);
-      cursor: pointer;
-    }
-
-    .palette-swatch.selected {
-      border-color: var(--focus);
-      box-shadow: 0 0 0 2px var(--black), 0 0 0 4px var(--focus);
-    }
-
-    .palette-swatch.selected::after {
-      content: "✓";
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      color: var(--check, var(--white));
-      font-size: 18px;
-      font-weight: 900;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-    }
-
-    .palette-footer {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .palette-value {
-      flex: 1;
-      font-family: monospace;
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    .palette-done {
-      min-width: 96px;
-    }
-
-    body.palette-open {
-      overflow: hidden;
-    }
-
-    .visually-hidden {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
+    .text-input:focus { border-color:var(--focus); outline:none; }
     select {
-      width: 100%;
-      height: 48px;
-      padding: 0 48px 0 16px;
-      appearance: none;
-      -webkit-appearance: none;
-      border: 2px solid var(--control-border);
-      border-radius: 4px;
-      background-color: var(--black);
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%2300AAFF' d='m7 10 5 5 5-5z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      background-size: 24px 24px;
-      color: var(--white);
-      font-size: 16px;
-      line-height: normal;
-      font-weight: 700;
+      width:100%; height:48px; padding:0 48px 0 16px; appearance:none; -webkit-appearance:none;
+      border:2px solid var(--control-border); border-radius:4px; background-color:#000;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%2300AAFF' d='m7 10 5 5 5-5z'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 10px center; background-size:24px 24px;
+      color:#fff; font-size:16px; font-weight:700;
     }
-
-    select:focus-visible {
-      border-color: var(--focus);
-      outline-offset: 0;
+    select:focus-visible { border-color:var(--focus); outline:2px solid var(--focus); outline-offset:0; }
+    select option { color:#fff; background:#000; }
+    .theme-card { color:#fff; filter:drop-shadow(0 0 6px rgba(0,0,0,.5)); }
+    .theme-tabs { display:grid; grid-template-columns:1fr 1fr; min-height:52px; }
+    .theme-tab {
+      min-width:0; min-height:52px; padding:16px; border:0; border-radius:0; background:transparent;
+      color:#fff; font-size:18px; line-height:20px; font-weight:700; cursor:pointer;
     }
-
-    select option {
-      color: var(--white);
-      background: var(--black);
+    .theme-tab[aria-selected="true"] {
+      border:1px solid var(--card-border); border-bottom:0; border-radius:8px 8px 0 0; background:var(--card);
     }
-
+    .theme-panel {
+      overflow:hidden; border:1px solid var(--card-border); border-radius:0 0 8px 8px; background:var(--card);
+      box-shadow:0 0 12px rgba(0,0,0,.5);
+    }
+    .theme-panel[hidden] { display:none; }
+    .theme-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; padding:16px; }
+    .theme-choice { height:80px; padding:6px; overflow:hidden; border:2px solid transparent; border-radius:8px; background:transparent; cursor:pointer; }
+    .theme-choice[aria-pressed="true"] { border-color:var(--focus); }
+    .theme-choice-swatch { display:flex; align-items:center; justify-content:center; width:100%; height:100%; border-radius:6px; font-size:14px; font-weight:700; }
+    .custom-theme-list { padding:0 16px; }
+    .theme-row {
+      display:grid; grid-template-columns:minmax(0,1fr) 43px 1px 48px; align-items:center; gap:24px;
+      min-height:85px; padding:16px; border-bottom:1px solid var(--control-border);
+    }
+    .theme-row:last-child { border-bottom:0; }
+    .theme-row-label { min-width:0; font-size:18px; line-height:22px; font-weight:700; }
+    .theme-row-preview { display:block; width:43px; height:53px; object-fit:contain; }
+    .theme-row-divider { width:1px; height:53px; background:var(--control-border); }
+    .color-picker-trigger {
+      width:48px; height:48px; padding:0; border:2px solid rgba(255,255,255,.3); border-radius:50%;
+      background:var(--selected-color,#000); box-shadow:inset 0 0 0 1px rgba(0,0,0,.35); cursor:pointer;
+    }
+    .theme-tab:focus-visible,.theme-choice:focus-visible,.color-picker-trigger:focus-visible,.palette-swatch:focus-visible,.palette-close:focus-visible {
+      position:relative; z-index:1; outline:2px solid var(--focus); outline-offset:2px;
+    }
+    .analytics-card .card-form { gap:16px; }
+    .analytics-toggle { padding:8px 12px; border:0; border-radius:4px; background:#000; }
+    .analytics-toggle strong { font-weight:400; }
+    .support-link {
+      display:inline-flex; align-items:center; justify-content:center; width:100%; min-height:48px; padding:12px 24px;
+      border-radius:4px; background:var(--button-muted); color:#fff; font-weight:700; text-decoration:none;
+    }
+    .palette-dialog { position:fixed; z-index:30; inset:0; display:grid; place-items:center; padding:20px; background:rgba(0,0,0,.78); }
+    .palette-dialog[hidden] { display:none; }
+    .palette-sheet { width:min(100%,366px); max-height:calc(100vh - 40px); overflow:auto; padding:16px; border:1px solid var(--card-border); border-radius:8px; background:var(--card); box-shadow:0 0 16px rgba(0,0,0,.7); }
+    .palette-head { display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+    .palette-head h2 { flex:1; margin:0; font-size:20px; line-height:28px; }
+    .palette-close { width:40px; height:40px; padding:0; border:0; border-radius:4px; background:var(--button-muted); color:#fff; font-size:24px; line-height:1; cursor:pointer; }
+    .palette-copy { margin:0 0 16px; color:rgba(255,255,255,.8); font-size:14px; line-height:20px; }
+    .palette-grid { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:6px; }
+    .palette-swatch { position:relative; aspect-ratio:1; min-width:0; padding:0; border:2px solid rgba(255,255,255,.22); border-radius:5px; background:var(--swatch); box-shadow:inset 0 0 0 1px rgba(0,0,0,.32); cursor:pointer; }
+    .palette-swatch.selected { border-color:var(--focus); box-shadow:0 0 0 2px #000,0 0 0 4px var(--focus); }
+    .palette-swatch.selected::after { content:"✓"; position:absolute; inset:0; display:grid; place-items:center; color:var(--check,#fff); font-size:18px; font-weight:900; text-shadow:0 1px 2px rgba(0,0,0,.8); }
+    .palette-footer { display:flex; align-items:center; gap:12px; margin-top:16px; }
+    .palette-value { flex:1; font-family:monospace; font-size:16px; font-weight:700; }
+    body.palette-open { overflow:hidden; }
+    .visually-hidden { position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
     .actions {
-      position: fixed;
-      z-index: 10;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding: 16px max(16px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
-      background: rgba(0, 0, 0, 0.94);
-      box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+      position:fixed; z-index:10; left:50%; bottom:0; width:min(100%,390px); transform:translateX(-50%);
+      padding:16px max(16px,env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+      background:#222; box-shadow:0 0 12px rgba(0,0,0,.5);
     }
-
-    .actions-inner {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      width: min(100%, 334px);
-      margin: 0 auto;
-    }
-
-    .button {
-      min-height: 48px;
-      padding: 12px 16px;
-      border: 0;
-      border-radius: 4px;
-      background: #444444;
-      color: var(--white);
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .button.primary {
-      background: var(--focus);
-      color: #000000;
-    }
-
-    .status {
-      grid-column: 1 / -1;
-      min-height: 0;
-      color: #00dd66;
-      font-size: 13px;
-      line-height: 18px;
-      font-weight: 700;
-      text-align: center;
-    }
-
-    .status:empty {
-      display: none;
-    }
-
-    @media (max-width: 360px) {
-      body {
-        padding-right: 8px;
-        padding-left: 8px;
-      }
-
-      .card-form,
-      .card-title {
-        padding-right: 14px;
-        padding-left: 14px;
-      }
-
-      .slot-row,
-      .layout-toggle {
-        gap: 12px;
-      }
-
-      .theme-grid {
-        padding-right: 12px;
-        padding-left: 12px;
-      }
-
-      .custom-theme-list {
-        padding-right: 12px;
-        padding-left: 12px;
-      }
-
-      .theme-row {
-        grid-template-columns: minmax(0, 1fr) 43px 1px 48px;
-        gap: 12px;
-      }
+    .actions-inner { display:grid; grid-template-columns:1fr 1fr; gap:16px; width:100%; margin:0 auto; }
+    .button { min-height:48px; padding:12px 24px; border:0; border-radius:4px; background:var(--button-muted); color:#fff; font-weight:700; cursor:pointer; }
+    .button.primary { background:var(--focus); color:#fff; }
+    .status { grid-column:1/-1; min-height:0; color:#55ff88; font-size:13px; line-height:18px; font-weight:700; text-align:center; }
+    .status:empty { display:none; }
+    @media(max-width:360px) {
+      .page-heading { padding-right:16px; padding-left:16px; }
+      .page-content { padding-right:8px; padding-left:8px; }
+      .card-form,.card-title { padding-right:14px; padding-left:14px; }
+      .slot-row,.layout-toggle { gap:12px; }
+      .theme-grid,.custom-theme-list { padding-right:12px; padding-left:12px; }
+      .theme-row { grid-template-columns:minmax(0,1fr) 43px 1px 48px; gap:12px; padding-right:12px; padding-left:12px; }
     }
   </style>
 </head>
 <body>
-  <main class="page">
+  <main class="shell">
     <header class="page-heading">
       <h1>Redux</h1>
-      <p>Customize your Pebble watch face.</p>
+      <p>Use the settings below to customize your Pebble watchface.</p>
     </header>
 
-    <section class="card" aria-labelledby="generalTitle">
-      <h2 class="card-title" id="generalTitle">General settings</h2>
-      <div class="card-form setting-list">
-        <label class="setting-row" for="leadingZero"><strong>Display leading zero on the hours</strong><span class="switch"><input id="leadingZero" type="checkbox" checked><span class="switch-track" aria-hidden="true"></span></span></label>
-        <label class="setting-row" for="hour12"><strong>Use 12-hour format</strong><span class="switch"><input id="hour12" type="checkbox" checked><span class="switch-track" aria-hidden="true"></span></span></label>
-        <label class="setting-row" for="celsius"><strong>Use Celsius for temperature</strong><span class="switch"><input id="celsius" type="checkbox"><span class="switch-track" aria-hidden="true"></span></span></label>
-        <label class="setting-row" for="bluetooth"><strong>Show Bluetooth connectivity</strong><span class="switch"><input id="bluetooth" type="checkbox"><span class="switch-track" aria-hidden="true"></span></span></label>
-        <label class="setting-row" for="batteryIndicator"><strong>Show battery indicator</strong><span class="switch"><input id="batteryIndicator" type="checkbox" checked><span class="switch-track" aria-hidden="true"></span></span></label>
-      </div>
-    </section>
+    <div class="page-content">
+      <section class="card" aria-labelledby="generalTitle">
+        <h2 class="card-title" id="generalTitle">General settings</h2>
+        <div class="card-form setting-list">
+          <label class="setting-row" for="leadingZero"><strong>Display leading zero on the hours.</strong><span class="checkbox"><input id="leadingZero" type="checkbox"><span class="checkbox-box" aria-hidden="true"></span></span></label>
+          <label class="setting-row" for="hour12"><strong>Use 12-hour format</strong><span class="checkbox"><input id="hour12" type="checkbox"><span class="checkbox-box" aria-hidden="true"></span></span></label>
+          <label class="setting-row" for="celsius"><strong>Use Celsius for temperature</strong><span class="checkbox"><input id="celsius" type="checkbox"><span class="checkbox-box" aria-hidden="true"></span></span></label>
+          <label class="setting-row" for="bluetooth"><strong>Show Bluetooth connectivity</strong><span class="checkbox"><input id="bluetooth" type="checkbox"><span class="checkbox-box" aria-hidden="true"></span></span></label>
+          <label class="setting-row" for="batteryIndicator"><strong>Show battery indicator</strong><span class="checkbox"><input id="batteryIndicator" type="checkbox"><span class="checkbox-box" aria-hidden="true"></span></span></label>
+        </div>
+      </section>
 
-    <section class="card section-gap" aria-labelledby="informationTitle">
-      <h2 class="card-title" id="informationTitle">Information</h2>
-      <div class="card-form">
-        <p class="card-copy">Customize what information is shown on the watch face.</p>
-
-        <label class="layout-toggle" for="verticalLayout">
-          <strong>Vertical layout</strong>
-          <span class="switch">
-            <input id="verticalLayout" type="checkbox" checked>
-            <span class="switch-track" aria-hidden="true"></span>
-          </span>
-        </label>
-
-        <div class="slots">
-          <div class="slot-row" data-slot="1">
-            <img class="slot-preview" id="slot1Preview" src="./images/vertical-slot-1.png" alt="First information position">
-            <select id="slot1Metric" aria-label="Information slot 1"></select>
-          </div>
-          <div class="slot-row" data-slot="2">
-            <img class="slot-preview" id="slot2Preview" src="./images/vertical-slot-2.png" alt="Second information position">
-            <select id="slot2Metric" aria-label="Information slot 2"></select>
-          </div>
-          <div class="slot-row" id="slot3Row" data-slot="3">
-            <img class="slot-preview" id="slot3Preview" src="./images/vertical-slot-3.png" alt="Third information position">
-            <select id="slot3Metric" aria-label="Information slot 3"></select>
+      <section class="card" aria-labelledby="informationTitle">
+        <h2 class="card-title" id="informationTitle">Information</h2>
+        <div class="card-form">
+          <p class="card-copy">Customize what information is shown on the watch face.</p>
+          <label class="layout-toggle" for="verticalLayout"><strong>Switch to vertical layout</strong><span class="switch"><input id="verticalLayout" type="checkbox"><span class="switch-track" aria-hidden="true"></span></span></label>
+          <div class="slot-count" id="verticalSlotCount" aria-label="Vertical slot count"><button type="button" disabled aria-pressed="false">2 slots</button><button type="button" disabled aria-pressed="true">3 slots</button></div>
+          <div class="slots">
+            <div class="slot-row" data-slot="1"><img class="slot-preview" id="slot1Preview" src="./images/vertical-slot-1.png" alt="First information position"><select id="slot1Metric" aria-label="Information slot 1"></select></div>
+            <div class="slot-row" data-slot="2"><img class="slot-preview" id="slot2Preview" src="./images/vertical-slot-2.png" alt="Second information position"><select id="slot2Metric" aria-label="Information slot 2"></select></div>
+            <div class="slot-row" id="slot3Row" data-slot="3"><img class="slot-preview" id="slot3Preview" src="./images/vertical-slot-3.png" alt="Third information position"><select id="slot3Metric" aria-label="Information slot 3"></select></div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <section class="theme-card" aria-labelledby="themeSettingsTitle">
-      <h2 class="visually-hidden" id="themeSettingsTitle">Theme settings</h2>
-      <div class="theme-tabs" role="tablist" aria-label="Theme settings">
-        <button class="theme-tab" id="presetThemeTab" type="button" role="tab" aria-selected="true" aria-controls="presetThemePanel">Theme</button>
-        <button class="theme-tab" id="customThemeTab" type="button" role="tab" aria-selected="false" aria-controls="customThemePanel">Custom</button>
-      </div>
-      <div class="theme-panel" id="presetThemePanel" role="tabpanel" aria-labelledby="presetThemeTab">
-        <div class="theme-grid" id="themeGrid"></div>
-      </div>
-      <div class="theme-panel" id="customThemePanel" role="tabpanel" aria-labelledby="customThemeTab" hidden>
-        <div class="custom-theme-list" id="customThemeRows"></div>
-      </div>
-    </section>
+      <section class="theme-card" aria-labelledby="themeSettingsTitle">
+        <h2 class="visually-hidden" id="themeSettingsTitle">Theme settings</h2>
+        <div class="theme-tabs" role="tablist" aria-label="Theme settings">
+          <button class="theme-tab" id="presetThemeTab" type="button" role="tab" aria-selected="true" aria-controls="presetThemePanel">Theme</button>
+          <button class="theme-tab" id="customThemeTab" type="button" role="tab" aria-selected="false" aria-controls="customThemePanel">Custom</button>
+        </div>
+        <div class="theme-panel" id="presetThemePanel" role="tabpanel" aria-labelledby="presetThemeTab"><div class="theme-grid" id="themeGrid"></div></div>
+        <div class="theme-panel" id="customThemePanel" role="tabpanel" aria-labelledby="customThemeTab" hidden><div class="custom-theme-list" id="customThemeRows"></div></div>
+      </section>
 
-    <section class="card section-gap" id="locationCard" aria-labelledby="locationTitle">
-      <h2 class="card-title" id="locationTitle">Manual location</h2>
-      <div class="card-form">
-        <p class="card-copy">Enter either a ZIP/postal code or city to override the phone location.</p>
-        <div><label class="field-label" for="manualCountry">Country code</label><input class="text-input" id="manualCountry" type="text" maxlength="2" placeholder="US"></div>
-        <div><label class="field-label" for="manualPostalCode">ZIP/postal code</label><input class="text-input" id="manualPostalCode" type="text" autocomplete="postal-code"></div>
-        <div><label class="field-label" for="manualCity">City</label><input class="text-input" id="manualCity" type="text" autocomplete="address-level2"></div>
-      </div>
-    </section>
+      <section class="card" id="locationCard" aria-labelledby="locationTitle">
+        <h2 class="card-title" id="locationTitle">Manual location</h2>
+        <div class="card-form">
+          <div class="field-group"><label class="field-label" for="manualCountry">Country</label><select id="manualCountry" aria-label="Country"></select></div>
+          <div class="field-group"><label class="field-label" for="manualPostalCode">ZIP/postal code</label><input class="text-input" id="manualPostalCode" type="text" autocomplete="postal-code"></div>
+          <div class="field-group"><label class="field-label" for="manualCity">City</label><input class="text-input" id="manualCity" type="text" autocomplete="address-level2"></div>
+        </div>
+      </section>
 
-    <section class="card section-gap" aria-labelledby="languageTitle">
-      <h2 class="card-title" id="languageTitle">Language</h2>
-      <div class="card-form"><p class="card-copy">Change the watch face language.</p><select id="language" aria-label="Language"></select></div>
-    </section>
+      <section class="card" aria-labelledby="languageTitle">
+        <h2 class="card-title" id="languageTitle">Language</h2>
+        <div class="card-form"><p class="card-copy">Change the default language for the watch face and the setting page.</p><select id="language" aria-label="Language"></select></div>
+      </section>
 
-    <section class="card section-gap" aria-labelledby="analyticsTitle">
-      <h2 class="card-title" id="analyticsTitle">Analytics</h2>
-      <div class="card-form"><label class="setting-row" for="analytics"><strong>Share anonymous usage analytics</strong><span class="switch"><input id="analytics" type="checkbox" checked><span class="switch-track" aria-hidden="true"></span></span></label><p class="card-copy">No personal or health data is collected.</p></div>
-    </section>
+      <section class="card analytics-card" aria-labelledby="analyticsTitle">
+        <h2 class="card-title" id="analyticsTitle">Analytics</h2>
+        <div class="card-form"><p class="card-copy">This watch face uses anonymous data to help track and improve the experience. No personal or health data is collected.</p><label class="setting-row analytics-toggle" for="analytics"><strong>Share anonymous usage analytics</strong><span class="checkbox"><input id="analytics" type="checkbox"><span class="checkbox-box" aria-hidden="true"></span></span></label></div>
+      </section>
 
-    <section class="card section-gap" aria-labelledby="supportTitle">
-      <h2 class="card-title" id="supportTitle">Support</h2>
-      <div class="card-form"><p class="card-copy">Redux is free and built with care. Consider supporting future improvements.</p><a class="support-link" id="supportLink" href="https://ko-fi.com/lylemorris" target="_blank" rel="noopener">Support Redux</a></div>
-    </section>
+      <section class="card" aria-labelledby="supportTitle">
+        <h2 class="card-title" id="supportTitle">Support</h2>
+        <div class="card-form"><p class="card-copy">This watch face is free to use and built with care. If it makes your day a little easier, consider leaving a small tip to help support future updates and improvements.</p><a class="support-link" id="supportLink" href="https://ko-fi.com/lylemorris" target="_blank" rel="noopener">Support</a></div>
+      </section>
+    </div>
   </main>
 
   <div class="palette-dialog" id="paletteDialog" role="dialog" aria-modal="true" aria-labelledby="paletteTitle" hidden>
-    <div class="palette-sheet">
-      <div class="palette-head">
-        <h2 id="paletteTitle">Pebble color</h2>
-        <button class="palette-close" id="paletteClose" type="button" aria-label="Close">×</button>
-      </div>
-      <p class="palette-copy">Choose one of the 64 colors supported by Pebble color displays.</p>
-      <div class="palette-grid" id="pebbleColorGrid" role="radiogroup" aria-label="Pebble 64-color palette"></div>
-      <div class="palette-footer">
-        <span class="palette-value" id="paletteValue">#000000</span>
-        <button class="button primary palette-done" id="paletteDone" type="button">Done</button>
-      </div>
-    </div>
+    <div class="palette-sheet"><div class="palette-head"><h2 id="paletteTitle">Pebble color</h2><button class="palette-close" id="paletteClose" type="button" aria-label="Close">×</button></div><p class="palette-copy">Choose one of the 64 colors supported by Pebble color displays.</p><div class="palette-grid" id="pebbleColorGrid" role="radiogroup" aria-label="Pebble 64-color palette"></div><div class="palette-footer"><span class="palette-value" id="paletteValue">#000000</span><button class="button primary" id="paletteDone" type="button">Done</button></div></div>
   </div>
 
-  <footer class="actions">
-    <div class="actions-inner">
-      <div class="status" id="status" role="status" aria-live="polite"></div>
-      <button class="button" id="resetButton" type="button">Reset layout</button>
-      <button class="button primary" id="saveButton" type="button">Save settings</button>
-    </div>
-  </footer>
+  <footer class="actions"><div class="actions-inner"><div class="status" id="status" role="status" aria-live="polite"></div><button class="button" id="resetButton" type="button">Reset layout</button><button class="button primary" id="saveButton" type="button">Save settings</button></div></footer>
 
   <script>
-    (function () {
+    (function(){
       "use strict";
-
-      var STORAGE_KEY = "redux-qa-settings";
-      var IMAGE_ROOT = "./images/";
-      var IMAGE_FALLBACK_ROOT = "https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/redux/qa/images/";
-      var BOTTOM_SLOT_PREVIEW = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACsAAAA1CAYAAADYgRIrAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAAAsxJREFUeAHtmkuKKjEUho/VtuIbFdGxCOLAsWPX4KJciVtwMQ5Fwff7/bqXP5eEGFN205doAv1BKC3Lyp/fnJNUYqBYLP4hDaFQiJLJJKVSKZrNZjSfz8kU6XSa1bNcLmm73dLpdNJeF1RPfH5+Urlcpo+PD3Fus9mQSWAMxKIAiO10OnS9Xump2EKhcCcU4H0kEmFHNAZHufAKVVSHULlczuczO6r14V5wezKZ+Iv1PE+0TiaXy7HySqBDFeupF6itfBfxeJwVmTuxmUyGbAIBLiPEoi+qLXk3apcUYm0TChBocuCKANMFFggEAhSLxdiXEIAmQFZAelRTFUBX4IEmxCI1qSDYstksBYNBMgmMgCHr9ZoVGVkXs4o7p/IKoTKJROJBB8Tycx6Sb6lUevhiOBx+qVCOmgEgtlKpsKOncxQgO7wDvzz/VCwCyzbMhLcB8Ev7Omsb6B7OOMvEOuWsLbOsr3BPbL/f147JNoF5A3R6mCTs93uyGf4I9Prx9AdgRshGMHIENkUlh2BiXckI7ol1hV+xpnBGLNbNnBgUMMJ2u103nMW67eFw+CfW9okM1uDEcGu7WAy1+XzesccacgSRDfw2HDj1ep2q1SqZpNVq0XQ69f0cXfVbqavRaJBparUatdtt388h1okAA0/F2taA2+32PbGveEbDxqBar4wIMN0Fx+ORFSx9NptNtlZrCpjR6/XYa+ww6oQKsX7OLRYLJhKt5i03yWq10mrhu41PUxcuGI1GFI1GmcOm9hQulwsTqdOB8/yXZ2LRebGQ4Ldjs9vtWHkHstPCKtObyT9F3o0XYsfjMdkGuoVsohDLu4JNqAbeDbeDwUC7c8NTB0feute9V+Fb9uo9OepOIgfZwVcs/xeF+kWkreFwSKbAXBX/c1DrVLPDQy6CuzagM+dh1oXoQ4vwGIFUBpe/mkL+L7g/UpRcdHX+BbXMZcwgM4xyAAAAAElFTkSuQmCC";
-      var METRICS = [
-        { value: "calendar", label: "Calendar" },
-        { value: "weather", label: "Weather" },
-        { value: "battery", label: "Battery" },
-        { value: "calories", label: "Calories" },
-        { value: "activity", label: "Activity time" },
-        { value: "sleep", label: "Sleep score" },
-        { value: "heart", label: "Heart rate" },
-        { value: "steps", label: "Steps" },
-        { value: "distance", label: "Distance" }
+      var STORAGE_KEY="redux-qa-settings";
+      var IMAGE_ROOT="./images/";
+      var IMAGE_FALLBACK_ROOT="https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/redux/qa/images/";
+      var BOTTOM_SLOT_PREVIEW="./images/background.png";
+      var METRICS=[
+        {value:"calendar",label:"Calendar"},{value:"weather",label:"Weather"},{value:"battery",label:"Battery"},
+        {value:"calories",label:"Calories"},{value:"activity",label:"Activity time"},{value:"sleep",label:"Sleep score"},
+        {value:"heart",label:"Heart rate"},{value:"steps",label:"Steps"},{value:"distance",label:"Distance"}
       ];
-      var LANGUAGES = [
-        ["en","English"],["es","Spanish"],["fr","French"],["de","German"],["pt","Portuguese"],
-        ["it","Italian"],["nl","Dutch"],["da","Danish"],["nb","Norwegian"],["sv","Swedish"],
-        ["fi","Finnish"],["is","Icelandic"],["ca","Catalan"],["eu","Basque"],["gl","Galician"],
-        ["pl","Polish"],["cs","Czech"],["sk","Slovak"],["sl","Slovenian"],["hr","Croatian"],
-        ["bs","Bosnian (BS)"],["sr-Latn","Serbian (Latin)"],["ro","Romanian"],["hu","Hungarian"],
-        ["et","Estonian"],["lv","Latvian"],["lt","Lithuanian"],["tr","Turkish"],["sq","Albanian"],["mt","Maltese (MS)"]
+      var LANGUAGES=[["en","English"],["es","Spanish"],["fr","French"],["de","German"],["pt","Portuguese"],["it","Italian"],["nl","Dutch"],["da","Danish"],["nb","Norwegian"],["sv","Swedish"],["fi","Finnish"],["is","Icelandic"],["ca","Catalan"],["eu","Basque"],["gl","Galician"],["pl","Polish"],["cs","Czech"],["sk","Slovak"],["sl","Slovenian"],["hr","Croatian"],["bs","Bosnian (BS)"],["sr-Latn","Serbian (Latin)"],["ro","Romanian"],["hu","Hungarian"],["et","Estonian"],["lv","Latvian"],["lt","Lithuanian"],["tr","Turkish"],["sq","Albanian"],["mt","Maltese (MS)"]];
+      var COUNTRY_CODES=["AD","AE","AF","AG","AI","AL","AM","AO","AQ","AR","AS","AT","AU","AW","AX","AZ","BA","BB","BD","BE","BF","BG","BH","BI","BJ","BL","BM","BN","BO","BQ","BR","BS","BT","BV","BW","BY","BZ","CA","CC","CD","CF","CG","CH","CI","CK","CL","CM","CN","CO","CR","CU","CV","CW","CX","CY","CZ","DE","DJ","DK","DM","DO","DZ","EC","EE","EG","EH","ER","ES","ET","FI","FJ","FK","FM","FO","FR","GA","GB","GD","GE","GF","GG","GH","GI","GL","GM","GN","GP","GQ","GR","GS","GT","GU","GW","GY","HK","HM","HN","HR","HT","HU","ID","IE","IL","IM","IN","IO","IQ","IR","IS","IT","JE","JM","JO","JP","KE","KG","KH","KI","KM","KN","KP","KR","KW","KY","KZ","LA","LB","LC","LI","LK","LR","LS","LT","LU","LV","LY","MA","MC","MD","ME","MF","MG","MH","MK","ML","MM","MN","MO","MP","MQ","MR","MS","MT","MU","MV","MW","MX","MY","MZ","NA","NC","NE","NF","NG","NI","NL","NO","NP","NR","NU","NZ","OM","PA","PE","PF","PG","PH","PK","PL","PM","PN","PR","PS","PT","PW","PY","QA","RE","RO","RS","RU","RW","SA","SB","SC","SD","SE","SG","SH","SI","SJ","SK","SL","SM","SN","SO","SR","SS","ST","SV","SX","SY","SZ","TC","TD","TF","TG","TH","TJ","TK","TL","TM","TN","TO","TR","TT","TV","TW","TZ","UA","UG","UM","US","UY","UZ","VA","VC","VE","VG","VI","VN","VU","WF","WS","YE","YT","ZA","ZM","ZW"];
+      function countryLabel(code){try{if(window.Intl&&Intl.DisplayNames)return new Intl.DisplayNames(["en"],{type:"region"}).of(code)||code;}catch(e){}var fallback={US:"United States",GB:"United Kingdom",CA:"Canada",AU:"Australia",DE:"Germany",FR:"France",ES:"Spain",IT:"Italy",PT:"Portugal"};return fallback[code]||code;}
+      var THEMES=[
+        {value:"orange",label:"Orange",color:"#ff5400",text:"#ffffff"},{value:"blue",label:"Blue",color:"#00aaff",text:"#000000"},
+        {value:"purple",label:"Purple",color:"#5500ff",text:"#ffffff"},{value:"yellow",label:"Yellow",color:"#ffaa00",text:"#000000"},
+        {value:"green",label:"Green",color:"#55aa00",text:"#ffffff"},{value:"red",label:"Red",color:"#ff0000",text:"#ffffff"},
+        {value:"pink",label:"Pink",color:"#ff0055",text:"#ffffff"},{value:"brown",label:"Brown",color:"#aa5500",text:"#ffffff"},
+        {value:"white",label:"White",color:"#ffffff",text:"#000000"},{value:"black",label:"Black",color:"#000000",text:"#ffffff"}
       ];
-      var THEMES = [
-        { value: "orange", label: "Orange", color: "#ff5400", text: "#ffffff" },
-        { value: "blue", label: "Blue", color: "#00aaff", text: "#000000" },
-        { value: "purple", label: "Purple", color: "#5500ff", text: "#ffffff" },
-        { value: "yellow", label: "Yellow", color: "#ffaa00", text: "#000000" },
-        { value: "green", label: "Green", color: "#55aa00", text: "#ffffff" },
-        { value: "red", label: "Red", color: "#ff0000", text: "#ffffff" },
-        { value: "pink", label: "Pink", color: "#ff0055", text: "#ffffff" },
-        { value: "brown", label: "Brown", color: "#aa5500", text: "#ffffff" },
-        { value: "white", label: "White", color: "#ffffff", text: "#000000" },
-        { value: "black", label: "Black", color: "#000000", text: "#ffffff" }
-      ];
-      var PEBBLE_LEVELS = ["00", "55", "aa", "ff"];
-      var PEBBLE_COLORS = [];
-      var PEBBLE_COLOR_LOOKUP = {};
-      PEBBLE_LEVELS.forEach(function (red) {
-        PEBBLE_LEVELS.forEach(function (green) {
-          PEBBLE_LEVELS.forEach(function (blue) {
-            var color = "#" + red + green + blue;
-            PEBBLE_COLORS.push(color);
-            PEBBLE_COLOR_LOOKUP[color] = true;
-          });
-        });
-      });
-      var DEFAULTS = {
-        showLeadingZero: true,
-        hour24: false,
-        celsius: false,
-        showBluetooth: false,
-        manualLocation: false,
-        manualPostalCode: "",
-        manualCity: "",
-        manualCountry: "",
-        language: "en",
-        analyticsEnabled: true,
-        verticalLayout: true,
-        slot1Metric: "calendar",
-        slot2Metric: "weather",
-        slot3Metric: "steps",
-        themeMode: "preset",
-        theme: "blue",
-        showBatteryIndicator: true,
-        customTheme: {
-          horizontal: {
-            background: "#00aaff",
-            boxBackground: "#ffffff",
-            boxTopBorder: "#000000",
-            boxBottomBorder: "#000000",
-            timeText: "#000000",
-            slot1Text: "#000000",
-            slot2Text: "#000000",
-            slot3Text: "#000000",
-            batteryIndicator: "#00aaff"
-          },
-          vertical: {
-            background: "#000000",
-            trayBackground: "#00aaff",
-            divider: "#ffffff",
-            timeText: "#ffffff",
-            dateText: "#ffffff",
-            slot1Text: "#000000",
-            slot2Text: "#000000",
-            slot3Text: "#000000"
-          }
-        }
+      var PEBBLE_LEVELS=["00","55","aa","ff"],PEBBLE_COLORS=[],PEBBLE_COLOR_LOOKUP={};
+      PEBBLE_LEVELS.forEach(function(r){PEBBLE_LEVELS.forEach(function(g){PEBBLE_LEVELS.forEach(function(b){var c="#"+r+g+b;PEBBLE_COLORS.push(c);PEBBLE_COLOR_LOOKUP[c]=true;});});});
+      var DEFAULTS={
+        showLeadingZero:true,hour24:false,celsius:false,showBluetooth:false,manualLocation:false,manualPostalCode:"",manualCity:"",manualCountry:"",language:"en",analyticsEnabled:true,
+        verticalLayout:true,slot1Metric:"calendar",slot2Metric:"weather",slot3Metric:"steps",themeMode:"preset",theme:"blue",showBatteryIndicator:true,
+        customTheme:{horizontal:{background:"#00aaff",boxBackground:"#ffffff",boxTopBorder:"#000000",boxBottomBorder:"#000000",timeText:"#000000",slot1Text:"#000000",slot2Text:"#000000",slot3Text:"#000000",batteryIndicator:"#00aaff"},vertical:{background:"#000000",trayBackground:"#00aaff",divider:"#ffffff",timeText:"#ffffff",dateText:"#ffffff",slot1Text:"#000000",slot2Text:"#000000",slot3Text:"#000000"}}
       };
-      var state;
-      var activeColorTarget = null;
-
-      function byId(id) {
-        return document.getElementById(id);
-      }
-
-      function asBoolean(value, fallback) {
-        if (value === true || value === 1 || value === "1" || value === "true") return true;
-        if (value === false || value === 0 || value === "0" || value === "false") return false;
-        return fallback;
-      }
-
-      function firstValue() {
-        for (var index = 0; index < arguments.length; index += 1) {
-          if (arguments[index] !== undefined && arguments[index] !== null && arguments[index] !== "") {
-            return arguments[index];
-          }
-        }
-        return undefined;
-      }
-
-      function clone(value) {
-        return JSON.parse(JSON.stringify(value));
-      }
-
-      function validMetric(value, allowNone, fallback) {
-        if (allowNone && value === "none") return "none";
-        for (var index = 0; index < METRICS.length; index += 1) {
-          if (METRICS[index].value === value) return value;
-        }
-        return fallback;
-      }
-
-      function validTheme(value) {
-        for (var index = 0; index < THEMES.length; index += 1) {
-          if (THEMES[index].value === value) return value;
-        }
-        return DEFAULTS.theme;
-      }
-
-      function validColor(value, fallback) {
-        var normalized = String(value || "").toLowerCase();
-        return PEBBLE_COLOR_LOOKUP[normalized] ? normalized : fallback;
-      }
-
-      function normalizeColorGroup(source, defaults) {
-        source = source || {};
-        var result = {};
-        Object.keys(defaults).forEach(function (key) {
-          result[key] = validColor(source[key], defaults[key]);
-        });
-        return result;
-      }
-
-      function normalize(raw) {
-        raw = raw || {};
-        var vertical = asBoolean(
-          raw.verticalLayout !== undefined ? raw.verticalLayout : raw.vertical_layout,
-          DEFAULTS.verticalLayout
-        );
-        var slot1 = validMetric(
-          raw.slot1Metric || raw.slot_1_metric || raw.leftMetric,
-          false,
-          DEFAULTS.slot1Metric
-        );
-        var slot2 = validMetric(
-          raw.slot2Metric || raw.slot_2_metric || raw.rightMetric,
-          false,
-          DEFAULTS.slot2Metric
-        );
-        var slot3 = validMetric(
-          raw.slot3Metric || raw.slot_3_metric || raw.middleMetric,
-          true,
-          DEFAULTS.slot3Metric
-        );
-
-        if (vertical && slot3 === "none") slot3 = DEFAULTS.slot3Metric;
-
-        var customSource = raw.customTheme || raw.custom_theme || {};
-        var horizontalSource = Object.assign({}, customSource.horizontal || {});
-        var verticalSource = Object.assign({}, customSource.vertical || {});
-        var activeBackground = firstValue(raw.watchfaceBackground, raw.watchface_background, raw.backgroundColor, raw.background_color);
-        if (activeBackground) {
-          if (vertical) verticalSource.background = activeBackground;
-          else horizontalSource.background = activeBackground;
-        }
-
-        horizontalSource.boxBackground = firstValue(raw.boxBackgroundColor, raw.box_background_color, horizontalSource.boxBackground);
-        horizontalSource.boxTopBorder = firstValue(raw.boxTopBorderColor, raw.box_top_border_color, horizontalSource.boxTopBorder);
-        horizontalSource.boxBottomBorder = firstValue(raw.boxBottomBorderColor, raw.box_bottom_border_color, horizontalSource.boxBottomBorder);
-        horizontalSource.batteryIndicator = firstValue(raw.batteryIndicatorColor, raw.battery_indicator_color, horizontalSource.batteryIndicator);
-        verticalSource.trayBackground = firstValue(raw.trayBackgroundColor, raw.tray_background_color, verticalSource.trayBackground);
-        verticalSource.divider = firstValue(raw.dividerColor, raw.divider_color, verticalSource.divider);
-        verticalSource.dateText = firstValue(raw.dateTextColor, raw.date_text_color, verticalSource.dateText);
-
+      var state,activeColorTarget=null;
+      function byId(id){return document.getElementById(id);}
+      function asBoolean(v,f){if(v===true||v===1||v==="1"||v==="true")return true;if(v===false||v===0||v==="0"||v==="false")return false;return f;}
+      function firstValue(){for(var i=0;i<arguments.length;i+=1){if(arguments[i]!==undefined&&arguments[i]!==null&&arguments[i]!=="")return arguments[i];}}
+      function clone(v){return JSON.parse(JSON.stringify(v));}
+      function validMetric(v,allowNone,fallback){if(allowNone&&v==="none")return "none";for(var i=0;i<METRICS.length;i+=1)if(METRICS[i].value===v)return v;return fallback;}
+      function validTheme(v){for(var i=0;i<THEMES.length;i+=1)if(THEMES[i].value===v)return v;return DEFAULTS.theme;}
+      function validColor(v,fallback){var n=String(v||"").toLowerCase();return PEBBLE_COLOR_LOOKUP[n]?n:fallback;}
+      function normalizeColorGroup(source,defaults){source=source||{};var result={};Object.keys(defaults).forEach(function(k){result[k]=validColor(source[k],defaults[k]);});return result;}
+      function deriveVertical(raw){if(raw.verticalLayout!==undefined||raw.vertical_layout!==undefined)return asBoolean(firstValue(raw.verticalLayout,raw.vertical_layout),DEFAULTS.verticalLayout);if(raw.layout)return String(raw.layout).indexOf("vertical")===0;return DEFAULTS.verticalLayout;}
+      function normalize(raw){
+        raw=raw||{};var vertical=deriveVertical(raw);
+        var slot1=validMetric(firstValue(raw.slot1Metric,raw.slot_1_metric,raw.leftMetric),false,DEFAULTS.slot1Metric);
+        var slot2=validMetric(firstValue(raw.slot2Metric,raw.slot_2_metric,raw.rightMetric),false,DEFAULTS.slot2Metric);
+        var slot3=validMetric(firstValue(raw.slot3Metric,raw.slot_3_metric,raw.middleMetric),true,DEFAULTS.slot3Metric);
+        if(!vertical&&(raw.layout==="horizontal_2"||raw.slotCount===2||raw.slot_count===2||raw.showMiddleSlot===false||raw.show_middle_slot===false))slot3="none";
+        if(vertical&&slot3==="none")slot3=DEFAULTS.slot3Metric;
+        var customSource=raw.customTheme||raw.custom_theme||{},horizontalSource=Object.assign({},customSource.horizontal||{}),verticalSource=Object.assign({},customSource.vertical||{});
+        var activeBackground=firstValue(raw.watchfaceBackground,raw.watchface_background,raw.backgroundColor,raw.background_color);
+        if(activeBackground){if(vertical)verticalSource.background=activeBackground;else horizontalSource.background=activeBackground;}
+        horizontalSource.boxBackground=firstValue(raw.boxBackgroundColor,raw.box_background_color,horizontalSource.boxBackground);
+        horizontalSource.boxTopBorder=firstValue(raw.boxTopBorderColor,raw.box_top_border_color,horizontalSource.boxTopBorder);
+        horizontalSource.boxBottomBorder=firstValue(raw.boxBottomBorderColor,raw.box_bottom_border_color,horizontalSource.boxBottomBorder);
+        horizontalSource.batteryIndicator=firstValue(raw.batteryIndicatorColor,raw.battery_indicator_color,horizontalSource.batteryIndicator);
+        verticalSource.trayBackground=firstValue(raw.trayBackgroundColor,raw.tray_background_color,raw.boxBackgroundColor,raw.box_background_color,verticalSource.trayBackground);
+        verticalSource.divider=firstValue(raw.dividerColor,raw.divider_color,raw.boxTopBorderColor,raw.box_top_border_color,verticalSource.divider);
+        verticalSource.dateText=firstValue(raw.dateTextColor,raw.date_text_color,verticalSource.dateText);
         return {
-          showLeadingZero: asBoolean(firstValue(raw.showLeadingZero, raw.show_leading_zero), DEFAULTS.showLeadingZero),
-          hour24: asBoolean(firstValue(raw.hour24, raw.use_24_hour), DEFAULTS.hour24),
-          celsius: asBoolean(firstValue(raw.celsius, raw.use_celsius), DEFAULTS.celsius),
-          showBluetooth: asBoolean(firstValue(raw.showBluetooth, raw.show_bluetooth), DEFAULTS.showBluetooth),
-          manualLocation: asBoolean(firstValue(raw.manualLocation, raw.manual_location), DEFAULTS.manualLocation),
-          manualPostalCode: String(firstValue(raw.manualPostalCode, raw.manual_postal_code, DEFAULTS.manualPostalCode) || "").trim(),
-          manualCity: String(firstValue(raw.manualCity, raw.manual_city, DEFAULTS.manualCity) || "").trim(),
-          manualCountry: String(firstValue(raw.manualCountry, raw.manual_country, DEFAULTS.manualCountry) || "").trim().toUpperCase().slice(0,2),
-          language: LANGUAGES.some(function(item){ return item[0] === raw.language; }) ? raw.language : DEFAULTS.language,
-          analyticsEnabled: asBoolean(firstValue(raw.analyticsEnabled, raw.analytics_enabled), DEFAULTS.analyticsEnabled),
-          verticalLayout: vertical,
-          slot1Metric: slot1,
-          slot2Metric: slot2,
-          slot3Metric: slot3,
-          themeMode: firstValue(raw.themeMode, raw.theme_mode) === "custom" ? "custom" : "preset",
-          theme: validTheme(raw.theme),
-          showBatteryIndicator: asBoolean(
-            firstValue(raw.showBatteryIndicator, raw.show_battery_indicator),
-            DEFAULTS.showBatteryIndicator
-          ),
-          customTheme: {
-            horizontal: normalizeColorGroup(horizontalSource, DEFAULTS.customTheme.horizontal),
-            vertical: normalizeColorGroup(verticalSource, DEFAULTS.customTheme.vertical)
-          }
+          showLeadingZero:asBoolean(firstValue(raw.showLeadingZero,raw.show_leading_zero),DEFAULTS.showLeadingZero),hour24:asBoolean(firstValue(raw.hour24,raw.use_24_hour),DEFAULTS.hour24),celsius:asBoolean(firstValue(raw.celsius,raw.use_celsius),DEFAULTS.celsius),showBluetooth:asBoolean(firstValue(raw.showBluetooth,raw.show_bluetooth),DEFAULTS.showBluetooth),
+          manualLocation:asBoolean(firstValue(raw.manualLocation,raw.manual_location),DEFAULTS.manualLocation),manualPostalCode:String(firstValue(raw.manualPostalCode,raw.manual_postal_code,DEFAULTS.manualPostalCode)||"").trim(),manualCity:String(firstValue(raw.manualCity,raw.manual_city,DEFAULTS.manualCity)||"").trim(),manualCountry:String(firstValue(raw.manualCountry,raw.manual_country,DEFAULTS.manualCountry)||"").trim().toUpperCase().slice(0,2),
+          language:LANGUAGES.some(function(item){return item[0]===raw.language;})?raw.language:DEFAULTS.language,analyticsEnabled:asBoolean(firstValue(raw.analyticsEnabled,raw.analytics_enabled),DEFAULTS.analyticsEnabled),verticalLayout:vertical,slot1Metric:slot1,slot2Metric:slot2,slot3Metric:slot3,
+          themeMode:firstValue(raw.themeMode,raw.theme_mode)==="custom"?"custom":"preset",theme:validTheme(raw.theme),showBatteryIndicator:asBoolean(firstValue(raw.showBatteryIndicator,raw.show_battery_indicator),DEFAULTS.showBatteryIndicator),customTheme:{horizontal:normalizeColorGroup(horizontalSource,DEFAULTS.customTheme.horizontal),vertical:normalizeColorGroup(verticalSource,DEFAULTS.customTheme.vertical)}
         };
       }
-
-      function readIncomingSettings() {
-        var parameters = new URLSearchParams(window.location.search);
-        var encoded = parameters.get("settings");
-        if (encoded) {
-          try {
-            return normalize(JSON.parse(encoded));
-          } catch (error) {
-            try {
-              return normalize(JSON.parse(decodeURIComponent(encoded)));
-            } catch (decodeError) {
-              return normalize(DEFAULTS);
-            }
-          }
-        }
-
-        try {
-          var stored = window.localStorage.getItem(STORAGE_KEY);
-          return stored ? normalize(JSON.parse(stored)) : normalize(DEFAULTS);
-        } catch (error) {
-          return normalize(DEFAULTS);
-        }
+      function readIncomingSettings(){var p=new URLSearchParams(window.location.search),encoded=p.get("settings");if(encoded){try{return normalize(JSON.parse(encoded));}catch(e){try{return normalize(JSON.parse(decodeURIComponent(encoded)));}catch(e2){return normalize(DEFAULTS);}}}try{var stored=localStorage.getItem(STORAGE_KEY);return stored?normalize(JSON.parse(stored)):normalize(DEFAULTS);}catch(e3){return normalize(DEFAULTS);}}
+      function populateMetricSelect(select,selected,allowNone){select.innerHTML="";METRICS.forEach(function(m){var o=document.createElement("option");o.value=m.value;o.textContent=m.label;select.appendChild(o);});if(allowNone){var n=document.createElement("option");n.value="none";n.textContent="None";select.appendChild(n);}select.value=selected;}
+      function populateCountries(selected){var select=byId("manualCountry");select.innerHTML="";var placeholder=document.createElement("option");placeholder.value="";placeholder.textContent="Select a country";select.appendChild(placeholder);COUNTRY_CODES.forEach(function(code){var o=document.createElement("option");o.value=code;o.textContent=countryLabel(code);select.appendChild(o);});select.value=COUNTRY_CODES.indexOf(selected)!==-1?selected:"";}
+      function setPreview(preview,filename){preview.onerror=function(){preview.onerror=null;preview.src=IMAGE_FALLBACK_ROOT+filename;};preview.src=IMAGE_ROOT+filename;}
+      function buildThemeGrid(){var grid=byId("themeGrid");grid.innerHTML="";THEMES.forEach(function(theme){var button=document.createElement("button"),swatch=document.createElement("span");button.type="button";button.className="theme-choice";button.dataset.theme=theme.value;button.setAttribute("aria-pressed","false");button.setAttribute("aria-label",theme.label+" theme");swatch.className="theme-choice-swatch";swatch.textContent=theme.label;swatch.style.backgroundColor=theme.color;swatch.style.color=theme.text;button.appendChild(swatch);button.addEventListener("click",function(){state.themeMode="preset";state.theme=theme.value;renderTheme();});grid.appendChild(button);});}
+      function activeLayoutDetails(){var vertical=byId("verticalLayout").checked,third=byId("slot3Metric").value!=="none";return {orientation:vertical?"vertical":"horizontal",slotCount:vertical||third?3:2};}
+      function horizontalRows(slotCount){var prefix=slotCount===3?"horizontal-3-slot-":"horizontal-2-slot-";var rows=[{key:"background",label:"Pebble background",image:"background.png"},{key:"boxBackground",label:"Time box background",image:"time_box_horizontal_background.png"},{key:"boxTopBorder",label:"Time box top border",image:"time_box_horizontal_top_border.png"},{key:"boxBottomBorder",label:"Time box bottom border",image:"time_box_horizontal_bottom_border.png"},{key:"timeText",label:"Time box text color",image:"time_box_horizontal_text.png"},{key:"slot1Text",label:"Information 1 text color",image:prefix+"1.png"},{key:"slot2Text",label:"Information 2 text color",image:prefix+"2.png"}];if(slotCount===3)rows.push({key:"slot3Text",label:"Information 3 text color",image:prefix+"3.png"});return rows;}
+      function verticalRows(){return [{key:"background",label:"Pebble background",image:"background.png"},{key:"trayBackground",label:"Time box background",image:"time_box_vertical_background.png"},{key:"divider",label:"Time box top border",image:"time_box_vertical_border.png"},{key:"timeText",label:"Time box text color",image:"time_box_vertical_text.png"},{key:"slot1Text",label:"Information 1 text color",image:"vertical-slot-1.png"},{key:"slot2Text",label:"Information 2 text color",image:"vertical-slot-2.png"},{key:"slot3Text",label:"Information 3 text color",image:"vertical-slot-3.png"}];}
+      function colorContrast(hex){var r=parseInt(hex.substr(1,2),16),g=parseInt(hex.substr(3,2),16),b=parseInt(hex.substr(5,2),16);return (r*299+g*587+b*114)/1000>150?"#000000":"#ffffff";}
+      function buildPebblePalette(){var grid=byId("pebbleColorGrid");grid.innerHTML="";PEBBLE_COLORS.forEach(function(color){var button=document.createElement("button");button.type="button";button.className="palette-swatch";button.setAttribute("role","radio");button.setAttribute("aria-checked","false");button.setAttribute("aria-label",color.toUpperCase());button.dataset.pebbleColor=color;button.style.setProperty("--swatch",color);button.style.setProperty("--check",colorContrast(color));button.addEventListener("click",function(){selectPebbleColor(color);});grid.appendChild(button);});}
+      function updatePaletteSelection(value){value=validColor(value,"#000000");byId("paletteValue").textContent=value.toUpperCase();Array.prototype.forEach.call(document.querySelectorAll(".palette-swatch"),function(button){var selected=button.dataset.pebbleColor===value;button.classList.toggle("selected",selected);button.setAttribute("aria-checked",selected?"true":"false");});}
+      function syncColorButton(button,label,value){button.style.setProperty("--selected-color",value);button.setAttribute("aria-label",label+", "+value.toUpperCase());button.title=label+": "+value.toUpperCase();}
+      function openPebbleColorPicker(orientation,row,button){activeColorTarget={orientation:orientation,key:row.key,label:row.label,button:button};byId("paletteTitle").textContent=row.label;updatePaletteSelection(state.customTheme[orientation][row.key]);byId("paletteDialog").hidden=false;document.body.classList.add("palette-open");var selected=document.querySelector(".palette-swatch.selected");if(selected)selected.focus();}
+      function closePebbleColorPicker(){byId("paletteDialog").hidden=true;document.body.classList.remove("palette-open");if(activeColorTarget&&activeColorTarget.button)activeColorTarget.button.focus();activeColorTarget=null;}
+      function selectPebbleColor(value){if(!activeColorTarget)return;var t=activeColorTarget,selected=validColor(value,state.customTheme[t.orientation][t.key]);state.themeMode="custom";state.customTheme[t.orientation][t.key]=selected;syncColorButton(t.button,t.label,selected);updatePaletteSelection(selected);}
+      function createColorButton(row,orientation){var button=document.createElement("button"),current=state.customTheme[orientation][row.key];button.type="button";button.className="color-picker-trigger";syncColorButton(button,row.label,current);button.addEventListener("click",function(){openPebbleColorPicker(orientation,row,button);});return button;}
+      function renderCustomRows(){if(!state)return;var details=activeLayoutDetails(),rows=details.orientation==="vertical"?verticalRows():horizontalRows(details.slotCount),container=byId("customThemeRows");container.innerHTML="";rows.forEach(function(row){var el=document.createElement("div"),label=document.createElement("div"),preview=document.createElement("img"),divider=document.createElement("span");el.className="theme-row";label.className="theme-row-label";label.textContent=row.label;preview.className="theme-row-preview";preview.alt="";divider.className="theme-row-divider";divider.setAttribute("aria-hidden","true");setPreview(preview,row.image);el.appendChild(label);el.appendChild(preview);el.appendChild(divider);el.appendChild(createColorButton(row,details.orientation));container.appendChild(el);});}
+      function renderTheme(){var preset=state.themeMode!=="custom";byId("presetThemeTab").setAttribute("aria-selected",preset?"true":"false");byId("customThemeTab").setAttribute("aria-selected",preset?"false":"true");byId("presetThemePanel").hidden=!preset;byId("customThemePanel").hidden=preset;Array.prototype.forEach.call(document.querySelectorAll(".theme-choice"),function(button){button.setAttribute("aria-pressed",button.dataset.theme===state.theme?"true":"false");});if(!preset)renderCustomRows();}
+      function updatePreviewImages(){var vertical=byId("verticalLayout").checked,third=byId("slot3Metric").value!=="none",slot3Row=byId("slot3Row");if(vertical&&!third){byId("slot3Metric").value=DEFAULTS.slot3Metric;third=true;}byId("verticalSlotCount").classList.toggle("is-visible",vertical);if(vertical){setPreview(byId("slot1Preview"),"vertical-slot-1.png");setPreview(byId("slot2Preview"),"vertical-slot-2.png");setPreview(byId("slot3Preview"),"vertical-slot-3.png");}else if(third){setPreview(byId("slot1Preview"),"horizontal-3-slot-1.png");setPreview(byId("slot2Preview"),"horizontal-3-slot-2.png");setPreview(byId("slot3Preview"),"horizontal-3-slot-3.png");}else{setPreview(byId("slot1Preview"),"horizontal-2-slot-1.png");setPreview(byId("slot2Preview"),"horizontal-2-slot-2.png");setPreview(byId("slot3Preview"),"horizontal-3-slot-3.png");}slot3Row.classList.toggle("optional",!third);if(state&&state.themeMode==="custom")renderCustomRows();}
+      function render(settings){state=normalize(settings);byId("leadingZero").checked=state.showLeadingZero;byId("hour12").checked=!state.hour24;byId("celsius").checked=state.celsius;byId("bluetooth").checked=state.showBluetooth;byId("batteryIndicator").checked=state.showBatteryIndicator;byId("manualPostalCode").value=state.manualPostalCode;byId("manualCity").value=state.manualCity;populateCountries(state.manualCountry);byId("analytics").checked=state.analyticsEnabled;byId("language").innerHTML=LANGUAGES.map(function(item){return '<option value="'+item[0]+'">'+item[1]+'</option>';}).join("");byId("language").value=state.language;byId("verticalLayout").checked=state.verticalLayout;populateMetricSelect(byId("slot1Metric"),state.slot1Metric,false);populateMetricSelect(byId("slot2Metric"),state.slot2Metric,false);populateMetricSelect(byId("slot3Metric"),state.slot3Metric,true);updatePreviewImages();renderTheme();}
+      function collectSettings(){var vertical=byId("verticalLayout").checked,slot3=byId("slot3Metric").value;if(vertical&&slot3==="none")slot3=DEFAULTS.slot3Metric;var slotCount=slot3==="none"?2:3,layout=vertical?"vertical_3":(slotCount===3?"horizontal_3":"horizontal_2"),customTheme=clone(state.customTheme),activeCustom=vertical?customTheme.vertical:customTheme.horizontal,country=byId("manualCountry").value;
+        return {showLeadingZero:byId("leadingZero").checked,show_leading_zero:byId("leadingZero").checked,hour24:!byId("hour12").checked,use_24_hour:!byId("hour12").checked,celsius:byId("celsius").checked,use_celsius:byId("celsius").checked,showBluetooth:byId("bluetooth").checked,show_bluetooth:byId("bluetooth").checked,manualLocation:!!(byId("manualPostalCode").value.trim()||byId("manualCity").value.trim()),manual_location:!!(byId("manualPostalCode").value.trim()||byId("manualCity").value.trim()),manualPostalCode:byId("manualPostalCode").value.trim(),manual_postal_code:byId("manualPostalCode").value.trim(),manualCity:byId("manualCity").value.trim(),manual_city:byId("manualCity").value.trim(),manualCountry:country,manual_country:country,language:byId("language").value,analyticsEnabled:byId("analytics").checked,analytics_enabled:byId("analytics").checked,verticalLayout:vertical,vertical_layout:vertical,layout:layout,slotCount:slotCount,slot_count:slotCount,slot1Metric:byId("slot1Metric").value,slot2Metric:byId("slot2Metric").value,slot3Metric:slot3,slot_1_metric:byId("slot1Metric").value,slot_2_metric:byId("slot2Metric").value,slot_3_metric:slot3,themeMode:state.themeMode,theme_mode:state.themeMode,theme:state.theme,showBatteryIndicator:byId("batteryIndicator").checked,show_battery_indicator:byId("batteryIndicator").checked,customTheme:customTheme,custom_theme:customTheme,watchfaceBackground:activeCustom.background,watchface_background:activeCustom.background,boxBackgroundColor:vertical?customTheme.vertical.trayBackground:customTheme.horizontal.boxBackground,box_background_color:vertical?customTheme.vertical.trayBackground:customTheme.horizontal.boxBackground,boxTopBorderColor:vertical?customTheme.vertical.divider:customTheme.horizontal.boxTopBorder,box_top_border_color:vertical?customTheme.vertical.divider:customTheme.horizontal.boxTopBorder,boxBottomBorderColor:customTheme.horizontal.boxBottomBorder,box_bottom_border_color:customTheme.horizontal.boxBottomBorder,trayBackgroundColor:customTheme.vertical.trayBackground,tray_background_color:customTheme.vertical.trayBackground,dividerColor:customTheme.vertical.divider,divider_color:customTheme.vertical.divider,timeTextColor:activeCustom.timeText,time_text_color:activeCustom.timeText,dateTextColor:customTheme.vertical.dateText,date_text_color:customTheme.vertical.dateText,slot1TextColor:activeCustom.slot1Text,slot_1_text_color:activeCustom.slot1Text,slot2TextColor:activeCustom.slot2Text,slot_2_text_color:activeCustom.slot2Text,slot3TextColor:activeCustom.slot3Text,slot_3_text_color:activeCustom.slot3Text,batteryIndicatorColor:customTheme.horizontal.batteryIndicator,battery_indicator_color:customTheme.horizontal.batteryIndicator};
       }
-
-      function populateSelect(select, selected, allowNone) {
-        select.innerHTML = "";
-        METRICS.forEach(function (metric) {
-          var option = document.createElement("option");
-          option.value = metric.value;
-          option.textContent = metric.label;
-          select.appendChild(option);
-        });
-
-        if (allowNone) {
-          var noneOption = document.createElement("option");
-          noneOption.value = "none";
-          noneOption.textContent = "None";
-          select.appendChild(noneOption);
-        }
-
-        select.value = selected;
-      }
-
-      function setPreview(preview, filename) {
-        if (filename.indexOf("data:") === 0) {
-          preview.onerror = null;
-          preview.src = filename;
-          return;
-        }
-        preview.onerror = function () {
-          preview.onerror = null;
-          preview.src = IMAGE_FALLBACK_ROOT + filename;
-        };
-        preview.src = IMAGE_ROOT + filename;
-      }
-
-      function buildThemeGrid() {
-        var grid = byId("themeGrid");
-        grid.innerHTML = "";
-        THEMES.forEach(function (theme) {
-          var button = document.createElement("button");
-          var swatch = document.createElement("span");
-          button.type = "button";
-          button.className = "theme-choice";
-          button.dataset.theme = theme.value;
-          button.setAttribute("aria-pressed", "false");
-          button.setAttribute("aria-label", theme.label + " theme");
-          swatch.className = "theme-choice-swatch";
-          swatch.textContent = theme.label;
-          swatch.style.backgroundColor = theme.color;
-          swatch.style.color = theme.text;
-          button.appendChild(swatch);
-          button.addEventListener("click", function () {
-            state.themeMode = "preset";
-            state.theme = theme.value;
-            renderTheme();
-          });
-          grid.appendChild(button);
-        });
-      }
-
-      function activeLayoutDetails() {
-        var vertical = byId("verticalLayout").checked;
-        var thirdEnabled = byId("slot3Metric").value !== "none";
-        return {
-          orientation: vertical ? "vertical" : "horizontal",
-          slotCount: vertical || thirdEnabled ? 3 : 2
-        };
-      }
-
-      function horizontalRows(slotCount) {
-        var prefix = slotCount === 3 ? "horizontal-3-slot-" : "horizontal-2-slot-";
-        var rows = [
-          { key: "background", label: "Watch face background", image: "background.png" },
-          { key: "boxBackground", label: "Time box background", image: "time_box_horizontal_background.png" },
-          { key: "boxTopBorder", label: "Time box top border", image: "time_box_horizontal_top_border.png" },
-          { key: "boxBottomBorder", label: "Time box bottom border", image: "time_box_horizontal_bottom_border.png" },
-          { key: "timeText", label: "Time text", image: "time_box_horizontal_text.png" },
-          { key: "slot1Text", label: "Slot #1 text", image: prefix + "1.png" },
-          { key: "slot2Text", label: "Slot #2 text", image: prefix + "2.png" }
-        ];
-        if (slotCount === 3) {
-          rows.push({ key: "slot3Text", label: "Slot #3 text", image: prefix + "3.png" });
-        }
-        rows.push({
-          key: "batteryIndicator",
-          label: "Battery indicator",
-          image: BOTTOM_SLOT_PREVIEW,
-          disabled: !state.showBatteryIndicator
-        });
-        return rows;
-      }
-
-      function verticalRows() {
-        return [
-          { key: "background", label: "Watch face background", image: "background.png" },
-          { key: "trayBackground", label: "Tray background", image: "tray_vertical_background.png" },
-          { key: "divider", label: "Divider", image: "time_box_vertical_border.png" },
-          { key: "timeText", label: "Time text", image: "time_box_vertical_text.png" },
-          { key: "dateText", label: "Date text", image: BOTTOM_SLOT_PREVIEW },
-          { key: "slot1Text", label: "Slot #1 text", image: "vertical-slot-1.png" },
-          { key: "slot2Text", label: "Slot #2 text", image: "vertical-slot-2.png" },
-          { key: "slot3Text", label: "Slot #3 text", image: "vertical-slot-3.png" }
-        ];
-      }
-
-      function colorContrast(hex) {
-        var red = parseInt(hex.substr(1, 2), 16);
-        var green = parseInt(hex.substr(3, 2), 16);
-        var blue = parseInt(hex.substr(5, 2), 16);
-        return (red * 299 + green * 587 + blue * 114) / 1000 > 150 ? "#000000" : "#ffffff";
-      }
-
-      function buildPebblePalette() {
-        var grid = byId("pebbleColorGrid");
-        grid.innerHTML = "";
-        PEBBLE_COLORS.forEach(function (color) {
-          var button = document.createElement("button");
-          button.type = "button";
-          button.className = "palette-swatch";
-          button.setAttribute("role", "radio");
-          button.setAttribute("aria-checked", "false");
-          button.setAttribute("aria-label", color.toUpperCase());
-          button.dataset.pebbleColor = color;
-          button.style.setProperty("--swatch", color);
-          button.style.setProperty("--check", colorContrast(color));
-          button.addEventListener("click", function () {
-            selectPebbleColor(color);
-          });
-          grid.appendChild(button);
-        });
-      }
-
-      function updatePaletteSelection(value) {
-        value = validColor(value, "#000000");
-        byId("paletteValue").textContent = value.toUpperCase();
-        Array.prototype.forEach.call(document.querySelectorAll(".palette-swatch"), function (button) {
-          var selected = button.dataset.pebbleColor === value;
-          button.classList.toggle("selected", selected);
-          button.setAttribute("aria-checked", selected ? "true" : "false");
-        });
-      }
-
-      function syncColorButton(button, label, value) {
-        button.style.setProperty("--selected-color", value);
-        button.setAttribute("aria-label", label + " color, " + value.toUpperCase());
-        button.title = label + ": " + value.toUpperCase();
-      }
-
-      function openPebbleColorPicker(orientation, row, button) {
-        activeColorTarget = {
-          orientation: orientation,
-          key: row.key,
-          label: row.label,
-          button: button
-        };
-        byId("paletteTitle").textContent = row.label + " color";
-        updatePaletteSelection(state.customTheme[orientation][row.key]);
-        byId("paletteDialog").hidden = false;
-        document.body.classList.add("palette-open");
-        var selected = document.querySelector(".palette-swatch.selected");
-        if (selected) selected.focus();
-      }
-
-      function closePebbleColorPicker() {
-        byId("paletteDialog").hidden = true;
-        document.body.classList.remove("palette-open");
-        if (activeColorTarget && activeColorTarget.button) activeColorTarget.button.focus();
-        activeColorTarget = null;
-      }
-
-      function selectPebbleColor(value) {
-        if (!activeColorTarget) return;
-        var target = activeColorTarget;
-        var selected = validColor(value, state.customTheme[target.orientation][target.key]);
-        state.themeMode = "custom";
-        state.customTheme[target.orientation][target.key] = selected;
-        syncColorButton(target.button, target.label, selected);
-        updatePaletteSelection(selected);
-      }
-
-      function createColorButton(row, orientation) {
-        var button = document.createElement("button");
-        var current = state.customTheme[orientation][row.key];
-        button.type = "button";
-        button.className = "color-picker-trigger";
-        button.disabled = Boolean(row.disabled);
-        syncColorButton(button, row.label, current);
-        button.addEventListener("click", function () {
-          openPebbleColorPicker(orientation, row, button);
-        });
-        return button;
-      }
-
-      function renderCustomRows() {
-        if (!state) return;
-        var details = activeLayoutDetails();
-        var rows = details.orientation === "vertical" ? verticalRows() : horizontalRows(details.slotCount);
-        var container = byId("customThemeRows");
-        container.innerHTML = "";
-        rows.forEach(function (row) {
-          var element = document.createElement("div");
-          var label = document.createElement("div");
-          var preview = document.createElement("img");
-          var divider = document.createElement("span");
-          element.className = "theme-row" + (row.disabled ? " is-disabled" : "");
-          if (row.disabled) element.setAttribute("aria-disabled", "true");
-          label.className = "theme-row-label";
-          label.textContent = row.label;
-          preview.className = "theme-row-preview";
-          preview.alt = "";
-          divider.className = "theme-row-divider";
-          divider.setAttribute("aria-hidden", "true");
-          setPreview(preview, row.image);
-          element.appendChild(label);
-          element.appendChild(preview);
-          element.appendChild(divider);
-          element.appendChild(createColorButton(row, details.orientation));
-          container.appendChild(element);
-        });
-      }
-
-      function renderTheme() {
-        var presetActive = state.themeMode !== "custom";
-        byId("presetThemeTab").setAttribute("aria-selected", presetActive ? "true" : "false");
-        byId("customThemeTab").setAttribute("aria-selected", presetActive ? "false" : "true");
-        byId("presetThemePanel").hidden = !presetActive;
-        byId("customThemePanel").hidden = presetActive;
-        Array.prototype.forEach.call(document.querySelectorAll(".theme-choice"), function (button) {
-          button.setAttribute("aria-pressed", button.dataset.theme === state.theme ? "true" : "false");
-        });
-        if (!presetActive) renderCustomRows();
-      }
-
-      function updatePreviewImages() {
-        var vertical = byId("verticalLayout").checked;
-        var thirdEnabled = byId("slot3Metric").value !== "none";
-        var slot3Row = byId("slot3Row");
-
-        if (vertical && !thirdEnabled) {
-          byId("slot3Metric").value = DEFAULTS.slot3Metric;
-          thirdEnabled = true;
-        }
-
-        if (vertical) {
-          setPreview(byId("slot1Preview"), "vertical-slot-1.png");
-          setPreview(byId("slot2Preview"), "vertical-slot-2.png");
-          setPreview(byId("slot3Preview"), "vertical-slot-3.png");
-        } else if (thirdEnabled) {
-          setPreview(byId("slot1Preview"), "horizontal-3-slot-1.png");
-          setPreview(byId("slot2Preview"), "horizontal-3-slot-2.png");
-          setPreview(byId("slot3Preview"), "horizontal-3-slot-3.png");
-        } else {
-          setPreview(byId("slot1Preview"), "horizontal-2-slot-1.png");
-          setPreview(byId("slot2Preview"), "horizontal-2-slot-2.png");
-          setPreview(byId("slot3Preview"), "horizontal-3-slot-3.png");
-        }
-
-        slot3Row.classList.toggle("optional", !thirdEnabled);
-        if (state && state.themeMode === "custom") renderCustomRows();
-      }
-
-      function render(settings) {
-        state = normalize(settings);
-        byId("leadingZero").checked = state.showLeadingZero;
-        byId("hour12").checked = !state.hour24;
-        byId("celsius").checked = state.celsius;
-        byId("bluetooth").checked = state.showBluetooth;
-        byId("batteryIndicator").checked = state.showBatteryIndicator;
-        byId("manualPostalCode").value = state.manualPostalCode;
-        byId("manualCity").value = state.manualCity;
-        byId("manualCountry").value = state.manualCountry;
-        byId("analytics").checked = state.analyticsEnabled;
-        byId("language").innerHTML = LANGUAGES.map(function(item){ return '<option value="'+item[0]+'">'+item[1]+'</option>'; }).join("");
-        byId("language").value = state.language;
-        byId("verticalLayout").checked = state.verticalLayout;
-        populateSelect(byId("slot1Metric"), state.slot1Metric, false);
-        populateSelect(byId("slot2Metric"), state.slot2Metric, false);
-        populateSelect(byId("slot3Metric"), state.slot3Metric, true);
-        updatePreviewImages();
-        renderTheme();
-      }
-
-      function collectSettings() {
-        var vertical = byId("verticalLayout").checked;
-        var slot3 = byId("slot3Metric").value;
-        if (vertical && slot3 === "none") slot3 = DEFAULTS.slot3Metric;
-
-        var slotCount = slot3 === "none" ? 2 : 3;
-        var layout = vertical ? "vertical_3" : (slotCount === 3 ? "horizontal_3" : "horizontal_2");
-
-        var customTheme = clone(state.customTheme);
-        var activeCustom = vertical ? customTheme.vertical : customTheme.horizontal;
-        return {
-          showLeadingZero: byId("leadingZero").checked,
-          show_leading_zero: byId("leadingZero").checked,
-          hour24: !byId("hour12").checked,
-          use_24_hour: !byId("hour12").checked,
-          celsius: byId("celsius").checked,
-          use_celsius: byId("celsius").checked,
-          showBluetooth: byId("bluetooth").checked,
-          show_bluetooth: byId("bluetooth").checked,
-          manualLocation: !!(byId("manualPostalCode").value.trim() || byId("manualCity").value.trim()),
-          manual_location: !!(byId("manualPostalCode").value.trim() || byId("manualCity").value.trim()),
-          manualPostalCode: byId("manualPostalCode").value.trim(),
-          manual_postal_code: byId("manualPostalCode").value.trim(),
-          manualCity: byId("manualCity").value.trim(),
-          manual_city: byId("manualCity").value.trim(),
-          manualCountry: byId("manualCountry").value.trim().toUpperCase().slice(0,2),
-          manual_country: byId("manualCountry").value.trim().toUpperCase().slice(0,2),
-          language: byId("language").value,
-          analyticsEnabled: byId("analytics").checked,
-          analytics_enabled: byId("analytics").checked,
-          verticalLayout: vertical,
-          vertical_layout: vertical,
-          layout: layout,
-          slotCount: slotCount,
-          slot_count: slotCount,
-          slot1Metric: byId("slot1Metric").value,
-          slot2Metric: byId("slot2Metric").value,
-          slot3Metric: slot3,
-          slot_1_metric: byId("slot1Metric").value,
-          slot_2_metric: byId("slot2Metric").value,
-          slot_3_metric: slot3,
-          themeMode: state.themeMode,
-          theme_mode: state.themeMode,
-          theme: state.theme,
-          showBatteryIndicator: byId("batteryIndicator").checked,
-          show_battery_indicator: byId("batteryIndicator").checked,
-          customTheme: customTheme,
-          custom_theme: customTheme,
-          watchfaceBackground: activeCustom.background,
-          watchface_background: activeCustom.background,
-          boxBackgroundColor: customTheme.horizontal.boxBackground,
-          box_background_color: customTheme.horizontal.boxBackground,
-          boxTopBorderColor: customTheme.horizontal.boxTopBorder,
-          box_top_border_color: customTheme.horizontal.boxTopBorder,
-          boxBottomBorderColor: customTheme.horizontal.boxBottomBorder,
-          box_bottom_border_color: customTheme.horizontal.boxBottomBorder,
-          trayBackgroundColor: customTheme.vertical.trayBackground,
-          tray_background_color: customTheme.vertical.trayBackground,
-          dividerColor: customTheme.vertical.divider,
-          divider_color: customTheme.vertical.divider,
-          timeTextColor: activeCustom.timeText,
-          time_text_color: activeCustom.timeText,
-          dateTextColor: customTheme.vertical.dateText,
-          date_text_color: customTheme.vertical.dateText,
-          slot1TextColor: activeCustom.slot1Text,
-          slot_1_text_color: activeCustom.slot1Text,
-          slot2TextColor: activeCustom.slot2Text,
-          slot_2_text_color: activeCustom.slot2Text,
-          slot3TextColor: activeCustom.slot3Text,
-          slot_3_text_color: activeCustom.slot3Text,
-          batteryIndicatorColor: customTheme.horizontal.batteryIndicator,
-          battery_indicator_color: customTheme.horizontal.batteryIndicator
-        };
-      }
-
-      function saveSettings() {
-        var settings = collectSettings();
-        var encoded = encodeURIComponent(JSON.stringify(settings));
-        var parameters = new URLSearchParams(window.location.search);
-
-        try {
-          window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-        } catch (error) {
-          // The Pebble webview can disable local storage; saving still continues.
-        }
-
-        if (parameters.get("preview") === "1") {
-          byId("status").textContent = "Saved for browser preview.";
-          return;
-        }
-
-        byId("status").textContent = "Saving…";
-        window.location.href = "pebblejs://close#" + encoded;
-      }
-
-      byId("presetThemeTab").addEventListener("click", function () {
-        state.themeMode = "preset";
-        renderTheme();
-      });
-      byId("customThemeTab").addEventListener("click", function () {
-        state.themeMode = "custom";
-        renderTheme();
-      });
-      byId("verticalLayout").addEventListener("change", updatePreviewImages);
-      byId("slot3Metric").addEventListener("change", updatePreviewImages);
-      byId("resetButton").addEventListener("click", function () {
-        byId("verticalLayout").checked = DEFAULTS.verticalLayout;
-        populateSelect(byId("slot1Metric"), DEFAULTS.slot1Metric, false);
-        populateSelect(byId("slot2Metric"), DEFAULTS.slot2Metric, false);
-        populateSelect(byId("slot3Metric"), DEFAULTS.slot3Metric, true);
-        updatePreviewImages();
-        byId("status").textContent = "Layout reset.";
-      });
-      byId("saveButton").addEventListener("click", saveSettings);
-      byId("paletteClose").addEventListener("click", closePebbleColorPicker);
-      byId("paletteDone").addEventListener("click", closePebbleColorPicker);
-      byId("paletteDialog").addEventListener("click", function (event) {
-        if (event.target === byId("paletteDialog")) closePebbleColorPicker();
-      });
-      document.addEventListener("keydown", function (event) {
-        if (event.key === "Escape" && !byId("paletteDialog").hidden) closePebbleColorPicker();
-      });
-
-      buildThemeGrid();
-      buildPebblePalette();
-      render(readIncomingSettings());
+      function saveSettings(){var settings=collectSettings(),encoded=encodeURIComponent(JSON.stringify(settings)),parameters=new URLSearchParams(window.location.search);try{localStorage.setItem(STORAGE_KEY,JSON.stringify(settings));}catch(e){}if(parameters.get("preview")==="1"){byId("status").textContent="Saved for browser preview.";return;}byId("status").textContent="Saving…";window.location.href="pebblejs://close#"+encoded;}
+      byId("presetThemeTab").addEventListener("click",function(){state.themeMode="preset";renderTheme();});
+      byId("customThemeTab").addEventListener("click",function(){state.themeMode="custom";renderTheme();});
+      byId("verticalLayout").addEventListener("change",updatePreviewImages);byId("slot3Metric").addEventListener("change",updatePreviewImages);
+      byId("resetButton").addEventListener("click",function(){byId("verticalLayout").checked=DEFAULTS.verticalLayout;populateMetricSelect(byId("slot1Metric"),DEFAULTS.slot1Metric,false);populateMetricSelect(byId("slot2Metric"),DEFAULTS.slot2Metric,false);populateMetricSelect(byId("slot3Metric"),DEFAULTS.slot3Metric,true);updatePreviewImages();byId("status").textContent="Layout reset.";});
+      byId("saveButton").addEventListener("click",saveSettings);byId("paletteClose").addEventListener("click",closePebbleColorPicker);byId("paletteDone").addEventListener("click",closePebbleColorPicker);byId("paletteDialog").addEventListener("click",function(event){if(event.target===byId("paletteDialog"))closePebbleColorPicker();});document.addEventListener("keydown",function(event){if(event.key==="Escape"&&!byId("paletteDialog").hidden)closePebbleColorPicker();});
+      buildThemeGrid();buildPebblePalette();render(readIncomingSettings());
     }());
   </script>
 </body>
