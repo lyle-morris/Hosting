@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Redux Settings</title>
+</head>
+<body>
+<script>
+(function(){
+  'use strict';
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', './app-config-v7.html?source=v8', false);
+    xhr.send(null);
+    if(xhr.status && (xhr.status < 200 || xhr.status >= 300)) throw new Error('HTTP ' + xhr.status);
+
+    var html = xhr.responseText || '';
+    html = html.replace('./app-config-v6.js?v=2', './app-config-v6.js?v=8');
+    var patch = '<scr' + 'ipt src="./app-config-location-hotfix.js?v=1"></scr' + 'ipt>';
+    html = html.replace('</body>', patch + '</body>');
+
+    document.open();
+    document.write(html);
+    document.close();
+  } catch(error) {
+    document.body.innerHTML = '<div style="padding:24px;background:#222;color:#fff;font-family:sans-serif">Unable to load Redux settings. Please close and reopen settings.</div>';
+  }
+})();
+</script>
+</body>
+</html>
