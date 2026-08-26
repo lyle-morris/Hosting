@@ -86,7 +86,11 @@
     .theme-tab:focus-visible,.theme-choice:focus-visible,.color-picker-trigger:focus-visible,.palette-swatch:focus-visible,.palette-close:focus-visible{position:relative;z-index:1;outline:2px solid var(--focus);outline-offset:2px}
     .field-group{display:flex;flex-direction:column;gap:4px}
     .field-label{font-size:14px;line-height:20px;font-weight:700}
+    .input-wrap{position:relative}
     .text-input{width:100%;height:48px;padding:0 16px;border:2px solid var(--control-border);border-radius:4px;background:#000;color:#fff}
+    .input-wrap .text-input{padding-right:48px}
+    .field-clear{position:absolute;top:50%;right:4px;width:40px;height:40px;transform:translateY(-50%);padding:0;border:0;background:transparent;color:#fff;font-size:26px;line-height:40px;font-weight:400;cursor:pointer}
+    .field-clear:focus-visible{outline:2px solid var(--focus);outline-offset:-2px;border-radius:4px}
     .analytics-toggle{padding:8px 12px;border:0;border-radius:4px;background:#000}
     .analytics-toggle strong{font-weight:400}
     .support-link{display:inline-flex;align-items:center;justify-content:center;width:100%;min-height:48px;padding:12px 24px;border-radius:4px;background:var(--button-muted);color:#fff;font-weight:700;text-decoration:none}
@@ -163,7 +167,7 @@
         <h2 class="card-title" id="locationTitle">Manual location</h2>
         <div class="card-form">
           <div class="field-group"><label class="field-label" for="manualCountry">Country</label><select id="manualCountry"></select></div>
-          <div class="field-group"><label class="field-label" for="manualPostalCode">ZIP/postal code</label><input class="text-input" id="manualPostalCode" type="text" autocomplete="postal-code"></div>
+          <div class="field-group"><label class="field-label" for="manualPostalCode">ZIP/postal code</label><div class="input-wrap"><input class="text-input" id="manualPostalCode" type="text" autocomplete="postal-code"><button class="field-clear" id="manualPostalClear" type="button" aria-label="Clear ZIP/postal code" hidden>×</button></div></div>
           <div class="field-group"><label class="field-label" for="manualCity">City</label><input class="text-input" id="manualCity" type="text" autocomplete="address-level2"></div>
         </div>
       </section>
@@ -294,6 +298,7 @@
       if(slotCount===2)return"vertical-2-slot-"+index+".png";
       return"vertical-slot-"+index+".png"
     }
+    function updatePostalClear(){byId("manualPostalClear").hidden=!byId("manualPostalCode").value}
     function updateDynamicUi(){
       var d=layoutDetails();
       byId("slot3Row").hidden=d.slotCount!==3;
@@ -333,7 +338,7 @@
     function selectColor(color){if(!activeColorTarget)return;var t=activeColorTarget;state.themeMode="custom";state.customTheme[t.orientation][t.row.key]=color;if(t.orientation==="vertical"&&t.row.key==="timeText")state.customTheme.vertical.dateText=color;syncColorButton(t.button,t.row.label,color);updatePalette(color)}
     function renderCustomRows(){var d=layoutDetails(),orientation=d.orientation,rows=orientation==="vertical"?verticalRows(d.slotCount):horizontalRows(d.slotCount),container=byId("customThemeRows");container.innerHTML="";rows.forEach(function(row){var e=document.createElement("div"),label=document.createElement("div"),img=document.createElement("img"),divider=document.createElement("span"),button=document.createElement("button");e.className="theme-row";label.className="theme-row-label";label.textContent=row.label;img.className="theme-row-preview";img.alt="";setPreview(img,row.image,row.fallback);divider.className="theme-row-divider";button.type="button";button.className="color-picker-trigger";syncColorButton(button,row.label,state.customTheme[orientation][row.key]);button.addEventListener("click",function(){openColor(orientation,row,button)});e.appendChild(label);e.appendChild(img);e.appendChild(divider);e.appendChild(button);container.appendChild(e)})}
     function renderTheme(){var preset=state.themeMode!=="custom";byId("presetThemeTab").setAttribute("aria-selected",preset?"true":"false");byId("customThemeTab").setAttribute("aria-selected",preset?"false":"true");byId("presetThemePanel").hidden=!preset;byId("customThemePanel").hidden=preset;Array.prototype.forEach.call(document.querySelectorAll(".theme-choice"),function(b){b.setAttribute("aria-pressed",b.dataset.theme===state.theme?"true":"false")});if(!preset)renderCustomRows()}
-    function render(settings){state=normalize(settings);lastSlot3Metric=state.slot3Metric!=="none"?state.slot3Metric:"battery";byId("leadingZero").checked=state.showLeadingZero;byId("hour12").checked=!state.hour24;byId("celsius").checked=state.celsius;byId("bluetooth").checked=state.showBluetooth;byId("weekdayInsteadOfMonth").checked=state.weekdayInsteadOfMonth;byId("batteryIndicator").checked=state.showBatteryIndicator;byId("manualPostalCode").value=state.manualPostalCode;byId("manualCity").value=state.manualCity;populateCountries(state.manualCountry);populateLanguages(state.language);byId("analytics").checked=state.analyticsEnabled;byId("verticalLayout").checked=state.verticalLayout;byId("threeSlots").checked=state.slotCount===3;populateMetricSelect(byId("slot1Metric"),state.slot1Metric);populateMetricSelect(byId("slot2Metric"),state.slot2Metric);populateMetricSelect(byId("slot3Metric"),state.slot3Metric==="none"?lastSlot3Metric:state.slot3Metric);updateDynamicUi();renderTheme()}
+    function render(settings){state=normalize(settings);lastSlot3Metric=state.slot3Metric!=="none"?state.slot3Metric:"battery";byId("leadingZero").checked=state.showLeadingZero;byId("hour12").checked=!state.hour24;byId("celsius").checked=state.celsius;byId("bluetooth").checked=state.showBluetooth;byId("weekdayInsteadOfMonth").checked=state.weekdayInsteadOfMonth;byId("batteryIndicator").checked=state.showBatteryIndicator;byId("manualPostalCode").value=state.manualPostalCode;byId("manualCity").value=state.manualCity;populateCountries(state.manualCountry);populateLanguages(state.language);byId("analytics").checked=state.analyticsEnabled;byId("verticalLayout").checked=state.verticalLayout;byId("threeSlots").checked=state.slotCount===3;populateMetricSelect(byId("slot1Metric"),state.slot1Metric);populateMetricSelect(byId("slot2Metric"),state.slot2Metric);populateMetricSelect(byId("slot3Metric"),state.slot3Metric==="none"?lastSlot3Metric:state.slot3Metric);updatePostalClear();updateDynamicUi();renderTheme()}
     function collectSettings(){
       var d=layoutDetails(),slot3=d.slotCount===3?byId("slot3Metric").value:"none",layout=d.orientation+"_"+d.slotCount,custom=clone(state.customTheme);
       custom.vertical.dateText=custom.vertical.timeText;
@@ -362,6 +367,8 @@
     byId("verticalLayout").addEventListener("change",updateDynamicUi);
     byId("threeSlots").addEventListener("change",function(){if(this.checked){byId("slot3Metric").value=lastSlot3Metric}else{lastSlot3Metric=byId("slot3Metric").value||lastSlot3Metric}updateDynamicUi()});
     ["slot1Metric","slot2Metric","slot3Metric"].forEach(function(id){byId(id).addEventListener("change",function(){if(id==="slot3Metric")lastSlot3Metric=this.value;updateDynamicUi()})});
+    byId("manualPostalCode").addEventListener("input",updatePostalClear);
+    byId("manualPostalClear").addEventListener("click",function(){var input=byId("manualPostalCode");input.value="";updatePostalClear();input.focus()});
     byId("presetThemeTab").addEventListener("click",function(){state.themeMode="preset";renderTheme()});
     byId("customThemeTab").addEventListener("click",function(){if(state.themeMode!=="custom")applyPresetToCustom(state.theme);state.themeMode="custom";renderTheme()});
     byId("resetButton").addEventListener("click",resetLayout);byId("saveButton").addEventListener("click",saveSettings);
