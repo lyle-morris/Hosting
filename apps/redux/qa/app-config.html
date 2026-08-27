@@ -149,7 +149,6 @@
           <label class="setting-row" for="hour12"><strong>Use 12-hour format</strong><span class="checkbox"><input id="hour12" type="checkbox"><span class="checkbox-box"></span></span></label>
           <label class="setting-row" for="celsius"><strong>Use Celsius for temperature</strong><span class="checkbox"><input id="celsius" type="checkbox"><span class="checkbox-box"></span></span></label>
           <label class="setting-row" for="bluetooth"><strong>Show Bluetooth connectivity</strong><span class="checkbox"><input id="bluetooth" type="checkbox"><span class="checkbox-box"></span></span></label>
-          <label class="setting-row" id="weekdayRow" for="weekdayInsteadOfMonth"><strong>Use weekday label instead of month</strong><span class="checkbox"><input id="weekdayInsteadOfMonth" type="checkbox"><span class="checkbox-box"></span></span></label>
           <label class="setting-row" id="batteryIndicatorRow" for="batteryIndicator"><strong>Show battery indicator</strong><span class="checkbox"><input id="batteryIndicator" type="checkbox"><span class="checkbox-box"></span></span></label>
         </div>
       </section>
@@ -223,7 +222,7 @@
       {value:"white",label:"White",color:"#ffffff",text:"#000000"},{value:"black",label:"Black",color:"#000000",text:"#ffffff"}
     ];
     var DEFAULTS={
-      showLeadingZero:true,hour24:false,celsius:false,showBluetooth:false,weekdayInsteadOfMonth:false,
+      showLeadingZero:true,hour24:false,celsius:false,showBluetooth:false,
       manualPostalCode:"",manualCity:"",manualCountry:"US",language:"en",analyticsEnabled:true,
       verticalLayout:false,slotCount:2,slot1Metric:"calendar",slot2Metric:"weather",slot3Metric:"none",
       themeMode:"preset",theme:"orange",showBatteryIndicator:true,
@@ -275,7 +274,6 @@
         hour24:asBoolean(firstValue(raw.hour24,raw.use_24_hour),DEFAULTS.hour24),
         celsius:asBoolean(firstValue(raw.celsius,raw.use_celsius),DEFAULTS.celsius),
         showBluetooth:asBoolean(firstValue(raw.showBluetooth,raw.show_bluetooth),DEFAULTS.showBluetooth),
-        weekdayInsteadOfMonth:asBoolean(firstValue(raw.weekdayInsteadOfMonth,raw.weekday_instead_of_month),DEFAULTS.weekdayInsteadOfMonth),
         manualPostalCode:String(firstValue(raw.manualPostalCode,raw.manual_postal_code,DEFAULTS.manualPostalCode)||"").trim(),
         manualCity:String(firstValue(raw.manualCity,raw.manual_city,DEFAULTS.manualCity)||"").trim(),
         manualCountry:String(firstValue(raw.manualCountry,raw.manual_country,DEFAULTS.manualCountry)||DEFAULTS.manualCountry).trim().toUpperCase().slice(0,2),
@@ -305,7 +303,6 @@
       setPreview(byId("slot1Preview"),previewName(d.orientation,d.slotCount,1),d.orientation==="vertical"?"vertical-slot-1.png":null);
       setPreview(byId("slot2Preview"),previewName(d.orientation,d.slotCount,2),d.orientation==="vertical"?"vertical-slot-2.png":null);
       if(d.slotCount===3)setPreview(byId("slot3Preview"),previewName(d.orientation,d.slotCount,3),d.orientation==="vertical"?"vertical-slot-3.png":null);
-      byId("weekdayRow").hidden=!metricIsActive("calendar");
       byId("batteryIndicatorRow").hidden=d.orientation==="vertical";
       if(state&&state.themeMode==="custom")renderCustomRows()
     }
@@ -338,7 +335,7 @@
     function selectColor(color){if(!activeColorTarget)return;var t=activeColorTarget;state.themeMode="custom";state.customTheme[t.orientation][t.row.key]=color;if(t.orientation==="vertical"&&t.row.key==="timeText")state.customTheme.vertical.dateText=color;syncColorButton(t.button,t.row.label,color);updatePalette(color)}
     function renderCustomRows(){var d=layoutDetails(),orientation=d.orientation,rows=orientation==="vertical"?verticalRows(d.slotCount):horizontalRows(d.slotCount),container=byId("customThemeRows");container.innerHTML="";rows.forEach(function(row){var e=document.createElement("div"),label=document.createElement("div"),img=document.createElement("img"),divider=document.createElement("span"),button=document.createElement("button");e.className="theme-row";label.className="theme-row-label";label.textContent=row.label;img.className="theme-row-preview";img.alt="";setPreview(img,row.image,row.fallback);divider.className="theme-row-divider";button.type="button";button.className="color-picker-trigger";syncColorButton(button,row.label,state.customTheme[orientation][row.key]);button.addEventListener("click",function(){openColor(orientation,row,button)});e.appendChild(label);e.appendChild(img);e.appendChild(divider);e.appendChild(button);container.appendChild(e)})}
     function renderTheme(){var preset=state.themeMode!=="custom";byId("presetThemeTab").setAttribute("aria-selected",preset?"true":"false");byId("customThemeTab").setAttribute("aria-selected",preset?"false":"true");byId("presetThemePanel").hidden=!preset;byId("customThemePanel").hidden=preset;Array.prototype.forEach.call(document.querySelectorAll(".theme-choice"),function(b){b.setAttribute("aria-pressed",b.dataset.theme===state.theme?"true":"false")});if(!preset)renderCustomRows()}
-    function render(settings){state=normalize(settings);lastSlot3Metric=state.slot3Metric!=="none"?state.slot3Metric:"battery";byId("leadingZero").checked=state.showLeadingZero;byId("hour12").checked=!state.hour24;byId("celsius").checked=state.celsius;byId("bluetooth").checked=state.showBluetooth;byId("weekdayInsteadOfMonth").checked=state.weekdayInsteadOfMonth;byId("batteryIndicator").checked=state.showBatteryIndicator;byId("manualPostalCode").value=state.manualPostalCode;byId("manualCity").value=state.manualCity;populateCountries(state.manualCountry);populateLanguages(state.language);byId("analytics").checked=state.analyticsEnabled;byId("verticalLayout").checked=state.verticalLayout;byId("threeSlots").checked=state.slotCount===3;populateMetricSelect(byId("slot1Metric"),state.slot1Metric);populateMetricSelect(byId("slot2Metric"),state.slot2Metric);populateMetricSelect(byId("slot3Metric"),state.slot3Metric==="none"?lastSlot3Metric:state.slot3Metric);updatePostalClear();updateDynamicUi();renderTheme()}
+    function render(settings){state=normalize(settings);lastSlot3Metric=state.slot3Metric!=="none"?state.slot3Metric:"battery";byId("leadingZero").checked=state.showLeadingZero;byId("hour12").checked=!state.hour24;byId("celsius").checked=state.celsius;byId("bluetooth").checked=state.showBluetooth;byId("batteryIndicator").checked=state.showBatteryIndicator;byId("manualPostalCode").value=state.manualPostalCode;byId("manualCity").value=state.manualCity;populateCountries(state.manualCountry);populateLanguages(state.language);byId("analytics").checked=state.analyticsEnabled;byId("verticalLayout").checked=state.verticalLayout;byId("threeSlots").checked=state.slotCount===3;populateMetricSelect(byId("slot1Metric"),state.slot1Metric);populateMetricSelect(byId("slot2Metric"),state.slot2Metric);populateMetricSelect(byId("slot3Metric"),state.slot3Metric==="none"?lastSlot3Metric:state.slot3Metric);updatePostalClear();updateDynamicUi();renderTheme()}
     function collectSettings(){
       var d=layoutDetails(),slot3=d.slotCount===3?byId("slot3Metric").value:"none",layout=d.orientation+"_"+d.slotCount,custom=clone(state.customTheme);
       custom.vertical.dateText=custom.vertical.timeText;
@@ -347,7 +344,6 @@
         showLeadingZero:byId("leadingZero").checked,show_leading_zero:byId("leadingZero").checked,
         hour24:!byId("hour12").checked,use_24_hour:!byId("hour12").checked,celsius:byId("celsius").checked,use_celsius:byId("celsius").checked,
         showBluetooth:byId("bluetooth").checked,show_bluetooth:byId("bluetooth").checked,
-        weekdayInsteadOfMonth:byId("weekdayInsteadOfMonth").checked,weekday_instead_of_month:byId("weekdayInsteadOfMonth").checked,
         manualLocation:!!(manualPostal||manualCity),manual_location:!!(manualPostal||manualCity),manualPostalCode:manualPostal,manual_postal_code:manualPostal,manualCity:manualCity,manual_city:manualCity,manualCountry:manualCountry,manual_country:manualCountry,
         language:byId("language").value,analyticsEnabled:byId("analytics").checked,analytics_enabled:byId("analytics").checked,
         verticalLayout:d.orientation==="vertical",vertical_layout:d.orientation==="vertical",threeSlots:d.slotCount===3,three_slots:d.slotCount===3,
