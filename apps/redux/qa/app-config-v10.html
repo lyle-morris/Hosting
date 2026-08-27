@@ -1,0 +1,83 @@
+<!doctype html>
+<!-- Redux 2.1.0 QA app configuration v10 — current Figma structure patch -->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Redux Settings</title>
+</head>
+<body>
+<script>
+(function(){
+  'use strict';
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', './app-config.html?base=v10-20260827', false);
+    xhr.send(null);
+    if(xhr.status && (xhr.status < 200 || xhr.status >= 300)) throw new Error('HTTP ' + xhr.status);
+
+    var html = xhr.responseText || '';
+
+    /* Latest Figma uses slot 3 = None as the 2/3-slot selector. Keep the old
+       checkbox in the DOM for backwards-safe code paths, but remove it from UI. */
+    html = html.replace(
+      /<label class="layout-toggle" for="threeSlots">[\s\S]*?<\/label>/,
+      '<label class="layout-toggle legacy-three-slots" for="threeSlots" hidden><strong>Use 3 informational slots</strong><span class="switch"><input id="threeSlots" type="checkbox"><span class="switch-track" aria-hidden="true"></span></span></label>'
+    );
+    html = html.replace('Use vertical layout</strong>', 'Switch to vertical layout</strong>');
+
+    html = html.replace(
+      'function populateMetricSelect(el,value){el.innerHTML="";METRICS.forEach(function(m){var o=document.createElement("option");o.value=m.value;o.textContent=m.label;el.appendChild(o)});el.value=value}',
+      'function populateMetricSelect(el,value){el.innerHTML="";METRICS.forEach(function(m){var o=document.createElement("option");o.value=m.value;o.textContent=m.label;el.appendChild(o)});if(el.id==="slot3Metric"){var n=document.createElement("option");n.value="none";n.textContent="None";el.appendChild(n)}el.value=value||((el.id==="slot3Metric")?"none":"calendar")}'
+    );
+    html = html.replace(
+      'function layoutDetails(){return{orientation:byId("verticalLayout").checked?"vertical":"horizontal",slotCount:byId("threeSlots").checked?3:2}}',
+      'function layoutDetails(){return{orientation:byId("verticalLayout").checked?"vertical":"horizontal",slotCount:byId("slot3Metric").value==="none"?2:3}}'
+    );
+    html = html.replace(
+      'byId("slot3Row").hidden=d.slotCount!==3;',
+      'byId("slot3Row").hidden=false;byId("threeSlots").checked=d.slotCount===3;'
+    );
+    html = html.replace(
+      'populateMetricSelect(byId("slot3Metric"),state.slot3Metric==="none"?lastSlot3Metric:state.slot3Metric);',
+      'populateMetricSelect(byId("slot3Metric"),state.slot3Metric||"none");'
+    );
+    html = html.replace(
+      'populateMetricSelect(byId("slot3Metric"),lastSlot3Metric);updateDynamicUi();renderTheme();',
+      'populateMetricSelect(byId("slot3Metric"),"none");byId("threeSlots").checked=false;updateDynamicUi();renderTheme();'
+    );
+
+    var css = '<style id="redux-v10-figma">' +
+      '.page-heading h1{font-size:38px!important;line-height:46px!important;font-weight:900!important;letter-spacing:0!important}' +
+      '.page-heading p{font-size:16px!important;line-height:24px!important}' +
+      '.legacy-three-slots{display:none!important}' +
+      '#slot3Row{display:grid!important}' +
+      '.actions{position:fixed!important;z-index:200!important;left:50%!important;bottom:0!important;width:100%!important;max-width:390px!important;transform:translateX(-50%)!important;-webkit-transform:translateX(-50%)!important;padding:16px!important;background:#222!important;box-shadow:0 0 12px rgba(0,0,0,.5)!important}' +
+      '.actions-inner{display:grid!important;grid-template-columns:1fr 1fr!important;gap:16px!important;width:100%!important}' +
+      '.button{min-height:51px!important}' +
+      '@media(max-width:360px){.page-heading{padding-left:16px!important;padding-right:16px!important}}' +
+      '</style>';
+    html = html.replace('</head>', css + '</head>');
+
+    var patch = '<scr' + 'ipt>(function(){' +
+      'var content=document.querySelector(".page-content");' +
+      'var general=document.querySelector("section[aria-labelledby=generalTitle]");' +
+      'var info=document.querySelector("section[aria-labelledby=informationTitle]");' +
+      'if(content&&general&&info&&content.firstElementChild!==general){content.insertBefore(general,info);}' +
+      'var third=document.getElementById("slot3Metric");var legacy=document.getElementById("threeSlots");' +
+      'if(third&&legacy){legacy.checked=third.value!=="none";third.addEventListener("change",function(){legacy.checked=this.value!=="none";});}' +
+      'var h=document.querySelector(".page-heading h1");if(h)h.textContent="Redux";' +
+      'document.documentElement.setAttribute("data-redux-config","v10");' +
+      '}());</scr' + 'ipt>';
+    html = html.replace('</body>', patch + '</body>');
+
+    document.open();
+    document.write(html);
+    document.close();
+  } catch(error) {
+    document.body.innerHTML = '<div style="padding:24px;background:#222;color:#fff;font-family:sans-serif">Unable to load Redux settings v10. Please close and reopen settings.</div>';
+  }
+}());
+</script>
+</body>
+</html>
