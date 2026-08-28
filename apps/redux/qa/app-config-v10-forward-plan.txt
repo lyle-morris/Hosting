@@ -1,1 +1,0 @@
-Plan: forward app-config-v10.html to app-config-v11.html for stale companion compatibility.
