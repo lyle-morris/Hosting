@@ -15,7 +15,7 @@
   'use strict';
   try {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', './app-config.html?base=v11-20260828', false);
+    xhr.open('GET', './app-config.html?base=v11-20260828b', false);
     xhr.send(null);
     if(xhr.status && (xhr.status < 200 || xhr.status >= 300)) throw new Error('HTTP ' + xhr.status);
 
@@ -62,6 +62,7 @@
       'syncSlotEnd();if(three)three.addEventListener("change",function(){setTimeout(syncSlotEnd,0);});' +
       'function addThemeReset(panel,isCustom){if(!panel||panel.querySelector(".theme-reset-wrap"))return;var wrap=document.createElement("div");wrap.className="theme-reset-wrap";var btn=document.createElement("button");btn.type="button";btn.className="theme-reset-button";btn.textContent="Reset theme";btn.addEventListener("click",function(){var orange=document.querySelector(".theme-choice[data-theme=orange]");if(!orange)return;orange.click();if(isCustom){var customTab=byId("customThemeTab");if(customTab)customTab.click();}var status=byId("status");if(status)status.textContent="Theme reset.";});wrap.appendChild(btn);panel.appendChild(wrap);}' +
       'addThemeReset(byId("presetThemePanel"),false);addThemeReset(byId("customThemePanel"),true);' +
+      'var pink=document.querySelector(".theme-choice[data-theme=pink]");if(pink){if(pink.getAttribute("aria-pressed")==="true"){var red=document.querySelector(".theme-choice[data-theme=red]");if(red)red.click();}if(pink.parentNode)pink.parentNode.removeChild(pink);}' +
       'var save=byId("saveButton");if(save)save.textContent="Save settings";' +
       'var heading=document.querySelector(".page-heading h1");if(heading)heading.textContent="Redux";' +
       'document.documentElement.setAttribute("data-redux-config","v11");' +
