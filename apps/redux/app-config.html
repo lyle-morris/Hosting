@@ -1,4 +1,8 @@
 <!doctype html>
+<!-- Redux 2.1.0 production app configuration
+     Stable endpoint used by the published PBW.
+     Source of truth: REDUX - PEBBLE / node 2036:14801
+-->
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -9,9 +13,47 @@
 <script>
 (function(){
   'use strict';
-  var target = './qa/app-config-v11.html';
-  var query = window.location.search || '';
-  window.location.replace(target + query);
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', './qa/app-config.html?base=redux-2.1.0-prod-20260828b', false);
+    xhr.send(null);
+    if(xhr.status && (xhr.status < 200 || xhr.status >= 300)) throw new Error('HTTP ' + xhr.status);
+
+    var html = xhr.responseText || '';
+    var css = '<style id="redux-2-1-production">' +
+      '.page-heading h1{font-size:42px!important;line-height:normal!important;font-weight:500!important;letter-spacing:0!important}' +
+      '.page-heading p{font-size:18px!important;line-height:24px!important}' +
+      '.layout-toggle-group{display:flex;flex-direction:column;gap:1px;width:100%;overflow:hidden;border-radius:4px}' +
+      '.layout-toggle-group .layout-toggle{border-radius:0!important;margin:0!important}' +
+      '.slot-row.last-visible-slot{border-bottom:0!important}' +
+      '.slots>.info-reset{width:100%;min-height:51px;margin-top:0}' +
+      '.theme-choice-swatch{font-size:18px!important}' +
+      '#presetThemePanel{border-radius:0 8px 8px 8px!important}' +
+      '#customThemePanel{border-radius:8px 0 8px 8px!important}' +
+      '.theme-reset-wrap{padding:0 16px 16px}' +
+      '.theme-reset-button{width:100%;min-height:51px;padding:12px 24px;border:0;border-radius:4px;background:rgba(255,255,255,.15);color:#fff;font:inherit;font-weight:700;cursor:pointer}' +
+      '.custom-theme-list{padding-bottom:0!important}' +
+      '.theme-row{border-bottom-color:rgba(255,255,255,.10)!important}' +
+      '.setting-list:has(#batteryIndicatorRow[hidden]) label.setting-row[for="bluetooth"]{border-bottom:0!important}' +
+      '#language{padding-right:84px!important;background-position:right 10px center!important}' +
+      '#languageClear{right:40px!important;width:36px!important}' +
+      '.actions{z-index:200!important}' +
+      '.actions-inner{grid-template-columns:1fr!important;gap:0!important}' +
+      '.actions #saveButton{width:100%;min-height:51px}' +
+      '.actions .status:not(:empty){margin-bottom:8px}' +
+      '@media(max-width:360px){.theme-reset-wrap{padding-left:12px;padding-right:12px}}' +
+      '</style>';
+    html = html.replace('</head>', css + '</head>');
+
+    var patchScript = '<scr' + 'ipt src="./qa/app-config-v11-patch.js?v=redux-2.1.0-prod-20260828b"></scr' + 'ipt>';
+    html = html.replace('</body>', patchScript + '</body>');
+
+    document.open();
+    document.write(html);
+    document.close();
+  } catch(error) {
+    document.body.innerHTML = '<div style="padding:24px;background:#222;color:#fff;font-family:sans-serif">Unable to load Redux settings. Please close and reopen settings.</div>';
+  }
 }());
 </script>
 </body>
