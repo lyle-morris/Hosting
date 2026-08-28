@@ -15,7 +15,7 @@
   'use strict';
   try {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', './app-config.html?base=v11-20260828c', false);
+    xhr.open('GET', './app-config.html?base=v11-20260828d', false);
     xhr.send(null);
     if(xhr.status && (xhr.status < 200 || xhr.status >= 300)) throw new Error('HTTP ' + xhr.status);
 
@@ -39,7 +39,11 @@
       '@media(max-width:360px){.theme-reset-wrap{padding-left:12px;padding-right:12px}}' +
       '</style>';
     html = html.replace('</head>', css + '</head>');
-    html = html.replace('</body>', '<script src="./app-config-v11-patch.js?v=20260828c"></script></body>');
+
+    // Never place a literal closing script tag inside this inline wrapper. HTML parsers
+    // terminate the current script even when the tag appears inside a JavaScript string.
+    var patchScript = '<scr' + 'ipt src="./app-config-v11-patch.js?v=20260828d"></scr' + 'ipt>';
+    html = html.replace('</body>', patchScript + '</body>');
 
     document.open();
     document.write(html);
