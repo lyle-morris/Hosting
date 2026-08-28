@@ -1,0 +1,1069 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111111">
+  <title>Essential Redux Settings</title>
+  <style>
+    :root{
+      --black:#000000;
+      --page-top:#333333;
+      --card:#222222;
+      --card-border:#555555;
+      --white:#ffffff;
+      --focus:#00aaff;
+      --error:#ff6b6b;
+      --divider:rgba(255,255,255,.10);
+      --header:rgba(244,244,244,.08);
+      --body-end:rgba(255,255,255,.05);
+      --button:rgba(255,255,255,.15);
+      --orange:#ff5500;
+      --blue:#00aaff;
+      --purple:#5500ff;
+      --yellow:#ffaa00;
+      --green:#005500;
+      --red:#ff0055;
+    }
+
+    *{box-sizing:border-box}
+    html{background:#000000}
+    body{
+      margin:0;
+      min-width:320px;
+      min-height:100vh;
+      font-family:'Roboto',sans-serif;
+      font-size:16px;
+      line-height:24px;
+      color:#ffffff;
+      background:linear-gradient(180deg,#333333 0%,#000000 100%);
+      padding:12px;
+    }
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+
+    .page{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      width:min(100%,390px);
+      min-height:calc(100vh - 24px);
+      margin:0 auto;
+      padding:0 0 95px;
+    }
+    .page-header{padding:12px 12px 0}
+    .page-header h1{margin:0;font-size:38px;line-height:46px;font-weight:900}
+    .intro{margin:0}
+
+    section{
+      width:100%;
+      max-width:390px;
+      overflow:hidden;
+      background-color:#222222;
+      box-shadow:0 0 8px rgba(0,0,0,.5);
+      border-radius:8px;
+      border:1px solid #555555;
+    }
+    section h2{
+      margin:0;
+      padding:16px;
+      background-color:rgba(244,244,244,.08);
+      font-size:18px;
+      line-height:24px;
+      font-weight:700;
+    }
+    section .content{
+      display:flex;
+      flex-direction:column;
+      padding:16px;
+      background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.05));
+    }
+    section .content p{margin:0 0 16px;line-height:1.5}
+    section .content p:last-child{margin-bottom:0}
+    .general-settings .content{gap:0}
+
+    .setting-row{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      min-height:56px;
+      padding:12px 0;
+      border-bottom:1px solid var(--divider);
+    }
+    .setting-row:last-child{border-bottom:0}
+    .setting-row>span:first-child{flex:1;font-weight:500}
+    .check-control{display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px}
+
+    input[type=checkbox]{
+      width:20px;
+      height:20px;
+      margin:0;
+      accent-color:#00aaff;
+    }
+    input[type="text"],select{
+      width:100%;
+      height:48px;
+      padding:0 12px;
+      background-color:#000000;
+      border:2px solid #555555;
+      border-radius:4px;
+      color:#ffffff;
+      display:flex;
+      font-size:16px;
+      font-weight:700;
+    }
+    input[type="text"]:focus,select:focus{
+      outline:none;
+      border-color:#00aaff;
+    }
+    select{
+      -webkit-appearance:none;
+      -moz-appearance:none;
+      appearance:none;
+      padding-right:44px;
+      background-image:url("data:image/svg+xml;utf8,<svg fill='%2300AAFF' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+      background-repeat:no-repeat;
+      background-position:right 10px center;
+      background-size:24px;
+    }
+    select option{background:#000000;color:#ffffff;padding:6px}
+    select.invalid,input[type="text"].invalid{border-color:var(--error)}
+    .field-error{margin:0!important;color:var(--error);font-size:14px;line-height:20px;font-weight:700}
+    .field-error:empty{display:none}
+    .field{display:flex;flex-direction:column;gap:4px}
+    .field-label{font-size:14px;font-weight:700}
+    .fields{display:flex;flex-direction:column;gap:16px}
+    .input-with-clear{position:relative}
+    .input-with-clear input[type="text"]{padding-right:48px}
+    .field-clear{
+      position:absolute;
+      top:4px;
+      right:4px;
+      width:40px;
+      height:40px;
+      padding:0;
+      border:0;
+      border-radius:4px;
+      background:transparent;
+      color:#ffffff;
+      font-size:24px;
+      line-height:1;
+    }
+    .field-clear:focus{outline:2px solid var(--focus);outline-offset:-2px}
+    .input-with-clear.has-clear select{padding-right:84px;background-position:right 48px center}
+
+    .theme-card{
+      overflow:visible;
+      background:transparent;
+      border:0;
+      box-shadow:none;
+    }
+    .tabs{display:grid;grid-template-columns:1fr 1fr}
+    .tab{
+      min-height:48px;
+      border:0;
+      border-bottom:1px solid var(--card-border);
+      background:transparent;
+      color:#ffffff;
+      font-size:18px;
+      font-weight:700;
+    }
+    .tab.active{
+      background:var(--card);
+      border:1px solid var(--card-border);
+      border-bottom-color:var(--card);
+      border-radius:8px 8px 0 0;
+    }
+    .tab:focus-visible,.theme:focus-within,.btn:focus-visible,.switch input:focus-visible+.switch-track,.color-picker-trigger:focus-visible,.palette-swatch:focus-visible{
+      outline:2px solid var(--focus);
+      outline-offset:2px;
+    }
+    .theme-panel{
+      margin-top:-1px;
+      padding:16px;
+      background:var(--card);
+      border:1px solid var(--card-border);
+      border-radius:0 0 8px 8px;
+      box-shadow:0 0 8px rgba(0,0,0,.5);
+    }
+    body[data-theme-mode="preset"] #presetPanel{border-radius:0 8px 8px 8px}
+    body[data-theme-mode="custom"] #customPanel{border-radius:8px 0 8px 8px}
+    .theme-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+    .theme{
+      --theme-bg:#000000;
+      --theme-fg:#ffffff;
+      position:relative;
+      display:flex;
+      height:80px;
+      padding:6px;
+      overflow:hidden;
+      border:2px solid transparent;
+      border-radius:8px;
+      cursor:pointer;
+    }
+    .theme input{position:absolute;opacity:0;pointer-events:none}
+    .theme span{
+      display:flex;
+      flex:1;
+      align-items:center;
+      justify-content:center;
+      width:100%;
+      border-radius:6px;
+      background:var(--theme-bg);
+      color:var(--theme-fg);
+      font-size:14px;
+      font-weight:700;
+      text-align:center;
+    }
+    .theme.selected{border-color:var(--focus)}
+    .orange{--theme-bg:var(--orange);--theme-fg:#ffffff}
+    .lightBlue{--theme-bg:var(--blue);--theme-fg:#000000}
+    .purple{--theme-bg:var(--purple);--theme-fg:#ffffff}
+    .yellow{--theme-bg:var(--yellow);--theme-fg:#000000}
+    .green{--theme-bg:var(--green);--theme-fg:#ffffff}
+    .red{--theme-bg:var(--red);--theme-fg:#ffffff}
+    .white{--theme-bg:#ffffff;--theme-fg:#000000}
+    .black{--theme-bg:#000000;--theme-fg:#ffffff}
+
+    .custom-list{display:flex;flex-direction:column}
+    .color-row{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 43px 48px;
+      align-items:center;
+      gap:16px;
+      min-height:72px;
+      padding:12px 0;
+      border-bottom:1px solid var(--divider);
+    }
+    .color-row:last-child{border-bottom:0}
+    .color-row label{font-size:18px;line-height:22px;font-weight:700}
+    .preview{width:43px;height:53px;object-fit:contain}
+    .color-picker-trigger{
+      width:48px;
+      height:48px;
+      padding:0;
+      border:2px solid rgba(255,255,255,.3);
+      border-radius:50%;
+      background:var(--selected-color,#000000);
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.35);
+    }
+    .visually-hidden{
+      position:absolute!important;
+      width:1px!important;
+      height:1px!important;
+      padding:0!important;
+      margin:-1px!important;
+      overflow:hidden!important;
+      clip:rect(0,0,0,0)!important;
+      white-space:nowrap!important;
+      border:0!important;
+    }
+    .palette-dialog{
+      position:fixed;
+      z-index:30;
+      inset:0;
+      display:grid;
+      place-items:center;
+      padding:20px;
+      background:rgba(0,0,0,.78);
+    }
+    .palette-sheet{
+      width:min(100%,366px);
+      max-height:calc(100vh - 40px);
+      overflow:auto;
+      padding:16px;
+      background:#222222;
+      border:1px solid #555555;
+      border-radius:8px;
+      box-shadow:0 0 16px rgba(0,0,0,.7);
+    }
+    .palette-head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+    .palette-head h2{flex:1;margin:0;font-size:20px;line-height:28px}
+    .palette-close{
+      width:40px;
+      height:40px;
+      border:0;
+      border-radius:4px;
+      background:rgba(255,255,255,.15);
+      color:#ffffff;
+      font-size:24px;
+      line-height:1;
+    }
+    .palette-copy{margin:0 0 16px;color:rgba(255,255,255,.8);font-size:14px;line-height:20px}
+    .palette-grid{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:6px}
+    .palette-swatch{
+      position:relative;
+      aspect-ratio:1;
+      min-width:0;
+      padding:0;
+      border:2px solid rgba(255,255,255,.22);
+      border-radius:5px;
+      background:var(--swatch);
+      box-shadow:inset 0 0 0 1px rgba(0,0,0,.32);
+    }
+    .palette-swatch.selected{border-color:#00aaff;box-shadow:0 0 0 2px #000000,0 0 0 4px #00aaff}
+    .palette-swatch.selected::after{
+      content:'✓';
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      color:var(--check,#ffffff);
+      font-size:18px;
+      font-weight:900;
+      text-shadow:0 1px 2px rgba(0,0,0,.8);
+    }
+    .palette-footer{display:flex;align-items:center;gap:12px;margin-top:16px}
+    .palette-value{flex:1;font-family:monospace;font-size:16px;font-weight:700}
+    .palette-done{min-width:96px}
+    body.palette-open{overflow:hidden}
+    .slot-toggle{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      min-height:50px;
+      padding:6px 16px;
+      background:#000000;
+      border-radius:4px;
+      margin-bottom:16px;
+    }
+    .slot-toggle strong{flex:1}
+    .switch{position:relative;width:43px;height:23px;flex:0 0 43px}
+    .switch input{position:absolute;opacity:0}
+    .switch-track{position:absolute;inset:0;border-radius:999px;background:#777777;transition:.15s}
+    .switch-track::after{
+      content:"";
+      position:absolute;
+      top:3px;
+      left:3px;
+      width:17px;
+      height:17px;
+      border-radius:50%;
+      background:#ffffff;
+      transition:.15s;
+    }
+    .switch input:checked+.switch-track{background:#00aa44}
+    .switch input:checked+.switch-track::after{transform:translateX(20px)}
+    .slots{display:flex;flex-direction:column}
+    .slot-row{
+      display:grid;
+      grid-template-columns:43px minmax(0,1fr);
+      align-items:center;
+      gap:16px;
+      min-height:72px;
+      padding:12px 0;
+      border-bottom:1px solid var(--divider);
+    }
+    .slot-row:last-child{border-bottom:0}
+    .slot-row[hidden]{display:none}
+    .slot-icon{width:43px;height:53px;object-fit:contain}
+
+    .analytics-row{padding:8px 12px;background:#000000;border-radius:4px}
+    .donate{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:48px;
+      padding:12px 24px;
+      background:var(--button);
+      border-radius:4px;
+      color:#ffffff;
+      font-weight:700;
+      text-decoration:none;
+    }
+    .actions{
+      position:fixed;
+      z-index:10;
+      left:0;
+      right:0;
+      bottom:0;
+      padding:16px max(16px,env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));
+      background:rgba(0,0,0,.96);
+      box-shadow:0 0 8px rgba(0,0,0,.5);
+    }
+    .actions-inner{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:min(100%,358px);margin:auto}
+    .btn{
+      min-height:48px;
+      padding:12px 18px;
+      border:0;
+      border-radius:4px;
+      background:var(--button);
+      color:#ffffff;
+      font-weight:700;
+    }
+    .btn.primary{background:var(--focus)}
+    .btn:disabled{opacity:.65;cursor:wait}
+    .status{grid-column:1/-1;text-align:center;color:#00ff88;font-size:12px;font-weight:700}
+    .status:empty{display:none}
+    [hidden]{display:none!important}
+
+    @media(max-width:360px){
+      .actions-inner{gap:8px}
+      .btn{padding-left:10px;padding-right:10px}
+      .color-row{grid-template-columns:minmax(0,1fr) 43px 44px;gap:12px}
+      .color-picker-trigger{width:44px;height:44px}
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="page-header">
+      <h1>Essential Redux</h1>
+      <p class="intro" data-i18n="intro">Use the settings below to customize your Pebble watchface.</p>
+    </header>
+
+    <section class="card general-settings">
+      <h2 data-i18n="settingsTitle">General settings</h2>
+      <div class="content">
+        <label class="setting-row"><span data-i18n="leadingZero">Display leading zero on the hours.</span><span class="check-control"><input id="leadingZero" type="checkbox"></span></label>
+        <label class="setting-row"><span data-i18n="hour12">Use 12-hour format</span><span class="check-control"><input id="hour12" type="checkbox" checked></span></label>
+        <label class="setting-row"><span data-i18n="celsius">Use Celsius for temperature</span><span class="check-control"><input id="celsius" type="checkbox"></span></label>
+        <label class="setting-row"><span data-i18n="bluetooth">Show Bluetooth connectivity</span><span class="check-control"><input id="bluetooth" type="checkbox"></span></label>
+        <label class="setting-row"><span data-i18n="batteryIndicator">Show battery indicator</span><span class="check-control"><input id="batteryIndicator" type="checkbox" checked></span></label>
+      </div>
+    </section>
+
+    <section class="theme-card" aria-labelledby="themeTab">
+      <div class="tabs" role="tablist" aria-label="Theme mode">
+        <button class="tab active" id="themeTab" type="button" role="tab" aria-selected="true" aria-controls="presetPanel" data-mode="preset" data-i18n="themeTab">Theme</button>
+        <button class="tab" id="customTab" type="button" role="tab" aria-selected="false" aria-controls="customPanel" data-mode="custom" data-i18n="customTab">Custom</button>
+      </div>
+      <div class="theme-panel" id="presetPanel" role="tabpanel" aria-labelledby="themeTab">
+        <div class="theme-grid" role="radiogroup" aria-label="Theme" id="themeGrid"></div>
+      </div>
+      <div class="theme-panel" id="customPanel" role="tabpanel" aria-labelledby="customTab" hidden>
+        <div class="custom-list">
+          <div class="color-row"><label for="customBackgroundColorButton" data-i18n="customBackground">Background color</label><img class="preview" src="./images/screen_background.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/screen_background.png'" alt=""><input id="customBackgroundColor" type="hidden" value="#ff5500"><button id="customBackgroundColorButton" class="color-picker-trigger" type="button" data-color-target="customBackgroundColor" style="--selected-color:#ff5500" aria-label="Choose background color"><span class="visually-hidden">Background color</span></button></div>
+          <div class="color-row"><label for="customTimeBoxColorButton" data-i18n="customTimeBox">Time box color</label><img class="preview" src="./images/time_box_background.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/time_box_background.png'" alt=""><input id="customTimeBoxColor" type="hidden" value="#ffffff"><button id="customTimeBoxColorButton" class="color-picker-trigger" type="button" data-color-target="customTimeBoxColor" style="--selected-color:#ffffff" aria-label="Choose time box color"><span class="visually-hidden">Time box color</span></button></div>
+          <div class="color-row"><label for="customTimeBorderColorButton" data-i18n="customBorders">Time box borders color</label><img class="preview" src="./images/time_box_borders.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/time_box_borders.png'" alt=""><input id="customTimeBorderColor" type="hidden" value="#000000"><button id="customTimeBorderColorButton" class="color-picker-trigger" type="button" data-color-target="customTimeBorderColor" style="--selected-color:#000000" aria-label="Choose time box borders color"><span class="visually-hidden">Time box borders color</span></button></div>
+          <div class="color-row"><label for="customTimeTextColorButton" data-i18n="customTimeText">Time box text color</label><img class="preview" src="./images/time_box_text.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/time_box_text.png'" alt=""><input id="customTimeTextColor" type="hidden" value="#000000"><button id="customTimeTextColorButton" class="color-picker-trigger" type="button" data-color-target="customTimeTextColor" style="--selected-color:#000000" aria-label="Choose time box text color"><span class="visually-hidden">Time box text color</span></button></div>
+          <div class="color-row"><label for="customInfo1TextColorButton" data-i18n="info1Text">Information 1 text color</label><img class="preview" src="./images/informational_1_text.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/informational_1_text.png'" alt=""><input id="customInfo1TextColor" type="hidden" value="#000000"><button id="customInfo1TextColorButton" class="color-picker-trigger" type="button" data-color-target="customInfo1TextColor" style="--selected-color:#000000" aria-label="Choose information 1 text color"><span class="visually-hidden">Information 1 text color</span></button></div>
+          <div class="color-row"><label for="customInfo2TextColorButton" data-i18n="info2Text">Information 2 text color</label><img class="preview" src="./images/informational_2_text.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/informational_2_text.png'" alt=""><input id="customInfo2TextColor" type="hidden" value="#000000"><button id="customInfo2TextColorButton" class="color-picker-trigger" type="button" data-color-target="customInfo2TextColor" style="--selected-color:#000000" aria-label="Choose information 2 text color"><span class="visually-hidden">Information 2 text color</span></button></div>
+          <div class="color-row"><label for="customInfo3TextColorButton" data-i18n="info3Text">Information 3 text color</label><img class="preview" src="./images/informational_3_text.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/informational_3_text.png'" alt=""><input id="customInfo3TextColor" type="hidden" value="#000000"><button id="customInfo3TextColorButton" class="color-picker-trigger" type="button" data-color-target="customInfo3TextColor" style="--selected-color:#000000" aria-label="Choose information 3 text color"><span class="visually-hidden">Information 3 text color</span></button></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 data-i18n="metricsTitle">Information</h2>
+      <div class="content">
+        <p class="copy" data-i18n="metricsCopy">Customize what information is shown on the watch face.</p>
+        <label class="slot-toggle">
+          <strong id="slotCountLabel" data-i18n="threeSlots">Show 3 informational slots.</strong>
+          <span class="switch"><input id="threeSlots" type="checkbox" aria-labelledby="slotCountLabel"><span class="switch-track"></span></span>
+        </label>
+        <div class="slots">
+          <div class="slot-row"><img class="slot-icon" src="./images/informational_1_text.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/informational_1_text.png'" alt=""><select id="leftMetric" aria-label="Slot 1"></select></div>
+          <div class="slot-row" id="middleSlotRow" hidden><img class="slot-icon" src="./images/informational_2_text.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/informational_2_text.png'" alt=""><select id="middleMetric" aria-label="Slot 2"></select></div>
+          <div class="slot-row"><img class="slot-icon" src="./images/informational_3_text.png" onerror="this.onerror=null;this.src='https://raw.githubusercontent.com/lyle-morris/Hosting/main/apps/essential-redux/qa/images/informational_3_text.png'" alt=""><select id="rightMetric" aria-label="Slot 3"></select></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" id="locationCard">
+      <h2 data-i18n="locationTitle">Manual location</h2>
+      <div class="content">
+        <div class="fields">
+          <div class="field"><label class="field-label" for="manualCountry" data-i18n="countryLabel">Country</label><div class="input-with-clear"><select id="manualCountry" autocomplete="country" aria-describedby="locationError"></select><button id="manualCountryClear" class="field-clear" type="button" aria-label="Clear country" hidden>×</button></div></div>
+          <div class="field"><label class="field-label" for="manualPostalCode" data-i18n="postalLabel">ZIP/postal code</label><div class="input-with-clear"><input id="manualPostalCode" type="text" maxlength="32" autocomplete="postal-code" aria-describedby="locationError"><button id="manualPostalCodeClear" class="field-clear" type="button" aria-label="Clear ZIP/postal code" hidden>×</button></div></div>
+          <div class="field"><label class="field-label" for="manualCity" data-i18n="cityLabel">City</label><div class="input-with-clear"><input id="manualCity" type="text" maxlength="100" autocomplete="address-level2" aria-describedby="locationError"><button id="manualCityClear" class="field-clear" type="button" aria-label="Clear city" hidden>×</button></div></div>
+          <p id="locationError" class="field-error" role="alert" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 data-i18n="languageLabel">Language</h2>
+      <div class="content"><p class="copy" data-i18n="languageCopy">Change the default language for the watch face and the settings page.</p><select id="language"></select></div>
+    </section>
+
+    <section class="card">
+      <h2 data-i18n="analyticsTitle">Analytics</h2>
+      <div class="content"><p class="copy" data-i18n="analyticsCopy">This watch face uses anonymous data to help track and improve the experience. No personal or health data is collected.</p><label class="setting-row analytics-row"><span data-i18n="analyticsLabel">Share anonymous usage analytics</span><span class="check-control"><input id="analytics" type="checkbox" checked></span></label></div>
+    </section>
+
+    <section class="card">
+      <h2 data-i18n="supportTitle">Support</h2>
+      <div class="content"><p class="copy" data-i18n="supportCopy">This watch face is free to use and built with care. If it makes your day a little easier, consider leaving a small tip to help support future updates and improvements.</p><a class="donate" id="donate" href="https://ko-fi.com/lylemorris" target="_blank" rel="noopener" data-i18n="donate">Support</a></div>
+    </section>
+  </main>
+
+  <div class="palette-dialog" id="paletteDialog" role="dialog" aria-modal="true" aria-labelledby="paletteTitle" hidden>
+    <div class="palette-sheet">
+      <div class="palette-head"><h2 id="paletteTitle" data-i18n="pebbleColorTitle">Pebble color</h2><button class="palette-close" id="paletteClose" type="button" aria-label="Close">×</button></div>
+      <p class="palette-copy" data-i18n="pebbleColorCopy">Choose one of the 64 colors supported by Pebble color displays.</p>
+      <div class="palette-grid" id="pebbleColorGrid" role="radiogroup" aria-label="Pebble 64-color palette"></div>
+      <div class="palette-footer"><span class="palette-value" id="paletteValue">#000000</span><button class="btn primary palette-done" id="paletteDone" type="button" data-i18n="done">Done</button></div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <div class="actions-inner">
+      <div id="status" class="status"></div>
+      <button class="btn" id="reset" type="button" data-i18n="reset">Reset layout</button>
+      <button class="btn primary" id="save" type="button" data-i18n="save">Save settings</button>
+    </div>
+  </div>
+
+  <script>
+    var GA_ID='G-37VYMTXT5S';
+    var D={
+      themeMode:'preset',theme:'lightBlue',reverse:false,hour24:false,showLeadingZero:true,
+      showBatteryIndicator:false,showBluetooth:false,celsius:false,layoutTest:false,
+      leftMetric:'calendar',middleMetric:'steps',rightMetric:'weather',showMiddleSlot:false,
+      language:'en',manualLocation:false,manualPostalCode:'',manualCity:'',manualCountry:'',
+      analyticsEnabled:true,customBackgroundColor:'#ff5500',customTimeBoxColor:'#ffffff',
+      customTimeBorderColor:'#000000',customTimeTextColor:'#000000',
+      customInfo1TextColor:'#000000',customInfo2TextColor:'#000000',customInfo3TextColor:'#000000',customInfoDefaultsMigrated:true
+    };
+    var LANGUAGE_CODES=['en','es','fr','de','pt','it','nl','da','nb','sv','fi','is','ca','eu','gl','pl','cs','sk','sl','hr','bs','sr-Latn','ro','hu','et','lv','lt','tr','sq','mt'];
+    var LANGUAGE_VALUES=['en','auto'].concat(LANGUAGE_CODES.slice(1));
+    var LANGUAGE_NAMES_EN=['English','Spanish','French','German','Portuguese','Italian','Dutch','Danish','Norwegian Bokmål','Swedish','Finnish','Icelandic','Catalan','Basque','Galician','Polish','Czech','Slovak','Slovenian','Croatian','Bosnian','Serbian (Latin)','Romanian','Hungarian','Estonian','Latvian','Lithuanian','Turkish','Albanian','Maltese'];
+    var LANGUAGE_LABEL_OVERRIDES={bs:'Bosnian (BS)',mt:'Maltese (MT)'};
+    var METRIC_VALUES=['calendar','weather','battery','calories','activity','sleep','heart','steps','distance','none'];
+    var THEME_VALUES=['orange','lightBlue','purple','yellow','green','red','white','black'];
+    var PRESET_CUSTOM_COLORS={
+      orange:{customBackgroundColor:'#ff5500',customTimeBoxColor:'#ffffff',customTimeBorderColor:'#000000',customTimeTextColor:'#000000',customInfo1TextColor:'#000000',customInfo2TextColor:'#000000',customInfo3TextColor:'#000000'},
+      lightBlue:{customBackgroundColor:'#00aaff',customTimeBoxColor:'#ffffff',customTimeBorderColor:'#000000',customTimeTextColor:'#000000',customInfo1TextColor:'#000000',customInfo2TextColor:'#000000',customInfo3TextColor:'#000000'},
+      purple:{customBackgroundColor:'#5500ff',customTimeBoxColor:'#ffffff',customTimeBorderColor:'#000000',customTimeTextColor:'#000000',customInfo1TextColor:'#ffffff',customInfo2TextColor:'#ffffff',customInfo3TextColor:'#ffffff'},
+      yellow:{customBackgroundColor:'#ffaa00',customTimeBoxColor:'#ffffff',customTimeBorderColor:'#000000',customTimeTextColor:'#000000',customInfo1TextColor:'#000000',customInfo2TextColor:'#000000',customInfo3TextColor:'#000000'},
+      green:{customBackgroundColor:'#005500',customTimeBoxColor:'#ffffff',customTimeBorderColor:'#000000',customTimeTextColor:'#000000',customInfo1TextColor:'#ffffff',customInfo2TextColor:'#ffffff',customInfo3TextColor:'#ffffff'},
+      red:{customBackgroundColor:'#ff0000',customTimeBoxColor:'#ffffff',customTimeBorderColor:'#000000',customTimeTextColor:'#000000',customInfo1TextColor:'#ffffff',customInfo2TextColor:'#ffffff',customInfo3TextColor:'#ffffff'},
+      white:{customBackgroundColor:'#ffffff',customTimeBoxColor:'#ffffff',customTimeBorderColor:'#000000',customTimeTextColor:'#000000',customInfo1TextColor:'#000000',customInfo2TextColor:'#000000',customInfo3TextColor:'#000000'},
+      black:{customBackgroundColor:'#000000',customTimeBoxColor:'#000000',customTimeBorderColor:'#ffffff',customTimeTextColor:'#ffffff',customInfo1TextColor:'#ffffff',customInfo2TextColor:'#ffffff',customInfo3TextColor:'#ffffff'}
+    };
+    var PEBBLE_LEVELS=['00','55','aa','ff'];
+    var PEBBLE_COLORS=[];
+    PEBBLE_LEVELS.forEach(function(r){
+      for(var gPair=0;gPair<2;gPair++){
+        for(var gOffset=0;gOffset<2;gOffset++){
+          var g=PEBBLE_LEVELS[gPair*2+gOffset];
+          PEBBLE_LEVELS.forEach(function(b){PEBBLE_COLORS.push('#'+r+g+b)});
+        }
+      }
+    });
+    var PEBBLE_COLOR_LOOKUP={};
+    PEBBLE_COLORS.forEach(function(color){PEBBLE_COLOR_LOOKUP[color]=true});
+    var COUNTRY_CODES=('US AF AX AL DZ AD AO AI AQ AG AR AM AW AU AT AZ BS BH BD BB BY BE BZ BJ BM BT BO BA BW BV BR GB IO BN BG BF BI KH CM CA CV BQ KY CF TD CL CN CX CC CO KM CD CG CK CR CI HR CU CW CY CZ DK DJ DM DO TL EC EG SV GQ ER EE SZ ET FK FO FJ FI FR GF PF TF GA GM GE DE GH GI GR GL GD GP GU GT GG GN GW GY HT HM HN HK HU IS IN ID IR IQ IE IM IL IT JM JP JE JO KZ KE KI KP KR KW KG LA LV LB LS LR LY LI LT LU MO MG MW MY MV ML MT MH MQ MR MU YT MX FM MD MC MN ME MS MA MZ MM NA NR NP NL NC NZ NI NE NG NU NF MK MP NO OM PK PW PS PA PG PY PE PH PN PL PT PR QA RE RO RU RW AS WS SM ST SA SN RS SC SL SG SK SI SB SO ZA GS SS ES LK BL SH KN LC SX MF PM VC SD SR SJ SE CH SY TW TJ TZ TH TG TK TO TT TN TR TM TC TV UG UA AE UY UM UZ VU VA VE VN VG VI WF EH YE ZM ZW').split(' ');
+    var I18N={
+      en:{
+        autoDevice:'Automatic (device)',
+        pageTitle:'Essential Redux Settings',intro:'Use the settings below to customize your Pebble watchface.',
+        settingsTitle:'General settings',leadingZero:'Display leading zero on the hours.',hour12:'Use 12-hour format',
+        celsius:'Use Celsius for temperature',bluetooth:'Show Bluetooth connectivity',batteryIndicator:'Show battery indicator',
+        themeTab:'Theme',customTab:'Custom',customBackground:'Background color',customTimeBox:'Time box color',
+        customBorders:'Time box borders color',customTimeText:'Time box text color',
+        info1Text:'Information 1 text color',info2Text:'Information 2 text color',info3Text:'Information 3 text color',
+        pebbleColorTitle:'Pebble color',pebbleColorCopy:'Choose one of the 64 colors supported by Pebble color displays.',done:'Done',
+        metricsTitle:'Information',metricsCopy:'Customize what information is shown on the watch face.',
+        twoSlots:'2 information slots',threeSlots:'Show 3 informational slots.',
+        locationTitle:'Manual location',countryLabel:'Country',postalLabel:'ZIP/postal code',cityLabel:'City',selectCountry:'Select a country',clearCountry:'Clear country',clearPostal:'Clear ZIP/postal code',clearCity:'Clear city',
+        locationChecking:'Checking location...',locationNotFound:'That location could not be found. Check the country, ZIP/postal code, and city.',
+        locationUnavailable:'The location could not be validated. Check your connection and try again.',
+        languageLabel:'Language',languageCopy:'Change the default language for the watch face and the settings page.',
+        analyticsTitle:'Analytics',analyticsLabel:'Share anonymous usage analytics',
+        analyticsCopy:'This watch face uses anonymous data to help track and improve the experience. No personal or health data is collected.',
+        supportTitle:'Support',supportCopy:'This watch face is free to use and built with care. If it makes your day a little easier, consider leaving a small tip to help support future updates and improvements.',
+        donate:'Support',reset:'Reset layout',save:'Save settings',saving:'Saving...',
+        saved:'Saved. If this window stays open, close it and rerun the emulator.',
+        languages:['Automatic (device)','English','Spanish','French','German','Portuguese'],
+        metrics:['Calendar','Weather','Battery','Calories','Activity time','Sleep time','Heart rate','Steps','Distance','None'],
+        themes:['Orange','Blue','Purple','Yellow','Green','Red','White','Black']
+      },
+      es:{
+        autoDevice:'Automático (dispositivo)',
+        pageTitle:'Configuración de Essential Redux',intro:'Usa los ajustes siguientes para personalizar la esfera de tu Pebble.',
+        settingsTitle:'Ajustes generales',leadingZero:'Mostrar cero inicial en la hora.',hour12:'Usar formato de 12 horas',
+        celsius:'Usar Celsius para la temperatura',bluetooth:'Mostrar conectividad Bluetooth',batteryIndicator:'Mostrar indicador de batería',
+        themeTab:'Tema',customTab:'Personalizado',customBackground:'Color de fondo',customTimeBox:'Color del cuadro de hora',
+        customBorders:'Color de los bordes de la hora',customTimeText:'Color del texto de la hora',
+        info1Text:'Color del texto de información 1',info2Text:'Color del texto de información 2',info3Text:'Color del texto de información 3',
+        pebbleColorTitle:'Color de Pebble',pebbleColorCopy:'Elige uno de los 64 colores compatibles con las pantallas Pebble a color.',done:'Listo',
+        metricsTitle:'Información',metricsCopy:'Personaliza la información que aparece en la esfera.',
+        twoSlots:'2 espacios de información',threeSlots:'3 espacios de información',
+        locationTitle:'Ubicación manual',countryLabel:'País',postalLabel:'Código postal',cityLabel:'Ciudad',selectCountry:'Selecciona un país',clearCountry:'Borrar país',clearPostal:'Borrar código postal',clearCity:'Borrar ciudad',
+        locationChecking:'Comprobando ubicación...',locationNotFound:'No se encontró esa ubicación. Verifica el país, el código postal y la ciudad.',
+        locationUnavailable:'No se pudo validar la ubicación. Comprueba tu conexión e inténtalo de nuevo.',
+        languageLabel:'Idioma',languageCopy:'Cambia el idioma predeterminado de la esfera y de la página de ajustes.',
+        analyticsTitle:'Analítica',analyticsLabel:'Compartir análisis de uso anónimos',
+        analyticsCopy:'Esta esfera usa datos anónimos para mejorar la experiencia. No se recopilan datos personales ni de salud.',
+        supportTitle:'Apoyo',supportCopy:'Esta esfera es gratuita y está hecha con cuidado. Si te facilita el día, considera dejar una pequeña propina para apoyar futuras mejoras.',
+        donate:'Apoyar',reset:'Restablecer diseño',save:'Guardar ajustes',saving:'Guardando...',
+        saved:'Guardado. Si esta ventana sigue abierta, ciérrala y vuelve a ejecutar el emulador.',
+        languages:['Automático (dispositivo)','Inglés','Español','Francés','Alemán','Portugués'],
+        metrics:['Calendario','Clima','Batería','Calorías','Tiempo activo','Tiempo de sueño','Frecuencia cardíaca','Pasos','Distancia','Ninguno'],
+        themes:['Naranja','Azul','Morado','Amarillo','Verde','Rojo','Blanco','Negro']
+      },
+      fr:{
+        autoDevice:'Automatique (appareil)',
+        pageTitle:'Paramètres Essential Redux',intro:'Utilisez les paramètres ci-dessous pour personnaliser votre cadran Pebble.',
+        settingsTitle:'Paramètres généraux',leadingZero:'Afficher le zéro initial de l’heure.',hour12:'Utiliser le format 12 heures',
+        celsius:'Utiliser Celsius pour la température',bluetooth:'Afficher la connectivité Bluetooth',batteryIndicator:'Afficher l’indicateur de batterie',
+        themeTab:'Thème',customTab:'Personnalisé',customBackground:'Couleur de fond',customTimeBox:'Couleur du cadre horaire',
+        customBorders:'Couleur des bordures horaires',customTimeText:'Couleur du texte horaire',
+        info1Text:'Couleur du texte d’information 1',info2Text:'Couleur du texte d’information 2',info3Text:'Couleur du texte d’information 3',
+        pebbleColorTitle:'Couleur Pebble',pebbleColorCopy:'Choisissez l’une des 64 couleurs prises en charge par les écrans Pebble couleur.',done:'Terminé',
+        metricsTitle:'Informations',metricsCopy:'Personnalisez les informations affichées sur le cadran.',
+        twoSlots:'2 emplacements d’information',threeSlots:'3 emplacements d’information',
+        locationTitle:'Localisation manuelle',countryLabel:'Pays',postalLabel:'Code postal',cityLabel:'Ville',selectCountry:'Sélectionnez un pays',clearCountry:'Effacer le pays',clearPostal:'Effacer le code postal',clearCity:'Effacer la ville',
+        locationChecking:'Vérification du lieu...',locationNotFound:'Ce lieu est introuvable. Vérifiez le pays, le code postal et la ville.',
+        locationUnavailable:'Le lieu n’a pas pu être validé. Vérifiez votre connexion et réessayez.',
+        languageLabel:'Langue',languageCopy:'Modifiez la langue par défaut du cadran et de la page des paramètres.',
+        analyticsTitle:'Analyse',analyticsLabel:'Partager des données d’utilisation anonymes',
+        analyticsCopy:'Ce cadran utilise des données anonymes pour améliorer l’expérience. Aucune donnée personnelle ou de santé n’est collectée.',
+        supportTitle:'Soutien',supportCopy:'Ce cadran est gratuit et conçu avec soin. S’il vous facilite la journée, vous pouvez laisser un petit pourboire pour soutenir les futures améliorations.',
+        donate:'Soutenir',reset:'Réinitialiser',save:'Enregistrer',saving:'Enregistrement...',
+        saved:'Enregistré. Si cette fenêtre reste ouverte, fermez-la et relancez l’émulateur.',
+        languages:['Automatique (appareil)','Anglais','Espagnol','Français','Allemand','Portugais'],
+        metrics:['Calendrier','Météo','Batterie','Calories','Temps d’activité','Temps de sommeil','Fréquence cardiaque','Pas','Distance','Aucun'],
+        themes:['Orange','Bleu','Violet','Jaune','Vert','Rouge','Blanc','Noir']
+      },
+      de:{
+        autoDevice:'Automatisch (Gerät)',
+        pageTitle:'Essential Redux Einstellungen',intro:'Passe dein Pebble-Zifferblatt mit den folgenden Einstellungen an.',
+        settingsTitle:'Allgemeine Einstellungen',leadingZero:'Führende Null bei der Stunde anzeigen.',hour12:'12-Stunden-Format verwenden',
+        celsius:'Celsius für die Temperatur verwenden',bluetooth:'Bluetooth-Verbindung anzeigen',batteryIndicator:'Batterieanzeige anzeigen',
+        themeTab:'Design',customTab:'Benutzerdefiniert',customBackground:'Hintergrundfarbe',customTimeBox:'Farbe des Zeitfelds',
+        customBorders:'Rahmenfarbe des Zeitfelds',customTimeText:'Textfarbe des Zeitfelds',
+        info1Text:'Textfarbe Information 1',info2Text:'Textfarbe Information 2',info3Text:'Textfarbe Information 3',
+        pebbleColorTitle:'Pebble-Farbe',pebbleColorCopy:'Wähle eine der 64 Farben, die von Pebble-Farbdisplays unterstützt werden.',done:'Fertig',
+        metricsTitle:'Informationen',metricsCopy:'Passe an, welche Informationen auf dem Zifferblatt angezeigt werden.',
+        twoSlots:'2 Informationsplätze',threeSlots:'3 Informationsplätze',
+        locationTitle:'Manueller Standort',countryLabel:'Land',postalLabel:'Postleitzahl',cityLabel:'Stadt',selectCountry:'Land auswählen',clearCountry:'Land löschen',clearPostal:'Postleitzahl löschen',clearCity:'Stadt löschen',
+        locationChecking:'Standort wird geprüft...',locationNotFound:'Dieser Standort wurde nicht gefunden. Prüfe Land, Postleitzahl und Stadt.',
+        locationUnavailable:'Der Standort konnte nicht geprüft werden. Prüfe deine Verbindung und versuche es erneut.',
+        languageLabel:'Sprache',languageCopy:'Ändere die Standardsprache für das Zifferblatt und die Einstellungsseite.',
+        analyticsTitle:'Analyse',analyticsLabel:'Anonyme Nutzungsdaten teilen',
+        analyticsCopy:'Dieses Zifferblatt verwendet anonyme Daten, um die Nutzung zu verbessern. Es werden keine persönlichen oder Gesundheitsdaten erfasst.',
+        supportTitle:'Unterstützung',supportCopy:'Dieses Zifferblatt ist kostenlos und wurde mit Sorgfalt erstellt. Wenn es deinen Alltag erleichtert, kannst du zukünftige Verbesserungen mit einem kleinen Beitrag unterstützen.',
+        donate:'Unterstützen',reset:'Layout zurücksetzen',save:'Einstellungen speichern',saving:'Wird gespeichert...',
+        saved:'Gespeichert. Wenn dieses Fenster geöffnet bleibt, schließe es und starte den Emulator erneut.',
+        languages:['Automatisch (Gerät)','Englisch','Spanisch','Französisch','Deutsch','Portugiesisch'],
+        metrics:['Kalender','Wetter','Batterie','Kalorien','Aktivzeit','Schlafzeit','Herzfrequenz','Schritte','Distanz','Keine'],
+        themes:['Orange','Blau','Violett','Gelb','Grün','Rot','Weiß','Schwarz']
+      },
+      pt:{
+        autoDevice:'Automático (dispositivo)',
+        pageTitle:'Configurações do Essential Redux',intro:'Use as configurações abaixo para personalizar o mostrador do Pebble.',
+        settingsTitle:'Configurações gerais',leadingZero:'Exibir zero inicial na hora.',hour12:'Usar formato de 12 horas',
+        celsius:'Usar Celsius para a temperatura',bluetooth:'Mostrar conectividade Bluetooth',batteryIndicator:'Mostrar indicador de bateria',
+        themeTab:'Tema',customTab:'Personalizado',customBackground:'Cor de fundo',customTimeBox:'Cor da caixa de hora',
+        customBorders:'Cor das bordas da hora',customTimeText:'Cor do texto da hora',
+        info1Text:'Cor do texto da informação 1',info2Text:'Cor do texto da informação 2',info3Text:'Cor do texto da informação 3',
+        pebbleColorTitle:'Cor Pebble',pebbleColorCopy:'Escolha uma das 64 cores compatíveis com telas coloridas Pebble.',done:'Concluído',
+        metricsTitle:'Informações',metricsCopy:'Personalize as informações exibidas no mostrador.',
+        twoSlots:'2 espaços de informação',threeSlots:'3 espaços de informação',
+        locationTitle:'Localização manual',countryLabel:'País',postalLabel:'CEP/código postal',cityLabel:'Cidade',selectCountry:'Selecione um país',clearCountry:'Limpar país',clearPostal:'Limpar CEP/código postal',clearCity:'Limpar cidade',
+        locationChecking:'Verificando localização...',locationNotFound:'Essa localização não foi encontrada. Verifique o país, o CEP/código postal e a cidade.',
+        locationUnavailable:'Não foi possível validar a localização. Verifique sua conexão e tente novamente.',
+        languageLabel:'Idioma',languageCopy:'Altere o idioma padrão do mostrador e da página de configurações.',
+        analyticsTitle:'Análise',analyticsLabel:'Compartilhar dados anônimos de uso',
+        analyticsCopy:'Este mostrador usa dados anônimos para melhorar a experiência. Nenhum dado pessoal ou de saúde é coletado.',
+        supportTitle:'Apoio',supportCopy:'Este mostrador é gratuito e foi criado com cuidado. Se ele facilitar o seu dia, considere deixar uma pequena contribuição para apoiar futuras melhorias.',
+        donate:'Apoiar',reset:'Redefinir layout',save:'Salvar configurações',saving:'Salvando...',
+        saved:'Salvo. Se esta janela continuar aberta, feche-a e execute o emulador novamente.',
+        languages:['Automático (dispositivo)','Inglês','Espanhol','Francês','Alemão','Português'],
+        metrics:['Calendário','Clima','Bateria','Calorias','Tempo ativo','Tempo de sono','Frequência cardíaca','Passos','Distância','Nenhum'],
+        themes:['Laranja','Azul','Roxo','Amarelo','Verde','Vermelho','Branco','Preto']
+      }
+    };
+
+    function addLocale(code,strings){I18N[code]=Object.assign({},I18N.en,strings)}
+    addLocale('it',{
+      autoDevice:"Automatico (dispositivo)",pageTitle:"Impostazioni Essential Redux",intro:"Usa le impostazioni seguenti per personalizzare il quadrante Pebble.",
+      settingsTitle:"Impostazioni generali",leadingZero:"Mostra lo zero iniziale nelle ore.",hour12:"Usa il formato a 12 ore",celsius:"Usa Celsius per la temperatura",bluetooth:"Mostra la connettività Bluetooth",batteryIndicator:"Mostra indicatore batteria",
+      themeTab:"Tema",customTab:"Personalizzato",customBackground:"Colore di sfondo",customTimeBox:"Colore riquadro ora",customBorders:"Colore bordi riquadro ora",customTimeText:"Colore testo riquadro ora",info1Text:"Colore testo informazione 1",info2Text:"Colore testo informazione 2",info3Text:"Colore testo informazione 3",
+      pebbleColorTitle:"Colore Pebble",pebbleColorCopy:"Scegli uno dei 64 colori supportati dai display Pebble a colori.",done:"Fatto",metricsTitle:"Informazioni",metricsCopy:"Personalizza le informazioni mostrate sul quadrante.",twoSlots:"2 spazi informativi",threeSlots:"3 spazi informativi",
+      locationTitle:"Posizione manuale",countryLabel:"Paese",postalLabel:"CAP/codice postale",cityLabel:"Città",selectCountry:"Seleziona un paese",clearCountry:"Cancella paese",clearPostal:"Cancella CAP/codice postale",clearCity:"Cancella città",locationChecking:"Verifica della posizione...",locationNotFound:"Posizione non trovata. Controlla paese, CAP/codice postale e città.",locationUnavailable:"Impossibile verificare la posizione. Controlla la connessione e riprova.",
+      languageLabel:"Lingua",languageCopy:"Cambia la lingua predefinita del quadrante e della pagina delle impostazioni.",analyticsTitle:"Analisi",analyticsLabel:"Condividi analisi di utilizzo anonime",analyticsCopy:"Questo quadrante usa dati anonimi per migliorare l’esperienza. Non vengono raccolti dati personali o sanitari.",supportTitle:"Supporto",supportCopy:"Questo quadrante è gratuito e realizzato con cura. Se ti semplifica la giornata, considera una piccola donazione per sostenere i futuri miglioramenti.",donate:"Sostieni",reset:"Reimposta layout",save:"Salva impostazioni",saving:"Salvataggio...",saved:"Salvato. Se questa finestra resta aperta, chiudila e riavvia l’emulatore.",
+      metrics:["Calendario","Meteo","Batteria","Calorie","Tempo attività","Tempo di sonno","Frequenza cardiaca","Passi","Distanza","Nessuno"],themes:["Arancione","Blu","Viola","Giallo","Verde","Rosso","Bianco","Nero"]
+    });
+    addLocale('nl',{
+      autoDevice:"Automatisch (apparaat)",pageTitle:"Instellingen Essential Redux",intro:"Gebruik de onderstaande instellingen om je Pebble-wijzerplaat aan te passen.",settingsTitle:"Algemene instellingen",leadingZero:"Voorloopnul bij het uur weergeven.",hour12:"12-uursnotatie gebruiken",celsius:"Celsius gebruiken voor temperatuur",bluetooth:"Bluetooth-verbinding weergeven",batteryIndicator:"Batterij-indicator weergeven",
+      themeTab:"Thema",customTab:"Aangepast",customBackground:"Achtergrondkleur",customTimeBox:"Kleur tijdvak",customBorders:"Randkleur tijdvak",customTimeText:"Tekstkleur tijdvak",info1Text:"Tekstkleur informatie 1",info2Text:"Tekstkleur informatie 2",info3Text:"Tekstkleur informatie 3",pebbleColorTitle:"Pebble-kleur",pebbleColorCopy:"Kies een van de 64 kleuren die Pebble-kleurenschermen ondersteunen.",done:"Gereed",metricsTitle:"Informatie",metricsCopy:"Pas aan welke informatie op de wijzerplaat wordt getoond.",twoSlots:"2 informatievakken",threeSlots:"3 informatievakken",
+      locationTitle:"Handmatige locatie",countryLabel:"Land",postalLabel:"Postcode",cityLabel:"Plaats",selectCountry:"Selecteer een land",clearCountry:"Land wissen",clearPostal:"Postcode wissen",clearCity:"Plaats wissen",locationChecking:"Locatie controleren...",locationNotFound:"Die locatie is niet gevonden. Controleer land, postcode en plaats.",locationUnavailable:"De locatie kon niet worden gecontroleerd. Controleer je verbinding en probeer opnieuw.",languageLabel:"Taal",languageCopy:"Wijzig de standaardtaal voor de wijzerplaat en instellingenpagina.",analyticsTitle:"Analyse",analyticsLabel:"Anonieme gebruiksgegevens delen",analyticsCopy:"Deze wijzerplaat gebruikt anonieme gegevens om de ervaring te verbeteren. Er worden geen persoonlijke of gezondheidsgegevens verzameld.",supportTitle:"Ondersteuning",supportCopy:"Deze wijzerplaat is gratis en met zorg gemaakt. Overweeg een kleine bijdrage om toekomstige verbeteringen te steunen.",donate:"Ondersteunen",reset:"Indeling herstellen",save:"Instellingen opslaan",saving:"Opslaan...",saved:"Opgeslagen. Sluit dit venster en start de emulator opnieuw als het open blijft.",
+      metrics:["Kalender","Weer","Batterij","Calorieën","Activiteitstijd","Slaaptijd","Hartslag","Stappen","Afstand","Geen"],themes:["Oranje","Blauw","Paars","Geel","Groen","Rood","Wit","Zwart"]
+    });
+    addLocale('da',{
+      autoDevice:"Automatisk (enhed)",pageTitle:"Essential Redux-indstillinger",intro:"Brug indstillingerne nedenfor til at tilpasse din Pebble-urskive.",settingsTitle:"Generelle indstillinger",leadingZero:"Vis indledende nul i timetallet.",hour12:"Brug 12-timers format",celsius:"Brug Celsius til temperatur",bluetooth:"Vis Bluetooth-forbindelse",batteryIndicator:"Vis batteriindikator",themeTab:"Tema",customTab:"Brugerdefineret",customBackground:"Baggrundsfarve",customTimeBox:"Farve på tidsfelt",customBorders:"Kantfarve på tidsfelt",customTimeText:"Tekstfarve i tidsfelt",info1Text:"Tekstfarve for information 1",info2Text:"Tekstfarve for information 2",info3Text:"Tekstfarve for information 3",pebbleColorTitle:"Pebble-farve",pebbleColorCopy:"Vælg en af de 64 farver, som Pebble-farveskærme understøtter.",done:"Færdig",metricsTitle:"Information",metricsCopy:"Tilpas hvilke oplysninger der vises på urskiven.",twoSlots:"2 informationsfelter",threeSlots:"3 informationsfelter",locationTitle:"Manuel placering",countryLabel:"Land",postalLabel:"Postnummer",cityLabel:"By",selectCountry:"Vælg et land",clearCountry:"Ryd land",clearPostal:"Ryd postnummer",clearCity:"Ryd by",locationChecking:"Kontrollerer placering...",locationNotFound:"Placeringen blev ikke fundet. Kontroller land, postnummer og by.",locationUnavailable:"Placeringen kunne ikke valideres. Kontroller forbindelsen, og prøv igen.",languageLabel:"Sprog",languageCopy:"Skift standardsprog for urskiven og indstillingssiden.",analyticsTitle:"Analyse",analyticsLabel:"Del anonyme brugsdata",analyticsCopy:"Denne urskive bruger anonyme data til at forbedre oplevelsen. Der indsamles ingen personlige eller sundhedsdata.",supportTitle:"Support",supportCopy:"Denne urskive er gratis og lavet med omhu. Overvej et lille bidrag til fremtidige forbedringer.",donate:"Støt",reset:"Nulstil layout",save:"Gem indstillinger",saving:"Gemmer...",saved:"Gemt. Hvis vinduet forbliver åbent, skal du lukke det og starte emulatoren igen.",metrics:["Kalender","Vejr","Batteri","Kalorier","Aktiv tid","Søvntid","Puls","Skridt","Afstand","Ingen"],themes:["Orange","Blå","Lilla","Gul","Grøn","Rød","Hvid","Sort"]
+    });
+    addLocale('nb',{
+      autoDevice:"Automatisk (enhet)",pageTitle:"Essential Redux-innstillinger",intro:"Bruk innstillingene nedenfor til å tilpasse Pebble-urskiven.",settingsTitle:"Generelle innstillinger",leadingZero:"Vis innledende null i timetallet.",hour12:"Bruk 12-timersformat",celsius:"Bruk Celsius for temperatur",bluetooth:"Vis Bluetooth-tilkobling",batteryIndicator:"Vis batteriindikator",themeTab:"Tema",customTab:"Egendefinert",customBackground:"Bakgrunnsfarge",customTimeBox:"Farge på tidsfelt",customBorders:"Kantfarge på tidsfelt",customTimeText:"Tekstfarge i tidsfelt",info1Text:"Tekstfarge for informasjon 1",info2Text:"Tekstfarge for informasjon 2",info3Text:"Tekstfarge for informasjon 3",pebbleColorTitle:"Pebble-farge",pebbleColorCopy:"Velg en av de 64 fargene som støttes av Pebble-fargeskjermer.",done:"Ferdig",metricsTitle:"Informasjon",metricsCopy:"Tilpass hvilken informasjon som vises på urskiven.",twoSlots:"2 informasjonsfelt",threeSlots:"3 informasjonsfelt",locationTitle:"Manuell plassering",countryLabel:"Land",postalLabel:"Postnummer",cityLabel:"By",selectCountry:"Velg et land",clearCountry:"Tøm land",clearPostal:"Tøm postnummer",clearCity:"Tøm by",locationChecking:"Kontrollerer plassering...",locationNotFound:"Plasseringen ble ikke funnet. Kontroller land, postnummer og by.",locationUnavailable:"Plasseringen kunne ikke valideres. Kontroller tilkoblingen og prøv igjen.",languageLabel:"Språk",languageCopy:"Endre standardspråk for urskiven og innstillingssiden.",analyticsTitle:"Analyse",analyticsLabel:"Del anonyme bruksdata",analyticsCopy:"Denne urskiven bruker anonyme data for å forbedre opplevelsen. Ingen personlige data eller helsedata samles inn.",supportTitle:"Støtte",supportCopy:"Denne urskiven er gratis og laget med omtanke. Vurder et lite bidrag for å støtte fremtidige forbedringer.",donate:"Støtt",reset:"Tilbakestill oppsett",save:"Lagre innstillinger",saving:"Lagrer...",saved:"Lagret. Hvis vinduet forblir åpent, lukk det og start emulatoren på nytt.",metrics:["Kalender","Vær","Batteri","Kalorier","Aktiv tid","Søvntid","Puls","Skritt","Avstand","Ingen"],themes:["Oransje","Blå","Lilla","Gul","Grønn","Rød","Hvit","Svart"]
+    });
+    addLocale('sv',{
+      autoDevice:"Automatiskt (enhet)",pageTitle:"Inställningar för Essential Redux",intro:"Använd inställningarna nedan för att anpassa din Pebble-urtavla.",settingsTitle:"Allmänna inställningar",leadingZero:"Visa inledande nolla i timmen.",hour12:"Använd 12-timmarsformat",celsius:"Använd Celsius för temperatur",bluetooth:"Visa Bluetooth-anslutning",batteryIndicator:"Visa batteriindikator",themeTab:"Tema",customTab:"Anpassat",customBackground:"Bakgrundsfärg",customTimeBox:"Färg på tidsruta",customBorders:"Kantfärg på tidsruta",customTimeText:"Textfärg i tidsruta",info1Text:"Textfärg för information 1",info2Text:"Textfärg för information 2",info3Text:"Textfärg för information 3",pebbleColorTitle:"Pebble-färg",pebbleColorCopy:"Välj en av de 64 färger som stöds av Pebbles färgskärmar.",done:"Klar",metricsTitle:"Information",metricsCopy:"Anpassa vilken information som visas på urtavlan.",twoSlots:"2 informationsfält",threeSlots:"3 informationsfält",locationTitle:"Manuell plats",countryLabel:"Land",postalLabel:"Postnummer",cityLabel:"Ort",selectCountry:"Välj ett land",clearCountry:"Rensa land",clearPostal:"Rensa postnummer",clearCity:"Rensa ort",locationChecking:"Kontrollerar plats...",locationNotFound:"Platsen kunde inte hittas. Kontrollera land, postnummer och ort.",locationUnavailable:"Platsen kunde inte valideras. Kontrollera anslutningen och försök igen.",languageLabel:"Språk",languageCopy:"Ändra standardspråk för urtavlan och inställningssidan.",analyticsTitle:"Analys",analyticsLabel:"Dela anonym användningsstatistik",analyticsCopy:"Den här urtavlan använder anonyma data för att förbättra upplevelsen. Inga person- eller hälsodata samlas in.",supportTitle:"Support",supportCopy:"Den här urtavlan är gratis och skapad med omsorg. Överväg ett litet bidrag för framtida förbättringar.",donate:"Stöd",reset:"Återställ layout",save:"Spara inställningar",saving:"Sparar...",saved:"Sparat. Om fönstret förblir öppet, stäng det och starta emulatorn igen.",metrics:["Kalender","Väder","Batteri","Kalorier","Aktiv tid","Sömntid","Puls","Steg","Avstånd","Ingen"],themes:["Orange","Blå","Lila","Gul","Grön","Röd","Vit","Svart"]
+    });
+    addLocale('fi',{
+      autoDevice:"Automaattinen (laite)",pageTitle:"Essential Redux -asetukset",intro:"Mukauta Pebble-kellotaulua alla olevilla asetuksilla.",settingsTitle:"Yleiset asetukset",leadingZero:"Näytä tunnin alkunolla.",hour12:"Käytä 12 tunnin muotoa",celsius:"Käytä lämpötilassa Celsius-asteita",bluetooth:"Näytä Bluetooth-yhteys",batteryIndicator:"Näytä akun ilmaisin",themeTab:"Teema",customTab:"Mukautettu",customBackground:"Taustaväri",customTimeBox:"Aikaruudun väri",customBorders:"Aikaruudun reunaväri",customTimeText:"Aikaruudun tekstiväri",info1Text:"Tiedon 1 tekstiväri",info2Text:"Tiedon 2 tekstiväri",info3Text:"Tiedon 3 tekstiväri",pebbleColorTitle:"Pebble-väri",pebbleColorCopy:"Valitse yksi Pebblen värinäyttöjen tukemasta 64 väristä.",done:"Valmis",metricsTitle:"Tiedot",metricsCopy:"Mukauta kellotaulussa näytettäviä tietoja.",twoSlots:"2 tietopaikkaa",threeSlots:"3 tietopaikkaa",locationTitle:"Manuaalinen sijainti",countryLabel:"Maa",postalLabel:"Postinumero",cityLabel:"Kaupunki",selectCountry:"Valitse maa",clearCountry:"Tyhjennä maa",clearPostal:"Tyhjennä postinumero",clearCity:"Tyhjennä kaupunki",locationChecking:"Tarkistetaan sijaintia...",locationNotFound:"Sijaintia ei löytynyt. Tarkista maa, postinumero ja kaupunki.",locationUnavailable:"Sijaintia ei voitu vahvistaa. Tarkista yhteys ja yritä uudelleen.",languageLabel:"Kieli",languageCopy:"Vaihda kellotaulun ja asetussivun oletuskieli.",analyticsTitle:"Analytiikka",analyticsLabel:"Jaa anonyymejä käyttötietoja",analyticsCopy:"Tämä kellotaulu käyttää anonyymejä tietoja käyttökokemuksen parantamiseen. Henkilö- tai terveystietoja ei kerätä.",supportTitle:"Tuki",supportCopy:"Tämä kellotaulu on ilmainen ja tehty huolella. Voit tukea tulevia parannuksia pienellä lahjoituksella.",donate:"Tue",reset:"Palauta asettelu",save:"Tallenna asetukset",saving:"Tallennetaan...",saved:"Tallennettu. Jos ikkuna jää auki, sulje se ja käynnistä emulaattori uudelleen.",metrics:["Kalenteri","Sää","Akku","Kalorit","Aktiivinen aika","Uniaika","Syke","Askeleet","Matka","Ei mitään"],themes:["Oranssi","Sininen","Violetti","Keltainen","Vihreä","Punainen","Valkoinen","Musta"]
+    });
+    addLocale('is',{
+      autoDevice:"Sjálfvirkt (tæki)",pageTitle:"Stillingar Essential Redux",intro:"Notaðu stillingarnar hér að neðan til að sérsníða Pebble-úrskífuna.",settingsTitle:"Almennar stillingar",leadingZero:"Sýna núll á undan klukkustund.",hour12:"Nota 12 tíma snið",celsius:"Nota Celsíus fyrir hitastig",bluetooth:"Sýna Bluetooth-tengingu",batteryIndicator:"Sýna rafhlöðuvísi",themeTab:"Þema",customTab:"Sérsniðið",customBackground:"Bakgrunnslitur",customTimeBox:"Litur tímareits",customBorders:"Rammalitur tímareits",customTimeText:"Textalitur tímareits",info1Text:"Textalitur upplýsinga 1",info2Text:"Textalitur upplýsinga 2",info3Text:"Textalitur upplýsinga 3",pebbleColorTitle:"Pebble-litur",pebbleColorCopy:"Veldu einn af 64 litum sem Pebble-litaskjáir styðja.",done:"Lokið",metricsTitle:"Upplýsingar",metricsCopy:"Sérsníddu hvaða upplýsingar birtast á úrskífunni.",twoSlots:"2 upplýsingareitir",threeSlots:"3 upplýsingareitir",locationTitle:"Handvirk staðsetning",countryLabel:"Land",postalLabel:"Póstnúmer",cityLabel:"Borg",selectCountry:"Veldu land",clearCountry:"Hreinsa land",clearPostal:"Hreinsa póstnúmer",clearCity:"Hreinsa borg",locationChecking:"Athuga staðsetningu...",locationNotFound:"Staðsetningin fannst ekki. Athugaðu land, póstnúmer og borg.",locationUnavailable:"Ekki tókst að staðfesta staðsetninguna. Athugaðu tenginguna og reyndu aftur.",languageLabel:"Tungumál",languageCopy:"Breyttu sjálfgefnu tungumáli úrskífunnar og stillingasíðunnar.",analyticsTitle:"Greining",analyticsLabel:"Deila nafnlausum notkunargögnum",analyticsCopy:"Úrskífan notar nafnlaus gögn til að bæta upplifunina. Engum persónu- eða heilsugögnum er safnað.",supportTitle:"Stuðningur",supportCopy:"Úrskífan er ókeypis og gerð af alúð. Íhugaðu lítið framlag til að styðja framtíðarbætur.",donate:"Styðja",reset:"Endurstilla útlit",save:"Vista stillingar",saving:"Vistar...",saved:"Vistað. Ef glugginn helst opinn skaltu loka honum og ræsa herminn aftur.",metrics:["Dagatal","Veður","Rafhlaða","Hitaeiningar","Virknitími","Svefntími","Hjartsláttur","Skref","Vegalengd","Ekkert"],themes:["Appelsínugulur","Blár","Fjólublár","Gulur","Grænn","Rauður","Hvítur","Svartur"]
+    });
+    addLocale('ca',{
+      autoDevice:"Automàtic (dispositiu)",pageTitle:"Configuració d’Essential Redux",intro:"Utilitza els ajustos següents per personalitzar l’esfera Pebble.",settingsTitle:"Configuració general",leadingZero:"Mostra el zero inicial a l’hora.",hour12:"Utilitza el format de 12 hores",celsius:"Utilitza Celsius per a la temperatura",bluetooth:"Mostra la connexió Bluetooth",batteryIndicator:"Mostra l’indicador de bateria",themeTab:"Tema",customTab:"Personalitzat",customBackground:"Color de fons",customTimeBox:"Color del quadre de l’hora",customBorders:"Color de les vores del quadre de l’hora",customTimeText:"Color del text de l’hora",info1Text:"Color del text de la informació 1",info2Text:"Color del text de la informació 2",info3Text:"Color del text de la informació 3",pebbleColorTitle:"Color Pebble",pebbleColorCopy:"Tria un dels 64 colors admesos per les pantalles Pebble en color.",done:"Fet",metricsTitle:"Informació",metricsCopy:"Personalitza la informació que es mostra a l’esfera.",twoSlots:"2 espais d’informació",threeSlots:"3 espais d’informació",locationTitle:"Ubicació manual",countryLabel:"País",postalLabel:"Codi postal",cityLabel:"Ciutat",selectCountry:"Selecciona un país",clearCountry:"Esborra el país",clearPostal:"Esborra el codi postal",clearCity:"Esborra la ciutat",locationChecking:"Comprovant la ubicació...",locationNotFound:"No s’ha trobat la ubicació. Comprova el país, el codi postal i la ciutat.",locationUnavailable:"No s’ha pogut validar la ubicació. Comprova la connexió i torna-ho a provar.",languageLabel:"Idioma",languageCopy:"Canvia l’idioma predeterminat de l’esfera i de la pàgina de configuració.",analyticsTitle:"Analítica",analyticsLabel:"Comparteix dades d’ús anònimes",analyticsCopy:"Aquesta esfera utilitza dades anònimes per millorar l’experiència. No es recullen dades personals ni de salut.",supportTitle:"Suport",supportCopy:"Aquesta esfera és gratuïta i està feta amb cura. Considera una petita aportació per donar suport a futures millores.",donate:"Dona suport",reset:"Restableix el disseny",save:"Desa la configuració",saving:"Desant...",saved:"Desat. Si aquesta finestra continua oberta, tanca-la i torna a iniciar l’emulador.",metrics:["Calendari","Temps","Bateria","Calories","Temps d’activitat","Temps de son","Freqüència cardíaca","Passos","Distància","Cap"],themes:["Taronja","Blau","Lila","Groc","Verd","Vermell","Blanc","Negre"]
+    });
+    addLocale('eu',{
+      autoDevice:"Automatikoa (gailua)",pageTitle:"Essential Redux ezarpenak",intro:"Erabili beheko ezarpenak Pebble erloju-esfera pertsonalizatzeko.",settingsTitle:"Ezarpen orokorrak",leadingZero:"Erakutsi hasierako zeroa orduan.",hour12:"Erabili 12 orduko formatua",celsius:"Erabili Celsius tenperaturan",bluetooth:"Erakutsi Bluetooth konexioa",batteryIndicator:"Erakutsi bateria-adierazlea",themeTab:"Gaia",customTab:"Pertsonalizatua",customBackground:"Atzeko planoaren kolorea",customTimeBox:"Ordu-koadroaren kolorea",customBorders:"Ordu-koadroaren ertz-kolorea",customTimeText:"Ordu-koadroaren testu-kolorea",info1Text:"1. informazioaren testu-kolorea",info2Text:"2. informazioaren testu-kolorea",info3Text:"3. informazioaren testu-kolorea",pebbleColorTitle:"Pebble kolorea",pebbleColorCopy:"Aukeratu Pebble kolore-pantailek onartzen dituzten 64 koloreetako bat.",done:"Eginda",metricsTitle:"Informazioa",metricsCopy:"Pertsonalizatu erloju-esferan agertzen den informazioa.",twoSlots:"2 informazio-eremu",threeSlots:"3 informazio-eremu",locationTitle:"Eskuzko kokapena",countryLabel:"Herrialdea",postalLabel:"Posta-kodea",cityLabel:"Hiria",selectCountry:"Hautatu herrialde bat",clearCountry:"Garbitu herrialdea",clearPostal:"Garbitu posta-kodea",clearCity:"Garbitu hiria",locationChecking:"Kokapena egiaztatzen...",locationNotFound:"Ez da kokapena aurkitu. Egiaztatu herrialdea, posta-kodea eta hiria.",locationUnavailable:"Ezin izan da kokapena balioztatu. Egiaztatu konexioa eta saiatu berriro.",languageLabel:"Hizkuntza",languageCopy:"Aldatu erloju-esferaren eta ezarpen-orriaren hizkuntza lehenetsia.",analyticsTitle:"Analitika",analyticsLabel:"Partekatu erabilera-datu anonimoak",analyticsCopy:"Erloju-esfera honek datu anonimoak erabiltzen ditu esperientzia hobetzeko. Ez da datu pertsonalik edo osasun-daturik biltzen.",supportTitle:"Laguntza",supportCopy:"Erloju-esfera hau doakoa da eta arretaz egina. Etorkizuneko hobekuntzak babesteko ekarpen txiki bat egin dezakezu.",donate:"Lagundu",reset:"Berrezarri diseinua",save:"Gorde ezarpenak",saving:"Gordetzen...",saved:"Gordeta. Leihoak irekita jarraitzen badu, itxi eta berrabiarazi emuladorea.",metrics:["Egutegia","Eguraldia","Bateria","Kaloriak","Jarduera-denbora","Lo-denbora","Bihotz-maiztasuna","Urratsak","Distantzia","Bat ere ez"],themes:["Laranja","Urdina","Morea","Horia","Berdea","Gorria","Zuria","Beltza"]
+    });
+    addLocale('gl',{
+      autoDevice:"Automático (dispositivo)",pageTitle:"Configuración de Essential Redux",intro:"Usa os axustes seguintes para personalizar a esfera Pebble.",settingsTitle:"Axustes xerais",leadingZero:"Mostrar o cero inicial na hora.",hour12:"Usar formato de 12 horas",celsius:"Usar Celsius para a temperatura",bluetooth:"Mostrar a conexión Bluetooth",batteryIndicator:"Mostrar indicador de batería",themeTab:"Tema",customTab:"Personalizado",customBackground:"Cor de fondo",customTimeBox:"Cor da caixa da hora",customBorders:"Cor dos bordos da caixa da hora",customTimeText:"Cor do texto da hora",info1Text:"Cor do texto da información 1",info2Text:"Cor do texto da información 2",info3Text:"Cor do texto da información 3",pebbleColorTitle:"Cor Pebble",pebbleColorCopy:"Escolle unha das 64 cores compatibles coas pantallas Pebble a cor.",done:"Feito",metricsTitle:"Información",metricsCopy:"Personaliza a información que aparece na esfera.",twoSlots:"2 espazos de información",threeSlots:"3 espazos de información",locationTitle:"Localización manual",countryLabel:"País",postalLabel:"Código postal",cityLabel:"Cidade",selectCountry:"Selecciona un país",clearCountry:"Borrar país",clearPostal:"Borrar código postal",clearCity:"Borrar cidade",locationChecking:"Comprobando a localización...",locationNotFound:"Non se atopou a localización. Comproba o país, o código postal e a cidade.",locationUnavailable:"Non se puido validar a localización. Comproba a conexión e inténtao de novo.",languageLabel:"Idioma",languageCopy:"Cambia o idioma predeterminado da esfera e da páxina de axustes.",analyticsTitle:"Analítica",analyticsLabel:"Compartir datos de uso anónimos",analyticsCopy:"Esta esfera usa datos anónimos para mellorar a experiencia. Non se recollen datos persoais nin de saúde.",supportTitle:"Apoio",supportCopy:"Esta esfera é gratuíta e está feita con coidado. Considera unha pequena achega para apoiar futuras melloras.",donate:"Apoiar",reset:"Restablecer deseño",save:"Gardar axustes",saving:"Gardando...",saved:"Gardado. Se esta xanela segue aberta, péchaa e volve iniciar o emulador.",metrics:["Calendario","Tempo","Batería","Calorías","Tempo de actividade","Tempo de sono","Frecuencia cardíaca","Pasos","Distancia","Ningún"],themes:["Laranxa","Azul","Morado","Amarelo","Verde","Vermello","Branco","Negro"]
+    });
+    addLocale('pl',{
+      autoDevice:"Automatyczny (urządzenie)",pageTitle:"Ustawienia Essential Redux",intro:"Użyj poniższych ustawień, aby dostosować tarczę Pebble.",settingsTitle:"Ustawienia ogólne",leadingZero:"Wyświetlaj zero wiodące w godzinie.",hour12:"Używaj formatu 12-godzinnego",celsius:"Używaj stopni Celsjusza",bluetooth:"Pokazuj połączenie Bluetooth",batteryIndicator:"Pokazuj wskaźnik baterii",themeTab:"Motyw",customTab:"Niestandardowy",customBackground:"Kolor tła",customTimeBox:"Kolor pola czasu",customBorders:"Kolor obramowania pola czasu",customTimeText:"Kolor tekstu czasu",info1Text:"Kolor tekstu informacji 1",info2Text:"Kolor tekstu informacji 2",info3Text:"Kolor tekstu informacji 3",pebbleColorTitle:"Kolor Pebble",pebbleColorCopy:"Wybierz jeden z 64 kolorów obsługiwanych przez kolorowe ekrany Pebble.",done:"Gotowe",metricsTitle:"Informacje",metricsCopy:"Dostosuj informacje wyświetlane na tarczy.",twoSlots:"2 pola informacji",threeSlots:"3 pola informacji",locationTitle:"Lokalizacja ręczna",countryLabel:"Kraj",postalLabel:"Kod pocztowy",cityLabel:"Miasto",selectCountry:"Wybierz kraj",clearCountry:"Wyczyść kraj",clearPostal:"Wyczyść kod pocztowy",clearCity:"Wyczyść miasto",locationChecking:"Sprawdzanie lokalizacji...",locationNotFound:"Nie znaleziono lokalizacji. Sprawdź kraj, kod pocztowy i miasto.",locationUnavailable:"Nie można zweryfikować lokalizacji. Sprawdź połączenie i spróbuj ponownie.",languageLabel:"Język",languageCopy:"Zmień domyślny język tarczy i strony ustawień.",analyticsTitle:"Analityka",analyticsLabel:"Udostępniaj anonimowe dane użytkowania",analyticsCopy:"Ta tarcza używa anonimowych danych, aby poprawiać działanie. Dane osobowe ani zdrowotne nie są zbierane.",supportTitle:"Wsparcie",supportCopy:"Ta tarcza jest bezpłatna i tworzona z dbałością. Rozważ drobne wsparcie przyszłych ulepszeń.",donate:"Wesprzyj",reset:"Resetuj układ",save:"Zapisz ustawienia",saving:"Zapisywanie...",saved:"Zapisano. Jeśli okno pozostanie otwarte, zamknij je i uruchom emulator ponownie.",metrics:["Kalendarz","Pogoda","Bateria","Kalorie","Czas aktywności","Czas snu","Tętno","Kroki","Dystans","Brak"],themes:["Pomarańczowy","Niebieski","Fioletowy","Żółty","Zielony","Czerwony","Biały","Czarny"]
+    });
+    addLocale('cs',{
+      autoDevice:"Automaticky (zařízení)",pageTitle:"Nastavení Essential Redux",intro:"Pomocí níže uvedených nastavení přizpůsobte ciferník Pebble.",settingsTitle:"Obecná nastavení",leadingZero:"Zobrazit úvodní nulu u hodin.",hour12:"Používat 12hodinový formát",celsius:"Používat stupně Celsia",bluetooth:"Zobrazit připojení Bluetooth",batteryIndicator:"Zobrazit indikátor baterie",themeTab:"Motiv",customTab:"Vlastní",customBackground:"Barva pozadí",customTimeBox:"Barva pole času",customBorders:"Barva okrajů pole času",customTimeText:"Barva textu času",info1Text:"Barva textu informace 1",info2Text:"Barva textu informace 2",info3Text:"Barva textu informace 3",pebbleColorTitle:"Barva Pebble",pebbleColorCopy:"Vyberte jednu ze 64 barev podporovaných barevnými displeji Pebble.",done:"Hotovo",metricsTitle:"Informace",metricsCopy:"Přizpůsobte informace zobrazené na ciferníku.",twoSlots:"2 informační pole",threeSlots:"3 informační pole",locationTitle:"Ruční poloha",countryLabel:"Země",postalLabel:"PSČ",cityLabel:"Město",selectCountry:"Vyberte zemi",clearCountry:"Vymazat zemi",clearPostal:"Vymazat PSČ",clearCity:"Vymazat město",locationChecking:"Kontrola polohy...",locationNotFound:"Poloha nebyla nalezena. Zkontrolujte zemi, PSČ a město.",locationUnavailable:"Polohu se nepodařilo ověřit. Zkontrolujte připojení a zkuste to znovu.",languageLabel:"Jazyk",languageCopy:"Změňte výchozí jazyk ciferníku a stránky nastavení.",analyticsTitle:"Analytika",analyticsLabel:"Sdílet anonymní údaje o používání",analyticsCopy:"Tento ciferník používá anonymní data ke zlepšování. Osobní ani zdravotní údaje se neshromažďují.",supportTitle:"Podpora",supportCopy:"Tento ciferník je zdarma a vytvořený s péčí. Zvažte malý příspěvek na budoucí vylepšení.",donate:"Podpořit",reset:"Obnovit rozvržení",save:"Uložit nastavení",saving:"Ukládání...",saved:"Uloženo. Pokud okno zůstane otevřené, zavřete ho a znovu spusťte emulátor.",metrics:["Kalendář","Počasí","Baterie","Kalorie","Doba aktivity","Doba spánku","Tepová frekvence","Kroky","Vzdálenost","Žádné"],themes:["Oranžová","Modrá","Fialová","Žlutá","Zelená","Červená","Bílá","Černá"]
+    });
+    addLocale('sk',{
+      autoDevice:"Automaticky (zariadenie)",pageTitle:"Nastavenia Essential Redux",intro:"Pomocou nastavení nižšie prispôsobte ciferník Pebble.",settingsTitle:"Všeobecné nastavenia",leadingZero:"Zobraziť úvodnú nulu pri hodine.",hour12:"Používať 12-hodinový formát",celsius:"Používať stupne Celzia",bluetooth:"Zobraziť pripojenie Bluetooth",batteryIndicator:"Zobraziť indikátor batérie",themeTab:"Téma",customTab:"Vlastné",customBackground:"Farba pozadia",customTimeBox:"Farba poľa času",customBorders:"Farba okrajov poľa času",customTimeText:"Farba textu času",info1Text:"Farba textu informácie 1",info2Text:"Farba textu informácie 2",info3Text:"Farba textu informácie 3",pebbleColorTitle:"Farba Pebble",pebbleColorCopy:"Vyberte jednu zo 64 farieb podporovaných farebnými displejmi Pebble.",done:"Hotovo",metricsTitle:"Informácie",metricsCopy:"Prispôsobte informácie zobrazované na ciferníku.",twoSlots:"2 informačné polia",threeSlots:"3 informačné polia",locationTitle:"Ručná poloha",countryLabel:"Krajina",postalLabel:"PSČ",cityLabel:"Mesto",selectCountry:"Vyberte krajinu",clearCountry:"Vymazať krajinu",clearPostal:"Vymazať PSČ",clearCity:"Vymazať mesto",locationChecking:"Kontrola polohy...",locationNotFound:"Poloha sa nenašla. Skontrolujte krajinu, PSČ a mesto.",locationUnavailable:"Polohu sa nepodarilo overiť. Skontrolujte pripojenie a skúste to znova.",languageLabel:"Jazyk",languageCopy:"Zmeňte predvolený jazyk ciferníka a stránky nastavení.",analyticsTitle:"Analytika",analyticsLabel:"Zdieľať anonymné údaje o používaní",analyticsCopy:"Tento ciferník používa anonymné údaje na zlepšovanie. Osobné ani zdravotné údaje sa nezhromažďujú.",supportTitle:"Podpora",supportCopy:"Tento ciferník je bezplatný a vytvorený starostlivo. Zvážte malý príspevok na budúce vylepšenia.",donate:"Podporiť",reset:"Obnoviť rozloženie",save:"Uložiť nastavenia",saving:"Ukladanie...",saved:"Uložené. Ak okno zostane otvorené, zatvorte ho a znova spustite emulátor.",metrics:["Kalendár","Počasie","Batéria","Kalórie","Čas aktivity","Čas spánku","Tep","Kroky","Vzdialenosť","Žiadne"],themes:["Oranžová","Modrá","Fialová","Žltá","Zelená","Červená","Biela","Čierna"]
+    });
+    addLocale('sl',{
+      autoDevice:"Samodejno (naprava)",pageTitle:"Nastavitve Essential Redux",intro:"S spodnjimi nastavitvami prilagodite številčnico Pebble.",settingsTitle:"Splošne nastavitve",leadingZero:"Prikaži začetno ničlo pri uri.",hour12:"Uporabi 12-urni zapis",celsius:"Uporabi stopinje Celzija",bluetooth:"Prikaži povezavo Bluetooth",batteryIndicator:"Prikaži indikator baterije",themeTab:"Tema",customTab:"Po meri",customBackground:"Barva ozadja",customTimeBox:"Barva polja časa",customBorders:"Barva robov polja časa",customTimeText:"Barva besedila časa",info1Text:"Barva besedila informacije 1",info2Text:"Barva besedila informacije 2",info3Text:"Barva besedila informacije 3",pebbleColorTitle:"Barva Pebble",pebbleColorCopy:"Izberite eno od 64 barv, ki jih podpirajo barvni zasloni Pebble.",done:"Končano",metricsTitle:"Informacije",metricsCopy:"Prilagodite informacije, prikazane na številčnici.",twoSlots:"2 informacijski polji",threeSlots:"3 informacijska polja",locationTitle:"Ročna lokacija",countryLabel:"Država",postalLabel:"Poštna številka",cityLabel:"Mesto",selectCountry:"Izberite državo",clearCountry:"Počisti državo",clearPostal:"Počisti poštno številko",clearCity:"Počisti mesto",locationChecking:"Preverjanje lokacije...",locationNotFound:"Lokacije ni bilo mogoče najti. Preverite državo, poštno številko in mesto.",locationUnavailable:"Lokacije ni bilo mogoče potrditi. Preverite povezavo in poskusite znova.",languageLabel:"Jezik",languageCopy:"Spremenite privzeti jezik številčnice in strani z nastavitvami.",analyticsTitle:"Analitika",analyticsLabel:"Deli anonimne podatke o uporabi",analyticsCopy:"Ta številčnica uporablja anonimne podatke za izboljšanje izkušnje. Osebni ali zdravstveni podatki se ne zbirajo.",supportTitle:"Podpora",supportCopy:"Ta številčnica je brezplačna in skrbno izdelana. Razmislite o majhnem prispevku za prihodnje izboljšave.",donate:"Podpri",reset:"Ponastavi postavitev",save:"Shrani nastavitve",saving:"Shranjevanje...",saved:"Shranjeno. Če okno ostane odprto, ga zaprite in znova zaženite emulator.",metrics:["Koledar","Vreme","Baterija","Kalorije","Čas dejavnosti","Čas spanja","Srčni utrip","Koraki","Razdalja","Brez"],themes:["Oranžna","Modra","Vijolična","Rumena","Zelena","Rdeča","Bela","Črna"]
+    });
+    addLocale('hr',{
+      autoDevice:"Automatski (uređaj)",pageTitle:"Postavke Essential Redux",intro:"Upotrijebite postavke u nastavku za prilagodbu Pebble brojčanika.",settingsTitle:"Opće postavke",leadingZero:"Prikaži početnu nulu sata.",hour12:"Koristi 12-satni format",celsius:"Koristi Celzijeve stupnjeve",bluetooth:"Prikaži Bluetooth vezu",batteryIndicator:"Prikaži pokazatelj baterije",themeTab:"Tema",customTab:"Prilagođeno",customBackground:"Boja pozadine",customTimeBox:"Boja polja vremena",customBorders:"Boja obruba polja vremena",customTimeText:"Boja teksta vremena",info1Text:"Boja teksta informacije 1",info2Text:"Boja teksta informacije 2",info3Text:"Boja teksta informacije 3",pebbleColorTitle:"Pebble boja",pebbleColorCopy:"Odaberite jednu od 64 boje koje podržavaju Pebble zasloni u boji.",done:"Gotovo",metricsTitle:"Informacije",metricsCopy:"Prilagodite informacije prikazane na brojčaniku.",twoSlots:"2 informacijska polja",threeSlots:"3 informacijska polja",locationTitle:"Ručna lokacija",countryLabel:"Država",postalLabel:"Poštanski broj",cityLabel:"Grad",selectCountry:"Odaberite državu",clearCountry:"Očisti državu",clearPostal:"Očisti poštanski broj",clearCity:"Očisti grad",locationChecking:"Provjera lokacije...",locationNotFound:"Lokacija nije pronađena. Provjerite državu, poštanski broj i grad.",locationUnavailable:"Lokaciju nije moguće potvrditi. Provjerite vezu i pokušajte ponovno.",languageLabel:"Jezik",languageCopy:"Promijenite zadani jezik brojčanika i stranice postavki.",analyticsTitle:"Analitika",analyticsLabel:"Dijeli anonimne podatke o upotrebi",analyticsCopy:"Ovaj brojčanik koristi anonimne podatke za poboljšanje iskustva. Osobni i zdravstveni podaci se ne prikupljaju.",supportTitle:"Podrška",supportCopy:"Ovaj brojčanik je besplatan i pažljivo izrađen. Razmotrite mali doprinos za buduća poboljšanja.",donate:"Podrži",reset:"Vrati raspored",save:"Spremi postavke",saving:"Spremanje...",saved:"Spremljeno. Ako prozor ostane otvoren, zatvorite ga i ponovno pokrenite emulator.",metrics:["Kalendar","Vrijeme","Baterija","Kalorije","Vrijeme aktivnosti","Vrijeme spavanja","Otkucaji srca","Koraci","Udaljenost","Ništa"],themes:["Narančasta","Plava","Ljubičasta","Žuta","Zelena","Crvena","Bijela","Crna"]
+    });
+    addLocale('bs',{
+      autoDevice:"Automatski (uređaj)",pageTitle:"Postavke Essential Redux",intro:"Koristite postavke ispod da prilagodite Pebble brojčanik.",settingsTitle:"Opće postavke",leadingZero:"Prikaži početnu nulu sata.",hour12:"Koristi 12-satni format",celsius:"Koristi Celzij za temperaturu",bluetooth:"Prikaži Bluetooth vezu",batteryIndicator:"Prikaži indikator baterije",themeTab:"Tema",customTab:"Prilagođeno",customBackground:"Boja pozadine",customTimeBox:"Boja polja vremena",customBorders:"Boja ivica polja vremena",customTimeText:"Boja teksta vremena",info1Text:"Boja teksta informacije 1",info2Text:"Boja teksta informacije 2",info3Text:"Boja teksta informacije 3",pebbleColorTitle:"Pebble boja",pebbleColorCopy:"Odaberite jednu od 64 boje koje podržavaju Pebble ekrani u boji.",done:"Gotovo",metricsTitle:"Informacije",metricsCopy:"Prilagodite informacije prikazane na brojčaniku.",twoSlots:"2 informacijska polja",threeSlots:"3 informacijska polja",locationTitle:"Ručna lokacija",countryLabel:"Država",postalLabel:"Poštanski broj",cityLabel:"Grad",selectCountry:"Odaberite državu",clearCountry:"Očisti državu",clearPostal:"Očisti poštanski broj",clearCity:"Očisti grad",locationChecking:"Provjera lokacije...",locationNotFound:"Lokacija nije pronađena. Provjerite državu, poštanski broj i grad.",locationUnavailable:"Lokaciju nije moguće potvrditi. Provjerite vezu i pokušajte ponovo.",languageLabel:"Jezik",languageCopy:"Promijenite zadani jezik brojčanika i stranice postavki.",analyticsTitle:"Analitika",analyticsLabel:"Dijeli anonimne podatke o korištenju",analyticsCopy:"Ovaj brojčanik koristi anonimne podatke za poboljšanje iskustva. Lični i zdravstveni podaci se ne prikupljaju.",supportTitle:"Podrška",supportCopy:"Ovaj brojčanik je besplatan i pažljivo izrađen. Razmotrite mali doprinos za buduća poboljšanja.",donate:"Podrži",reset:"Vrati raspored",save:"Sačuvaj postavke",saving:"Čuvanje...",saved:"Sačuvano. Ako prozor ostane otvoren, zatvorite ga i ponovo pokrenite emulator.",metrics:["Kalendar","Vrijeme","Baterija","Kalorije","Vrijeme aktivnosti","Vrijeme spavanja","Otkucaji srca","Koraci","Udaljenost","Ništa"],themes:["Narandžasta","Plava","Ljubičasta","Žuta","Zelena","Crvena","Bijela","Crna"]
+    });
+    addLocale('sr-Latn',{
+      autoDevice:"Automatski (uređaj)",pageTitle:"Podešavanja Essential Redux",intro:"Koristite podešavanja ispod da prilagodite Pebble brojčanik.",settingsTitle:"Opšta podešavanja",leadingZero:"Prikaži početnu nulu sata.",hour12:"Koristi 12-časovni format",celsius:"Koristi Celzijus za temperaturu",bluetooth:"Prikaži Bluetooth vezu",batteryIndicator:"Prikaži indikator baterije",themeTab:"Tema",customTab:"Prilagođeno",customBackground:"Boja pozadine",customTimeBox:"Boja polja vremena",customBorders:"Boja ivica polja vremena",customTimeText:"Boja teksta vremena",info1Text:"Boja teksta informacije 1",info2Text:"Boja teksta informacije 2",info3Text:"Boja teksta informacije 3",pebbleColorTitle:"Pebble boja",pebbleColorCopy:"Izaberite jednu od 64 boje koje podržavaju Pebble ekrani u boji.",done:"Gotovo",metricsTitle:"Informacije",metricsCopy:"Prilagodite informacije prikazane na brojčaniku.",twoSlots:"2 informaciona polja",threeSlots:"3 informaciona polja",locationTitle:"Ručna lokacija",countryLabel:"Država",postalLabel:"Poštanski broj",cityLabel:"Grad",selectCountry:"Izaberite državu",clearCountry:"Obriši državu",clearPostal:"Obriši poštanski broj",clearCity:"Obriši grad",locationChecking:"Provera lokacije...",locationNotFound:"Lokacija nije pronađena. Proverite državu, poštanski broj i grad.",locationUnavailable:"Lokaciju nije moguće potvrditi. Proverite vezu i pokušajte ponovo.",languageLabel:"Jezik",languageCopy:"Promenite podrazumevani jezik brojčanika i stranice podešavanja.",analyticsTitle:"Analitika",analyticsLabel:"Deli anonimne podatke o korišćenju",analyticsCopy:"Ovaj brojčanik koristi anonimne podatke za poboljšanje iskustva. Lični i zdravstveni podaci se ne prikupljaju.",supportTitle:"Podrška",supportCopy:"Ovaj brojčanik je besplatan i pažljivo izrađen. Razmotrite mali doprinos za buduća poboljšanja.",donate:"Podrži",reset:"Vrati raspored",save:"Sačuvaj podešavanja",saving:"Čuvanje...",saved:"Sačuvano. Ako prozor ostane otvoren, zatvorite ga i ponovo pokrenite emulator.",metrics:["Kalendar","Vreme","Baterija","Kalorije","Vreme aktivnosti","Vreme spavanja","Otkucaji srca","Koraci","Udaljenost","Ništa"],themes:["Narandžasta","Plava","Ljubičasta","Žuta","Zelena","Crvena","Bela","Crna"]
+    });
+    addLocale('ro',{
+      autoDevice:"Automat (dispozitiv)",pageTitle:"Setări Essential Redux",intro:"Folosește setările de mai jos pentru a personaliza cadranul Pebble.",settingsTitle:"Setări generale",leadingZero:"Afișează zero înaintea orei.",hour12:"Folosește formatul de 12 ore",celsius:"Folosește Celsius pentru temperatură",bluetooth:"Afișează conexiunea Bluetooth",batteryIndicator:"Afișează indicatorul bateriei",themeTab:"Temă",customTab:"Personalizat",customBackground:"Culoare fundal",customTimeBox:"Culoare casetă oră",customBorders:"Culoare margini casetă oră",customTimeText:"Culoare text oră",info1Text:"Culoare text informație 1",info2Text:"Culoare text informație 2",info3Text:"Culoare text informație 3",pebbleColorTitle:"Culoare Pebble",pebbleColorCopy:"Alege una dintre cele 64 de culori acceptate de ecranele color Pebble.",done:"Gata",metricsTitle:"Informații",metricsCopy:"Personalizează informațiile afișate pe cadran.",twoSlots:"2 câmpuri de informații",threeSlots:"3 câmpuri de informații",locationTitle:"Locație manuală",countryLabel:"Țară",postalLabel:"Cod poștal",cityLabel:"Oraș",selectCountry:"Selectează o țară",clearCountry:"Șterge țara",clearPostal:"Șterge codul poștal",clearCity:"Șterge orașul",locationChecking:"Se verifică locația...",locationNotFound:"Locația nu a fost găsită. Verifică țara, codul poștal și orașul.",locationUnavailable:"Locația nu a putut fi validată. Verifică conexiunea și încearcă din nou.",languageLabel:"Limbă",languageCopy:"Schimbă limba implicită a cadranului și paginii de setări.",analyticsTitle:"Analiză",analyticsLabel:"Partajează date anonime de utilizare",analyticsCopy:"Acest cadran folosește date anonime pentru a îmbunătăți experiența. Nu sunt colectate date personale sau de sănătate.",supportTitle:"Asistență",supportCopy:"Acest cadran este gratuit și realizat cu grijă. Poți contribui puțin pentru a susține îmbunătățirile viitoare.",donate:"Susține",reset:"Resetează aspectul",save:"Salvează setările",saving:"Se salvează...",saved:"Salvat. Dacă fereastra rămâne deschisă, închide-o și repornește emulatorul.",metrics:["Calendar","Vreme","Baterie","Calorii","Timp activ","Timp de somn","Ritm cardiac","Pași","Distanță","Nimic"],themes:["Portocaliu","Albastru","Mov","Galben","Verde","Roșu","Alb","Negru"]
+    });
+    addLocale('hu',{
+      autoDevice:"Automatikus (eszköz)",pageTitle:"Essential Redux beállítások",intro:"Az alábbi beállításokkal szabhatod személyre a Pebble számlapot.",settingsTitle:"Általános beállítások",leadingZero:"Kezdő nulla megjelenítése az óránál.",hour12:"12 órás formátum használata",celsius:"Celsius használata a hőmérséklethez",bluetooth:"Bluetooth-kapcsolat megjelenítése",batteryIndicator:"Akkumulátorjelző megjelenítése",themeTab:"Téma",customTab:"Egyéni",customBackground:"Háttérszín",customTimeBox:"Időmező színe",customBorders:"Időmező keretszíne",customTimeText:"Időmező szövegszíne",info1Text:"1. információ szövegszíne",info2Text:"2. információ szövegszíne",info3Text:"3. információ szövegszíne",pebbleColorTitle:"Pebble-szín",pebbleColorCopy:"Válassz a Pebble színes kijelzői által támogatott 64 szín közül.",done:"Kész",metricsTitle:"Információ",metricsCopy:"Szabd személyre a számlapon megjelenő információkat.",twoSlots:"2 információs mező",threeSlots:"3 információs mező",locationTitle:"Kézi hely",countryLabel:"Ország",postalLabel:"Irányítószám",cityLabel:"Város",selectCountry:"Válassz országot",clearCountry:"Ország törlése",clearPostal:"Irányítószám törlése",clearCity:"Város törlése",locationChecking:"Hely ellenőrzése...",locationNotFound:"A hely nem található. Ellenőrizd az országot, az irányítószámot és a várost.",locationUnavailable:"A hely nem ellenőrizhető. Ellenőrizd a kapcsolatot, és próbáld újra.",languageLabel:"Nyelv",languageCopy:"Módosítsd a számlap és a beállítási oldal alapértelmezett nyelvét.",analyticsTitle:"Elemzés",analyticsLabel:"Névtelen használati adatok megosztása",analyticsCopy:"Ez a számlap névtelen adatokat használ az élmény javításához. Személyes vagy egészségügyi adatokat nem gyűjt.",supportTitle:"Támogatás",supportCopy:"Ez a számlap ingyenes és gondosan készült. Egy kis hozzájárulással támogathatod a jövőbeli fejlesztéseket.",donate:"Támogatás",reset:"Elrendezés visszaállítása",save:"Beállítások mentése",saving:"Mentés...",saved:"Mentve. Ha az ablak nyitva marad, zárd be, és indítsd újra az emulátort.",metrics:["Naptár","Időjárás","Akkumulátor","Kalória","Aktív idő","Alvásidő","Pulzus","Lépések","Távolság","Nincs"],themes:["Narancs","Kék","Lila","Sárga","Zöld","Piros","Fehér","Fekete"]
+    });
+    addLocale('et',{
+      autoDevice:"Automaatne (seade)",pageTitle:"Essential Redux seaded",intro:"Kasuta allolevaid seadeid Pebble kellakuva kohandamiseks.",settingsTitle:"Üldseaded",leadingZero:"Kuva tunni ees null.",hour12:"Kasuta 12-tunnist vormingut",celsius:"Kasuta temperatuuri jaoks Celsiust",bluetooth:"Kuva Bluetooth-ühendus",batteryIndicator:"Kuva aku näidik",themeTab:"Teema",customTab:"Kohandatud",customBackground:"Taustavärv",customTimeBox:"Ajakasti värv",customBorders:"Ajakasti äärise värv",customTimeText:"Ajakasti teksti värv",info1Text:"Teabe 1 teksti värv",info2Text:"Teabe 2 teksti värv",info3Text:"Teabe 3 teksti värv",pebbleColorTitle:"Pebble värv",pebbleColorCopy:"Vali üks 64 värvist, mida Pebble värviekraanid toetavad.",done:"Valmis",metricsTitle:"Teave",metricsCopy:"Kohanda kellakuval näidatavat teavet.",twoSlots:"2 teabevälja",threeSlots:"3 teabevälja",locationTitle:"Käsitsi asukoht",countryLabel:"Riik",postalLabel:"Sihtnumber",cityLabel:"Linn",selectCountry:"Vali riik",clearCountry:"Tühjenda riik",clearPostal:"Tühjenda sihtnumber",clearCity:"Tühjenda linn",locationChecking:"Asukoha kontrollimine...",locationNotFound:"Asukohta ei leitud. Kontrolli riiki, sihtnumbrit ja linna.",locationUnavailable:"Asukohta ei saanud kinnitada. Kontrolli ühendust ja proovi uuesti.",languageLabel:"Keel",languageCopy:"Muuda kellakuva ja seadete lehe vaikekeelt.",analyticsTitle:"Analüütika",analyticsLabel:"Jaga anonüümseid kasutusandmeid",analyticsCopy:"See kellakuva kasutab kogemuse parandamiseks anonüümseid andmeid. Isiku- ega terviseandmeid ei koguta.",supportTitle:"Tugi",supportCopy:"See kellakuva on tasuta ja hoolikalt loodud. Tulevaste täiustuste toetamiseks võid teha väikese annetuse.",donate:"Toeta",reset:"Lähtesta paigutus",save:"Salvesta seaded",saving:"Salvestamine...",saved:"Salvestatud. Kui aken jääb avatuks, sulge see ja käivita emulaator uuesti.",metrics:["Kalender","Ilm","Aku","Kalorid","Aktiivne aeg","Uneaeg","Pulss","Sammud","Vahemaa","Puudub"],themes:["Oranž","Sinine","Lilla","Kollane","Roheline","Punane","Valge","Must"]
+    });
+    addLocale('lv',{
+      autoDevice:"Automātiski (ierīce)",pageTitle:"Essential Redux iestatījumi",intro:"Izmanto tālāk norādītos iestatījumus, lai pielāgotu Pebble ciparnīcu.",settingsTitle:"Vispārīgie iestatījumi",leadingZero:"Rādīt nulli stundas sākumā.",hour12:"Izmantot 12 stundu formātu",celsius:"Temperatūrai izmantot Celsiju",bluetooth:"Rādīt Bluetooth savienojumu",batteryIndicator:"Rādīt akumulatora indikatoru",themeTab:"Motīvs",customTab:"Pielāgots",customBackground:"Fona krāsa",customTimeBox:"Laika lauka krāsa",customBorders:"Laika lauka malu krāsa",customTimeText:"Laika teksta krāsa",info1Text:"1. informācijas teksta krāsa",info2Text:"2. informācijas teksta krāsa",info3Text:"3. informācijas teksta krāsa",pebbleColorTitle:"Pebble krāsa",pebbleColorCopy:"Izvēlies vienu no 64 krāsām, ko atbalsta Pebble krāsu ekrāni.",done:"Gatavs",metricsTitle:"Informācija",metricsCopy:"Pielāgo ciparnīcā redzamo informāciju.",twoSlots:"2 informācijas lauki",threeSlots:"3 informācijas lauki",locationTitle:"Manuāla atrašanās vieta",countryLabel:"Valsts",postalLabel:"Pasta indekss",cityLabel:"Pilsēta",selectCountry:"Izvēlies valsti",clearCountry:"Notīrīt valsti",clearPostal:"Notīrīt pasta indeksu",clearCity:"Notīrīt pilsētu",locationChecking:"Pārbauda atrašanās vietu...",locationNotFound:"Atrašanās vieta netika atrasta. Pārbaudi valsti, pasta indeksu un pilsētu.",locationUnavailable:"Atrašanās vietu nevarēja pārbaudīt. Pārbaudi savienojumu un mēģini vēlreiz.",languageLabel:"Valoda",languageCopy:"Maini ciparnīcas un iestatījumu lapas noklusējuma valodu.",analyticsTitle:"Analītika",analyticsLabel:"Kopīgot anonīmus lietojuma datus",analyticsCopy:"Šī ciparnīca izmanto anonīmus datus pieredzes uzlabošanai. Personas vai veselības dati netiek vākti.",supportTitle:"Atbalsts",supportCopy:"Šī ciparnīca ir bezmaksas un rūpīgi veidota. Apsver nelielu ieguldījumu turpmākiem uzlabojumiem.",donate:"Atbalstīt",reset:"Atiestatīt izkārtojumu",save:"Saglabāt iestatījumus",saving:"Saglabā...",saved:"Saglabāts. Ja logs paliek atvērts, aizver to un palaid emulatoru vēlreiz.",metrics:["Kalendārs","Laikapstākļi","Akumulators","Kalorijas","Aktīvais laiks","Miega laiks","Pulss","Soļi","Attālums","Nav"],themes:["Oranžs","Zils","Violets","Dzeltens","Zaļš","Sarkans","Balts","Melns"]
+    });
+    addLocale('lt',{
+      autoDevice:"Automatiškai (įrenginys)",pageTitle:"Essential Redux nustatymai",intro:"Naudokite toliau pateiktus nustatymus Pebble ciferblatui pritaikyti.",settingsTitle:"Bendrieji nustatymai",leadingZero:"Rodyti nulį prieš valandą.",hour12:"Naudoti 12 valandų formatą",celsius:"Temperatūrai naudoti Celsijų",bluetooth:"Rodyti Bluetooth ryšį",batteryIndicator:"Rodyti baterijos indikatorių",themeTab:"Tema",customTab:"Pasirinktinė",customBackground:"Fono spalva",customTimeBox:"Laiko lauko spalva",customBorders:"Laiko lauko kraštų spalva",customTimeText:"Laiko teksto spalva",info1Text:"1 informacijos teksto spalva",info2Text:"2 informacijos teksto spalva",info3Text:"3 informacijos teksto spalva",pebbleColorTitle:"Pebble spalva",pebbleColorCopy:"Pasirinkite vieną iš 64 Pebble spalvotų ekranų palaikomų spalvų.",done:"Atlikta",metricsTitle:"Informacija",metricsCopy:"Tinkinkite ciferblate rodomą informaciją.",twoSlots:"2 informacijos laukai",threeSlots:"3 informacijos laukai",locationTitle:"Rankinė vieta",countryLabel:"Šalis",postalLabel:"Pašto kodas",cityLabel:"Miestas",selectCountry:"Pasirinkite šalį",clearCountry:"Išvalyti šalį",clearPostal:"Išvalyti pašto kodą",clearCity:"Išvalyti miestą",locationChecking:"Tikrinama vieta...",locationNotFound:"Vieta nerasta. Patikrinkite šalį, pašto kodą ir miestą.",locationUnavailable:"Vietos patvirtinti nepavyko. Patikrinkite ryšį ir bandykite dar kartą.",languageLabel:"Kalba",languageCopy:"Pakeiskite numatytąją ciferblato ir nustatymų puslapio kalbą.",analyticsTitle:"Analitika",analyticsLabel:"Bendrinti anoniminius naudojimo duomenis",analyticsCopy:"Šis ciferblatas naudoja anoniminius duomenis patirčiai gerinti. Asmens ar sveikatos duomenys nerenkami.",supportTitle:"Palaikymas",supportCopy:"Šis ciferblatas nemokamas ir sukurtas kruopščiai. Galite nedidele auka paremti būsimus patobulinimus.",donate:"Paremti",reset:"Atkurti išdėstymą",save:"Išsaugoti nustatymus",saving:"Išsaugoma...",saved:"Išsaugota. Jei langas lieka atidarytas, uždarykite jį ir paleiskite emuliatorių iš naujo.",metrics:["Kalendorius","Orai","Baterija","Kalorijos","Aktyvumo laikas","Miego laikas","Pulsas","Žingsniai","Atstumas","Nėra"],themes:["Oranžinė","Mėlyna","Violetinė","Geltona","Žalia","Raudona","Balta","Juoda"]
+    });
+    addLocale('tr',{
+      autoDevice:"Otomatik (cihaz)",pageTitle:"Essential Redux Ayarları",intro:"Pebble saat yüzünü özelleştirmek için aşağıdaki ayarları kullanın.",settingsTitle:"Genel ayarlar",leadingZero:"Saatte baştaki sıfırı göster.",hour12:"12 saat biçimini kullan",celsius:"Sıcaklık için Celsius kullan",bluetooth:"Bluetooth bağlantısını göster",batteryIndicator:"Pil göstergesini göster",themeTab:"Tema",customTab:"Özel",customBackground:"Arka plan rengi",customTimeBox:"Saat kutusu rengi",customBorders:"Saat kutusu kenar rengi",customTimeText:"Saat metni rengi",info1Text:"Bilgi 1 metin rengi",info2Text:"Bilgi 2 metin rengi",info3Text:"Bilgi 3 metin rengi",pebbleColorTitle:"Pebble rengi",pebbleColorCopy:"Pebble renkli ekranların desteklediği 64 renkten birini seçin.",done:"Bitti",metricsTitle:"Bilgi",metricsCopy:"Saat yüzünde gösterilen bilgileri özelleştirin.",twoSlots:"2 bilgi alanı",threeSlots:"3 bilgi alanı",locationTitle:"Manuel konum",countryLabel:"Ülke",postalLabel:"Posta kodu",cityLabel:"Şehir",selectCountry:"Bir ülke seçin",clearCountry:"Ülkeyi temizle",clearPostal:"Posta kodunu temizle",clearCity:"Şehri temizle",locationChecking:"Konum kontrol ediliyor...",locationNotFound:"Konum bulunamadı. Ülkeyi, posta kodunu ve şehri kontrol edin.",locationUnavailable:"Konum doğrulanamadı. Bağlantınızı kontrol edip tekrar deneyin.",languageLabel:"Dil",languageCopy:"Saat yüzü ve ayarlar sayfasının varsayılan dilini değiştirin.",analyticsTitle:"Analiz",analyticsLabel:"Anonim kullanım verilerini paylaş",analyticsCopy:"Bu saat yüzü deneyimi iyileştirmek için anonim veriler kullanır. Kişisel veya sağlık verisi toplanmaz.",supportTitle:"Destek",supportCopy:"Bu saat yüzü ücretsizdir ve özenle hazırlanmıştır. Gelecekteki geliştirmeleri küçük bir katkıyla destekleyebilirsiniz.",donate:"Destekle",reset:"Düzeni sıfırla",save:"Ayarları kaydet",saving:"Kaydediliyor...",saved:"Kaydedildi. Bu pencere açık kalırsa kapatın ve emülatörü yeniden çalıştırın.",metrics:["Takvim","Hava durumu","Pil","Kalori","Aktif süre","Uyku süresi","Kalp atışı","Adım","Mesafe","Yok"],themes:["Turuncu","Mavi","Mor","Sarı","Yeşil","Kırmızı","Beyaz","Siyah"]
+    });
+    addLocale('sq',{
+      autoDevice:"Automatik (pajisja)",pageTitle:"Cilësimet e Essential Redux",intro:"Përdorni cilësimet më poshtë për të personalizuar faqen e orës Pebble.",settingsTitle:"Cilësimet e përgjithshme",leadingZero:"Shfaq zero në fillim të orës.",hour12:"Përdor formatin 12-orësh",celsius:"Përdor Celsius për temperaturën",bluetooth:"Shfaq lidhjen Bluetooth",batteryIndicator:"Shfaq treguesin e baterisë",themeTab:"Tema",customTab:"E personalizuar",customBackground:"Ngjyra e sfondit",customTimeBox:"Ngjyra e kutisë së orës",customBorders:"Ngjyra e kufijve të kutisë së orës",customTimeText:"Ngjyra e tekstit të orës",info1Text:"Ngjyra e tekstit të informacionit 1",info2Text:"Ngjyra e tekstit të informacionit 2",info3Text:"Ngjyra e tekstit të informacionit 3",pebbleColorTitle:"Ngjyra Pebble",pebbleColorCopy:"Zgjidhni një nga 64 ngjyrat e mbështetura nga ekranet Pebble me ngjyra.",done:"U krye",metricsTitle:"Informacion",metricsCopy:"Personalizoni informacionin e shfaqur në faqen e orës.",twoSlots:"2 fusha informacioni",threeSlots:"3 fusha informacioni",locationTitle:"Vendndodhje manuale",countryLabel:"Shteti",postalLabel:"Kodi postar",cityLabel:"Qyteti",selectCountry:"Zgjidhni një shtet",clearCountry:"Pastro shtetin",clearPostal:"Pastro kodin postar",clearCity:"Pastro qytetin",locationChecking:"Po kontrollohet vendndodhja...",locationNotFound:"Vendndodhja nuk u gjet. Kontrolloni shtetin, kodin postar dhe qytetin.",locationUnavailable:"Vendndodhja nuk mund të vërtetohej. Kontrolloni lidhjen dhe provoni përsëri.",languageLabel:"Gjuha",languageCopy:"Ndryshoni gjuhën e parazgjedhur të faqes së orës dhe faqes së cilësimeve.",analyticsTitle:"Analitika",analyticsLabel:"Ndaj të dhëna anonime përdorimi",analyticsCopy:"Kjo faqe ore përdor të dhëna anonime për të përmirësuar përvojën. Nuk mblidhen të dhëna personale ose shëndetësore.",supportTitle:"Mbështetje",supportCopy:"Kjo faqe ore është falas dhe e punuar me kujdes. Konsideroni një kontribut të vogël për përmirësimet e ardhshme.",donate:"Mbështet",reset:"Rivendos paraqitjen",save:"Ruaj cilësimet",saving:"Po ruhet...",saved:"U ruajt. Nëse dritarja mbetet hapur, mbylleni dhe rinisni emulatorin.",metrics:["Kalendari","Moti","Bateria","Kaloritë","Koha aktive","Koha e gjumit","Rrahjet e zemrës","Hapat","Distanca","Asnjë"],themes:["Portokalli","Blu","Vjollcë","E verdhë","E gjelbër","E kuqe","E bardhë","E zezë"]
+    });
+    addLocale('mt',{
+      autoDevice:"Awtomatiku (apparat)",pageTitle:"Settings ta’ Essential Redux",intro:"Uża s-settings hawn taħt biex tippersonalizza l-wiċċ tal-arloġġ Pebble.",settingsTitle:"Settings ġenerali",leadingZero:"Uri żero fil-bidu tas-siegħa.",hour12:"Uża format ta’ 12-il siegħa",celsius:"Uża Celsius għat-temperatura",bluetooth:"Uri l-konnessjoni Bluetooth",batteryIndicator:"Uri l-indikatur tal-batterija",themeTab:"Tema",customTab:"Personalizzat",customBackground:"Kulur tal-isfond",customTimeBox:"Kulur tal-kaxxa tal-ħin",customBorders:"Kulur tat-truf tal-kaxxa tal-ħin",customTimeText:"Kulur tat-test tal-ħin",info1Text:"Kulur tat-test tal-informazzjoni 1",info2Text:"Kulur tat-test tal-informazzjoni 2",info3Text:"Kulur tat-test tal-informazzjoni 3",pebbleColorTitle:"Kulur Pebble",pebbleColorCopy:"Agħżel wieħed mill-64 kulur appoġġjati mill-iskrins bil-kulur ta’ Pebble.",done:"Lest",metricsTitle:"Informazzjoni",metricsCopy:"Ippersonalizza l-informazzjoni murija fuq il-wiċċ tal-arloġġ.",twoSlots:"2 spazji ta’ informazzjoni",threeSlots:"3 spazji ta’ informazzjoni",locationTitle:"Post manwali",countryLabel:"Pajjiż",postalLabel:"Kodiċi postali",cityLabel:"Belt",selectCountry:"Agħżel pajjiż",clearCountry:"Neħħi l-pajjiż",clearPostal:"Neħħi l-kodiċi postali",clearCity:"Neħħi l-belt",locationChecking:"Qed jiġi ċċekkjat il-post...",locationNotFound:"Il-post ma nstabx. Iċċekkja l-pajjiż, il-kodiċi postali u l-belt.",locationUnavailable:"Il-post ma setax jiġi vvalidat. Iċċekkja l-konnessjoni u erġa’ pprova.",languageLabel:"Lingwa",languageCopy:"Ibdel il-lingwa awtomatika tal-wiċċ tal-arloġġ u tal-paġna tas-settings.",analyticsTitle:"Analitika",analyticsLabel:"Aqsam data anonima dwar l-użu",analyticsCopy:"Dan il-wiċċ tal-arloġġ juża data anonima biex itejjeb l-esperjenza. Ma tinġabar ebda data personali jew tas-saħħa.",supportTitle:"Appoġġ",supportCopy:"Dan il-wiċċ tal-arloġġ huwa b’xejn u magħmul b’attenzjoni. Ikkunsidra kontribuzzjoni żgħira għal titjib futur.",donate:"Appoġġja",reset:"Irrisettja t-tqassim",save:"Issejvja s-settings",saving:"Qed jiġi ssejvjat...",saved:"Issejvjat. Jekk it-tieqa tibqa’ miftuħa, agħlaqha u erġa’ ħaddem l-emulatur.",metrics:["Kalendarju","Temp","Batterija","Kaloriji","Ħin attiv","Ħin ta’ rqad","Taħbit tal-qalb","Passi","Distanza","Xejn"],themes:["Oranġjo","Blu","Vjola","Isfar","Aħdar","Aħmar","Abjad","Iswed"]
+    });
+
+    var gaLoading=false,gaLoaded=false,locationValidationToken=0,locationErrorKey='',locationInputsInvalid=false,saveInProgress=false,activeLocationField='';
+    function $(id){return document.getElementById(id)}
+    function b(v,d){if(v===true||v===1||v==='1'||v==='true')return true;if(v===false||v===0||v==='0'||v==='false')return false;return d}
+    function clean(v){return String(v||'').trim()}
+    function validTheme(v){return THEME_VALUES.indexOf(v)>=0?v:D.theme}
+    function validLanguage(v){return LANGUAGE_VALUES.indexOf(v)>=0?v:D.language}
+    function validCountry(v){v=String(v||'').toUpperCase();return COUNTRY_CODES.indexOf(v)>=0?v:D.manualCountry}
+    function validColor(v,d){v=String(v||'').toLowerCase();return PEBBLE_COLOR_LOOKUP[v]?v:d}
+    function deviceLanguage(){
+      var raw=String(navigator.language||navigator.userLanguage||'en').replace(/_/g,'-').toLowerCase();
+      if(raw==='no'||raw.indexOf('no-')===0)return'nb';
+      if(raw==='sr-latn'||raw.indexOf('sr-latn-')===0)return'sr-Latn';
+      var base=raw.split('-')[0];return I18N[base]?base:'en';
+    }
+    function effectiveLanguage(v){v=validLanguage(v);return v==='auto'?deviceLanguage():v}
+    function norm(s){
+      var raw=s||{},infoDefaultsMigrated=b(raw.customInfoDefaultsMigrated,false);s=Object.assign({},D,raw);
+      var postal=clean(s.manualPostalCode),city=clean(s.manualCity),country=validCountry(s.manualCountry),manualRequested=b(s.manualLocation,D.manualLocation);
+      if(!manualRequested&&!postal&&!city)country='';
+      var manual=manualRequested&&!!(postal||city);
+      var showMiddle=b(s.showMiddleSlot,Number(s.slotCount)===3);
+      var info1=validColor(s.customInfo1TextColor,D.customInfo1TextColor),info2=validColor(s.customInfo2TextColor,D.customInfo2TextColor),info3=validColor(s.customInfo3TextColor,D.customInfo3TextColor);
+      if(!infoDefaultsMigrated&&info1==='#ffffff'&&info2==='#ffffff'&&info3==='#ffffff'){info1=D.customInfo1TextColor;info2=D.customInfo2TextColor;info3=D.customInfo3TextColor}
+      return{
+        themeMode:s.themeMode==='custom'?'custom':'preset',theme:validTheme(String(s.theme||D.theme)),
+        reverse:false,hour24:b(s.hour24,D.hour24),showLeadingZero:b(s.showLeadingZero,D.showLeadingZero),
+        showBatteryIndicator:b(s.showBatteryIndicator,D.showBatteryIndicator),showBluetooth:b(s.showBluetooth,D.showBluetooth),
+        celsius:b(s.celsius,D.celsius),layoutTest:false,leftMetric:String(s.leftMetric||D.leftMetric),
+        middleMetric:String(s.middleMetric||D.middleMetric),rightMetric:String(s.rightMetric||D.rightMetric),
+        showMiddleSlot:showMiddle,slotCount:showMiddle?3:2,language:validLanguage(String(s.language||D.language)),
+        manualLocation:manual,manualPostalCode:postal,manualCity:city,manualCountry:country,
+        analyticsEnabled:b(s.analyticsEnabled,D.analyticsEnabled),
+        customBackgroundColor:validColor(s.customBackgroundColor,D.customBackgroundColor),
+        customTimeBoxColor:validColor(s.customTimeBoxColor,D.customTimeBoxColor),
+        customTimeBorderColor:validColor(s.customTimeBorderColor,D.customTimeBorderColor),
+        customTimeTextColor:validColor(s.customTimeTextColor,D.customTimeTextColor),
+        customInfo1TextColor:info1,customInfo2TextColor:info2,customInfo3TextColor:info3,customInfoDefaultsMigrated:true
+      }
+    }
+    function incoming(){
+      var p=new URLSearchParams(location.search),u=p.get('donation_url'),r=p.get('settings');
+      if(u)$('donate').href=u;
+      if(!r)return norm(D);
+      try{return norm(JSON.parse(decodeURIComponent(r)))}catch(e){return norm(D)}
+    }
+    function setOptions(el,values,labels,selected){
+      el.innerHTML='';
+      values.forEach(function(value,index){var o=document.createElement('option');o.value=value;o.textContent=labels[index];el.appendChild(o)});
+      el.value=selected;
+    }
+    function setLanguageOptions(lang,selected){
+      var labels=[],names=null,t=I18N[lang]||I18N.en;
+      try{if(typeof Intl!=='undefined'&&Intl.DisplayNames)names=new Intl.DisplayNames([lang],{type:'language'})}catch(e){}
+      LANGUAGE_VALUES.forEach(function(code){
+        if(code==='auto'){labels.push(t.autoDevice||(t.languages&&t.languages[0])||I18N.en.languages[0]);return}
+        var index=LANGUAGE_CODES.indexOf(code);labels.push(LANGUAGE_LABEL_OVERRIDES[code]||(names?names.of(code):LANGUAGE_NAMES_EN[index]));
+      });
+      setOptions($('language'),LANGUAGE_VALUES,labels,selected);
+    }
+    function setCountryOptions(selected,lang){
+      var names=null,t=I18N[lang]||I18N.en,placeholder=document.createElement('option');
+      try{if(typeof Intl!=='undefined'&&Intl.DisplayNames)names=new Intl.DisplayNames([lang],{type:'region'})}catch(e){}
+      $('manualCountry').innerHTML='';placeholder.value='';placeholder.textContent=t.selectCountry;$('manualCountry').appendChild(placeholder);
+      COUNTRY_CODES.forEach(function(code){
+        var o=document.createElement('option');o.value=code;o.textContent=names?names.of(code):code;$('manualCountry').appendChild(o)
+      });
+      $('manualCountry').value=validCountry(selected);syncClearButton('manualCountry');
+    }
+    function syncClearButton(id){
+      var hasValue=!!$(id).value.length;$(id+'Clear').hidden=!hasValue;
+      if(id==='manualCountry')$(id).parentNode.classList.toggle('has-clear',hasValue);
+    }
+    function syncLocationClearButtons(){syncClearButton('manualCountry');syncClearButton('manualPostalCode');syncClearButton('manualCity')}
+    function clearLocationField(id){$(id).value='';activeLocationField=id;syncClearButton(id);clearLocationValidation();$(id).focus()}
+    function markLocationEdited(id){activeLocationField=id;syncClearButton(id);clearLocationValidation()}
+    function locationValuesForSave(){
+      var values={country:validCountry($('manualCountry').value),postal:clean($('manualPostalCode').value),city:clean($('manualCity').value)};
+      if(activeLocationField==='manualCountry')return{country:values.country,postal:'',city:''};
+      if(activeLocationField==='manualPostalCode')return{country:'',postal:values.postal,city:''};
+      if(activeLocationField==='manualCity')return{country:'',postal:'',city:values.city};
+      return values;
+    }
+    function buildThemes(){
+      var html='';
+      THEME_VALUES.forEach(function(value){
+        html+='<label class="theme '+value+'" data-theme="'+value+'"><input type="radio" name="theme" value="'+value+'"><span></span></label>'
+      });
+      $('themeGrid').innerHTML=html;
+      document.querySelectorAll('input[name=theme]').forEach(function(i){i.onchange=function(){syncTheme(true)}});
+    }
+    function applyPresetColorsToCustom(theme){
+      var colors=PRESET_CUSTOM_COLORS[validTheme(theme)]||PRESET_CUSTOM_COLORS[D.theme];
+      Object.keys(colors).forEach(function(id){$(id).value=colors[id];syncColorTrigger(id)});
+    }
+    function syncTheme(reflectCustom){
+      document.querySelectorAll('.theme').forEach(function(t){t.classList.toggle('selected',!!t.querySelector('input:checked'))});
+      if(reflectCustom){
+        var selected=document.querySelector('input[name=theme]:checked');
+        if(selected)applyPresetColorsToCustom(selected.value);
+      }
+    }
+    var activeColorTarget='';
+    function colorContrast(hex){
+      var r=parseInt(hex.substr(1,2),16),g=parseInt(hex.substr(3,2),16),b=parseInt(hex.substr(5,2),16);
+      return (r*299+g*587+b*114)/1000>150?'#000000':'#ffffff';
+    }
+    function syncColorTrigger(id){
+      var value=validColor($(id).value,D[id]);
+      $(id).value=value;
+      var button=$(id+'Button');
+      if(button){button.style.setProperty('--selected-color',value);button.setAttribute('aria-label',button.textContent.trim()+' '+value)}
+    }
+    function buildPebblePalette(){
+      var html='';
+      PEBBLE_COLORS.forEach(function(color){
+        html+='<button class="palette-swatch" type="button" role="radio" aria-checked="false" aria-label="'+color.toUpperCase()+'" data-pebble-color="'+color+'" style="--swatch:'+color+';--check:'+colorContrast(color)+'"></button>';
+      });
+      $('pebbleColorGrid').innerHTML=html;
+      document.querySelectorAll('.palette-swatch').forEach(function(button){
+        button.onclick=function(){selectPebbleColor(button.getAttribute('data-pebble-color'))};
+      });
+    }
+    function updatePaletteSelection(value){
+      value=validColor(value,'#000000');
+      $('paletteValue').textContent=value.toUpperCase();
+      document.querySelectorAll('.palette-swatch').forEach(function(button){
+        var selected=button.getAttribute('data-pebble-color')===value;
+        button.classList.toggle('selected',selected);button.setAttribute('aria-checked',selected?'true':'false');
+      });
+    }
+    function openPebbleColorPicker(id){
+      activeColorTarget=id;updatePaletteSelection($(id).value);
+      $('paletteDialog').hidden=false;document.body.classList.add('palette-open');
+      var selected=document.querySelector('.palette-swatch.selected');if(selected)selected.focus();
+    }
+    function closePebbleColorPicker(){
+      $('paletteDialog').hidden=true;document.body.classList.remove('palette-open');
+      if(activeColorTarget&&$(activeColorTarget+'Button'))$(activeColorTarget+'Button').focus();
+      activeColorTarget='';
+    }
+    function selectPebbleColor(value){
+      if(!activeColorTarget)return;
+      $(activeColorTarget).value=validColor(value,D[activeColorTarget]);
+      syncColorTrigger(activeColorTarget);updatePaletteSelection($(activeColorTarget).value);
+    }
+    function setThemeMode(mode){
+      mode=mode==='custom'?'custom':'preset';
+      document.querySelectorAll('.tab').forEach(function(tab){
+        var active=tab.getAttribute('data-mode')===mode;
+        tab.classList.toggle('active',active);tab.setAttribute('aria-selected',active?'true':'false');
+      });
+      $('presetPanel').hidden=mode!=='preset';$('customPanel').hidden=mode!=='custom';
+      document.body.setAttribute('data-theme-mode',mode);
+    }
+    function updateSlotMode(){
+      var three=$('threeSlots').checked;
+      $('middleSlotRow').hidden=!three;
+      var t=I18N[effectiveLanguage($('language').value||D.language)];
+      $('slotCountLabel').textContent=t.threeSlots||I18N.en.threeSlots;
+    }
+    function applyTranslations(){
+      var languageSetting=validLanguage($('language').value||D.language),lang=effectiveLanguage(languageSetting),t=I18N[lang];
+      var left=$('leftMetric').value||D.leftMetric,middle=$('middleMetric').value||D.middleMetric,right=$('rightMetric').value||D.rightMetric,country=$('manualCountry').value||D.manualCountry;
+      document.documentElement.lang=lang;document.title=t.pageTitle;
+      document.querySelectorAll('[data-i18n]').forEach(function(el){var key=el.getAttribute('data-i18n');if(t[key])el.textContent=t[key]});
+      setLanguageOptions(lang,languageSetting);
+      setOptions($('leftMetric'),METRIC_VALUES,t.metrics,left);
+      setOptions($('middleMetric'),METRIC_VALUES,t.metrics,middle);
+      setOptions($('rightMetric'),METRIC_VALUES,t.metrics,right);
+      setCountryOptions(country,lang);
+      $('manualCountryClear').setAttribute('aria-label',t.clearCountry);$('manualPostalCodeClear').setAttribute('aria-label',t.clearPostal);$('manualCityClear').setAttribute('aria-label',t.clearCity);
+      document.querySelectorAll('.theme').forEach(function(el,index){el.querySelector('span').textContent=t.themes[index]});
+      updateSlotMode();renderLocationError();
+    }
+    function loadGA(){
+      if(gaLoaded||gaLoading||!$('analytics').checked)return;
+      gaLoading=true;window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};
+      var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
+      s.onload=function(){gaLoading=false;gaLoaded=true;gtag('js',new Date());gtag('config',GA_ID,{send_page_view:true})};
+      s.onerror=function(){gaLoading=false};document.head.appendChild(s);
+    }
+    function reduxTrack(name,data,tries){
+      if(!$('analytics').checked)return;
+      if(gaLoaded&&window.gtag){gtag('event',name,data||{});return}
+      loadGA();if((tries||0)<10)setTimeout(function(){reduxTrack(name,data,(tries||0)+1)},300);
+    }
+    function renderLocationError(){var t=I18N[effectiveLanguage($('language').value||D.language)];$('locationError').textContent=locationErrorKey?t[locationErrorKey]:''}
+    function setLocationError(key,invalid){
+      locationErrorKey=key||'';locationInputsInvalid=!!invalid;
+      ['manualCountry','manualPostalCode','manualCity'].forEach(function(id){
+        var el=$(id),mark=locationInputsInvalid&&!!clean(el.value);
+        el.classList.toggle('invalid',mark);el.setAttribute('aria-invalid',mark?'true':'false');
+      });
+      renderLocationError();
+    }
+    function clearLocationValidation(){locationValidationToken++;saveInProgress=false;$('save').disabled=false;$('status').textContent='';setLocationError('',false)}
+    function locationQueries(s){var queries=[];if(s.manualPostalCode)queries.push(s.manualPostalCode);if(s.manualCity&&(!queries.length||s.manualCity.toLowerCase()!==queries[0].toLowerCase()))queries.push(s.manualCity);return queries}
+    function postalFallbackTarget(s){
+      var q=clean(s.manualPostalCode).toUpperCase();
+      if((!s.manualCountry||s.manualCountry==='US')&&/^\d{5}(-\d{4})?$/.test(q))return['us',q.split('-')[0]];
+      var compact=q.replace(/ /g,'');
+      if((!s.manualCountry||s.manualCountry==='CA')&&/^[A-Z]\d[A-Z](\d[A-Z]\d)?$/.test(compact))return['ca',compact.substring(0,3)];
+      return null;
+    }
+    function requestJson(url,onSuccess,onFailure){
+      var request=new XMLHttpRequest();request.open('GET',url,true);
+      request.onload=function(){if(request.status<200||request.status>=300){onFailure(true);return}try{onSuccess(JSON.parse(request.responseText))}catch(e){onFailure(true)}};
+      request.onerror=function(){onFailure(false)};request.ontimeout=function(){onFailure(false)};request.timeout=15000;request.send();
+    }
+    function validatePostalFallback(s,token,hadResponse,done){
+      var target=postalFallbackTarget(s);
+      if(!target){done(false,hadResponse?'locationNotFound':'locationUnavailable');return}
+      var url='https://api.zippopotam.us/'+target[0]+'/'+encodeURIComponent(target[1]);
+      requestJson(url,function(data){
+        if(token!==locationValidationToken)return;
+        done(!!(data&&data.places&&data.places.length),(data&&data.places&&data.places.length)?'':'locationNotFound')
+      },function(responded){
+        if(token!==locationValidationToken)return;
+        done(false,(hadResponse||responded)?'locationNotFound':'locationUnavailable')
+      });
+    }
+    function validateLocation(s,done){
+      var token=++locationValidationToken,queries=locationQueries(s);
+      if(!s.manualLocation||!queries.length){done(true,'');return}
+      function next(index,hadResponse){
+        if(token!==locationValidationToken)return;
+        if(index>=queries.length){validatePostalFallback(s,token,hadResponse,done);return}
+        var url='https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(queries[index])+'&count=5&language=en&format=json'+(s.manualCountry?'&countryCode='+encodeURIComponent(s.manualCountry):'');
+        requestJson(url,function(data){
+          if(token!==locationValidationToken)return;
+          var results=data&&data.results?data.results:[],matched=!s.manualCountry?results.length>0:results.some(function(result){return String(result.country_code||'').toUpperCase()===s.manualCountry});
+          if(matched){done(true,'');return}next(index+1,true)
+        },function(responded){if(token!==locationValidationToken)return;next(index+1,hadResponse||responded)});
+      }
+      next(0,false);
+    }
+    function render(s){
+      $('hour12').checked=!s.hour24;$('leadingZero').checked=s.showLeadingZero;$('batteryIndicator').checked=s.showBatteryIndicator;
+      $('bluetooth').checked=s.showBluetooth;$('celsius').checked=s.celsius;$('manualPostalCode').value=s.manualPostalCode;
+      $('manualCity').value=s.manualCity;$('analytics').checked=s.analyticsEnabled;$('threeSlots').checked=s.showMiddleSlot;
+      ['customBackgroundColor','customTimeBoxColor','customTimeBorderColor','customTimeTextColor','customInfo1TextColor','customInfo2TextColor','customInfo3TextColor'].forEach(function(id){$(id).value=s[id];syncColorTrigger(id)});
+      setLanguageOptions('en',s.language);
+      setOptions($('leftMetric'),METRIC_VALUES,I18N.en.metrics,s.leftMetric);
+      setOptions($('middleMetric'),METRIC_VALUES,I18N.en.metrics,s.middleMetric);
+      setOptions($('rightMetric'),METRIC_VALUES,I18N.en.metrics,s.rightMetric);
+      setCountryOptions(s.manualCountry,'en');
+      (document.querySelector('input[name=theme][value="'+s.theme+'"]')||document.querySelector('input[name=theme][value="orange"]')).checked=true;
+      if(s.themeMode==='preset')applyPresetColorsToCustom(s.theme);
+      activeLocationField='';setThemeMode(s.themeMode);applyTranslations();syncTheme(false);syncLocationClearButtons();clearLocationValidation();loadGA();
+    }
+    function collect(){
+      var locationValues=locationValuesForSave(),postal=locationValues.postal,city=locationValues.city,country=locationValues.country;
+      return norm({
+        themeMode:document.body.getAttribute('data-theme-mode')||'preset',
+        theme:document.querySelector('input[name=theme]:checked').value,
+        hour24:!$('hour12').checked,showLeadingZero:$('leadingZero').checked,
+        showBatteryIndicator:$('batteryIndicator').checked,showBluetooth:$('bluetooth').checked,
+        celsius:$('celsius').checked,leftMetric:$('leftMetric').value,middleMetric:$('middleMetric').value,
+        rightMetric:$('rightMetric').value,showMiddleSlot:$('threeSlots').checked,slotCount:$('threeSlots').checked?3:2,
+        language:$('language').value,manualLocation:!!(postal||city),manualPostalCode:postal,
+        manualCity:city,manualCountry:country,analyticsEnabled:$('analytics').checked,
+        customBackgroundColor:$('customBackgroundColor').value,customTimeBoxColor:$('customTimeBoxColor').value,
+        customTimeBorderColor:$('customTimeBorderColor').value,customTimeTextColor:$('customTimeTextColor').value,
+        customInfo1TextColor:$('customInfo1TextColor').value,customInfo2TextColor:$('customInfo2TextColor').value,
+        customInfo3TextColor:$('customInfo3TextColor').value,customInfoDefaultsMigrated:true
+      });
+    }
+    function closeConfig(encoded){
+      var t=I18N[effectiveLanguage($('language').value)],closeUrl='pebblejs://close#'+encoded;
+      $('status').textContent=t.saving;try{document.location=closeUrl}catch(e){$('status').textContent=t.saved}
+    }
+    function finishSave(s){
+      reduxTrack('settings_saved',{
+        theme:s.theme,theme_mode:s.themeMode,language:s.language,use_24_hour:s.hour24?1:0,
+        leading_zero:s.showLeadingZero?1:0,battery_indicator:s.showBatteryIndicator?1:0,
+        bluetooth:s.showBluetooth?1:0,use_celsius:s.celsius?1:0,manual_location:s.manualLocation?1:0,
+        slot_count:s.slotCount,left_metric:s.leftMetric,middle_metric:s.middleMetric,right_metric:s.rightMetric
+      });
+      closeConfig(encodeURIComponent(JSON.stringify(s)));
+    }
+    function save(){
+      if(saveInProgress)return;
+      var s=collect(),t=I18N[effectiveLanguage(s.language)];
+      saveInProgress=true;$('save').disabled=true;
+      if(!s.manualLocation){finishSave(s);return}
+      $('status').textContent=t.locationChecking;setLocationError('',false);
+      validateLocation(s,function(valid,errorKey){
+        if(valid){finishSave(s);return}
+        saveInProgress=false;$('save').disabled=false;$('status').textContent='';
+        setLocationError(errorKey,errorKey==='locationNotFound');$('locationCard').scrollIntoView();
+      });
+    }
+
+    buildThemes();
+    buildPebblePalette();
+    render(incoming());
+    document.querySelectorAll('.tab').forEach(function(tab){tab.onclick=function(){setThemeMode(tab.getAttribute('data-mode'))}});
+    document.querySelectorAll('.color-picker-trigger').forEach(function(button){button.onclick=function(){openPebbleColorPicker(button.getAttribute('data-color-target'))}});
+    $('paletteClose').onclick=closePebbleColorPicker;$('paletteDone').onclick=closePebbleColorPicker;
+    $('paletteDialog').onclick=function(event){if(event.target===$('paletteDialog'))closePebbleColorPicker()};
+    document.addEventListener('keydown',function(event){if(event.key==='Escape'&&!$('paletteDialog').hidden)closePebbleColorPicker()});
+    $('threeSlots').onchange=updateSlotMode;
+    $('language').onchange=function(){applyTranslations();if(saveInProgress)$('status').textContent=I18N[effectiveLanguage($('language').value)].locationChecking};
+    $('manualCountry').onchange=function(){markLocationEdited('manualCountry')};
+    $('manualPostalCode').oninput=function(){markLocationEdited('manualPostalCode')};$('manualCity').oninput=function(){markLocationEdited('manualCity')};
+    $('manualCountryClear').onclick=function(){clearLocationField('manualCountry')};$('manualPostalCodeClear').onclick=function(){clearLocationField('manualPostalCode')};$('manualCityClear').onclick=function(){clearLocationField('manualCity')};
+    $('analytics').onchange=function(){if(this.checked)loadGA()};
+    $('donate').onclick=function(){reduxTrack('donation_clicked',{source:'app_config'})};
+    $('reset').onclick=function(){var c=collect();reduxTrack('layout_reset',{source:'app_config'});render(Object.assign({},D,{language:c.language,analyticsEnabled:c.analyticsEnabled}))};
+    $('save').onclick=save;
+  </script>
+</body>
+</html>
