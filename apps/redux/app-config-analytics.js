@@ -11,6 +11,7 @@
   function enabled(){var el=byId('analytics');return !!(el&&el.checked);}
   function value(id,fallback){var el=byId(id);return el&&el.value!==undefined?el.value:(fallback||'');}
   function checked(id){var el=byId(id);return !!(el&&el.checked);}
+  function cleanColor(color){return String(color||'').replace('#','').toUpperCase();}
 
   function selectedTheme(){
     var selected=document.querySelector('.theme-choice[aria-pressed="true"]');
@@ -28,6 +29,39 @@
       theme:mode==='custom'?'custom':(selectedTheme()||'unknown'),
       theme_mode:mode
     };
+  }
+
+  function customColorParams(){
+    var result={};
+    if(themeMode()!=='custom'||!window.state||!window.state.customTheme)return result;
+
+    var vertical=checked('verticalLayout');
+    var slotCount=checked('threeSlots')?3:2;
+    var colors=vertical?window.state.customTheme.vertical:window.state.customTheme.horizontal;
+    if(!colors)return result;
+
+    result.background_color=cleanColor(colors.background);
+    result.panel_color=cleanColor(vertical?colors.trayBackground:colors.boxBackground);
+    result.time_text_color=cleanColor(colors.timeText);
+    result.slot1_text_color=cleanColor(colors.slot1Text);
+    result.slot2_text_color=cleanColor(colors.slot2Text);
+    if(slotCount===3)result.slot3_text_color=cleanColor(colors.slot3Text);
+
+    if(vertical){
+      result.date_text_color=cleanColor(colors.dateText);
+      result.divider_color=cleanColor(colors.divider);
+    }else{
+      result.top_border_color=cleanColor(colors.boxTopBorder);
+      result.bottom_border_color=cleanColor(colors.boxBottomBorder);
+      result.battery_indicator_color=cleanColor(colors.batteryIndicator);
+    }
+    return result;
+  }
+
+  function addCustomColors(data){
+    var colors=customColorParams();
+    for(var key in colors){if(Object.prototype.hasOwnProperty.call(colors,key))data[key]=colors[key];}
+    return data;
   }
 
   function loadGA(){
@@ -54,13 +88,13 @@
         transport_type:'beacon'
       });
       var usage=themeUsage();
-      track('theme_used',{
+      track('theme_used',addCustomColors({
         theme:usage.theme,
         theme_mode:usage.theme_mode,
         source:'config_open',
         orientation:checked('verticalLayout')?'vertical':'horizontal',
         slot_count:checked('threeSlots')?3:2
-      });
+      }));
     };
     script.onerror=function(){gaLoading=false;};
     document.head.appendChild(script);
@@ -108,13 +142,13 @@
   if(save)save.addEventListener('click',function(){
     var snapshot=settingsSnapshot();
     track('settings_saved',snapshot);
-    track('theme_used',{
+    track('theme_used',addCustomColors({
       theme:snapshot.theme,
       theme_mode:snapshot.theme_mode,
       source:'settings_saved',
       orientation:snapshot.orientation,
       slot_count:snapshot.slot_count
-    });
+    }));
   },true);
 
   var reset=document.querySelector('.info-reset');
