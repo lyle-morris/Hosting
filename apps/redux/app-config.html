@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- Redux 2.1.2 production app configuration
-     Stable endpoint used by the published PBW.
+     Production-owned base, patch, images, and localization snapshot.
      Source of truth: REDUX - PEBBLE / node 2036:14801
 -->
 <html lang="en">
@@ -16,9 +16,23 @@
 <script>
 (function(){
   'use strict';
+
+  var BUILD = 'redux-2.1.2-prod-20260828b';
+
+  // The approved v11 patch historically requests the Essential Redux QA page
+  // only to extract the I18N table. Production now owns a frozen snapshot of
+  // that source, so rewrite that one request locally and leave all other XHRs alone.
+  var originalOpen = XMLHttpRequest.prototype.open;
+  XMLHttpRequest.prototype.open = function(method, url) {
+    if(typeof url === 'string' && url.indexOf('essential-redux/qa/app-config.html') !== -1) {
+      url = './app-config-i18n-source.html?i18n=' + encodeURIComponent(BUILD);
+    }
+    return originalOpen.apply(this, [method, url].concat(Array.prototype.slice.call(arguments, 2)));
+  };
+
   try {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', './qa/app-config.html?base=redux-2.1.2-prod-20260828a', false);
+    xhr.open('GET', './app-config-base.html?base=' + encodeURIComponent(BUILD), false);
     xhr.send(null);
     if(xhr.status && (xhr.status < 200 || xhr.status >= 300)) throw new Error('HTTP ' + xhr.status);
 
@@ -48,7 +62,7 @@
       '</style>';
     html = html.replace('</head>', css + '</head>');
 
-    var patchScript = '<scr' + 'ipt src="./qa/app-config-v11-patch.js?v=redux-2.1.2-prod-20260828a"></scr' + 'ipt>';
+    var patchScript = '<scr' + 'ipt src="./app-config-patch.js?v=' + encodeURIComponent(BUILD) + '"></scr' + 'ipt>';
     html = html.replace('</body>', patchScript + '</body>');
 
     document.open();
