@@ -17,11 +17,8 @@
 (function(){
   'use strict';
 
-  var BUILD = 'redux-2.1.2-prod-20260828d';
+  var BUILD = 'redux-2.1.2-prod-20260828e';
 
-  // The approved v11 patch historically requests the Essential Redux QA page
-  // only to extract the I18N table. Production owns a frozen snapshot of that
-  // source, so rewrite that request locally and leave all other XHRs alone.
   var originalOpen = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function(method, url) {
     if(typeof url === 'string' && url.indexOf('essential-redux/qa/app-config.html') !== -1) {
@@ -37,8 +34,6 @@
     if(xhr.status && (xhr.status < 200 || xhr.status >= 300)) throw new Error('HTTP ' + xhr.status);
 
     var html = xhr.responseText || '';
-
-    // Production must not fall back to QA assets if a preview image misses.
     html = html.replace(/https:\/\/raw\.githubusercontent\.com\/lyle-morris\/Hosting\/main\/apps\/redux\/qa\/images\//g, './images/');
     html = html.replace('<!-- Redux 2.1.0 QA app configuration — Figma node 2036:14801 -->', '<!-- Redux 2.1.2 production base configuration — Figma node 2036:14801 -->');
 
