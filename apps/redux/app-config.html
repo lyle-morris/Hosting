@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- Redux 2.1.0 production app configuration
+<!-- Redux 2.1.2 production app configuration
      Stable endpoint used by the published PBW.
      Source of truth: REDUX - PEBBLE / node 2036:14801
 -->
@@ -7,6 +7,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Redux Settings</title>
 </head>
 <body>
@@ -15,7 +18,7 @@
   'use strict';
   try {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', './qa/app-config.html?base=redux-2.1.0-prod-20260828b', false);
+    xhr.open('GET', './qa/app-config.html?base=redux-2.1.2-prod-20260828a', false);
     xhr.send(null);
     if(xhr.status && (xhr.status < 200 || xhr.status >= 300)) throw new Error('HTTP ' + xhr.status);
 
@@ -45,7 +48,7 @@
       '</style>';
     html = html.replace('</head>', css + '</head>');
 
-    var patchScript = '<scr' + 'ipt src="./qa/app-config-v11-patch.js?v=redux-2.1.0-prod-20260828b"></scr' + 'ipt>';
+    var patchScript = '<scr' + 'ipt src="./qa/app-config-v11-patch.js?v=redux-2.1.2-prod-20260828a"></scr' + 'ipt>';
     html = html.replace('</body>', patchScript + '</body>');
 
     document.open();
