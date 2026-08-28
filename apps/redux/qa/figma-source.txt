@@ -1,0 +1,8 @@
+Redux app-config source of truth
+
+File: REDUX - PEBBLE
+File key: xzRHQ8LtcLqtyn7TW0x9J5
+Node: 2036:14801
+URL: https://www.figma.com/design/xzRHQ8LtcLqtyn7TW0x9J5/REDUX---PEBBLE?node-id=2036-14801&m=dev
+
+Do not use the older Pebble file oRliygHF8qzrzs5THYQOMH as the Redux app-config source.
