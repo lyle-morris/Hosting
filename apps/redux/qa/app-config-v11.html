@@ -15,7 +15,7 @@
   'use strict';
   try {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', './app-config.html?base=v11-20260828d', false);
+    xhr.open('GET', './app-config.html?base=v11-20260828e', false);
     xhr.send(null);
     if(xhr.status && (xhr.status < 200 || xhr.status >= 300)) throw new Error('HTTP ' + xhr.status);
 
@@ -28,10 +28,15 @@
       '.slot-row.last-visible-slot{border-bottom:0!important}' +
       '.slots>.info-reset{width:100%;min-height:51px;margin-top:0}' +
       '.theme-choice-swatch{font-size:18px!important}' +
+      '#presetThemePanel{border-radius:0 8px 8px 8px!important}' +
+      '#customThemePanel{border-radius:8px 0 8px 8px!important}' +
       '.theme-reset-wrap{padding:0 16px 16px}' +
       '.theme-reset-button{width:100%;min-height:51px;padding:12px 24px;border:0;border-radius:4px;background:rgba(255,255,255,.15);color:#fff;font:inherit;font-weight:700;cursor:pointer}' +
       '.custom-theme-list{padding-bottom:0!important}' +
       '.theme-row{border-bottom-color:rgba(255,255,255,.10)!important}' +
+      '.setting-list:has(#batteryIndicatorRow[hidden]) label.setting-row[for="bluetooth"]{border-bottom:0!important}' +
+      '#language{padding-right:84px!important;background-position:right 10px center!important}' +
+      '#languageClear{right:40px!important;width:36px!important}' +
       '.actions{z-index:200!important}' +
       '.actions-inner{grid-template-columns:1fr!important;gap:0!important}' +
       '.actions #saveButton{width:100%;min-height:51px}' +
@@ -42,7 +47,7 @@
 
     // Never place a literal closing script tag inside this inline wrapper. HTML parsers
     // terminate the current script even when the tag appears inside a JavaScript string.
-    var patchScript = '<scr' + 'ipt src="./app-config-v11-patch.js?v=20260828d"></scr' + 'ipt>';
+    var patchScript = '<scr' + 'ipt src="./app-config-v11-patch.js?v=20260828e"></scr' + 'ipt>';
     html = html.replace('</body>', patchScript + '</body>');
 
     document.open();
