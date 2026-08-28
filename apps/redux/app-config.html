@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- Redux 2.1.2 production app configuration
-     Production-owned base, patch, images, and localization snapshot.
+     Production-owned base, patch, images, localization, and analytics.
      Source of truth: REDUX - PEBBLE / node 2036:14801
 -->
 <html lang="en">
@@ -17,7 +17,7 @@
 (function(){
   'use strict';
 
-  var BUILD = 'redux-2.1.2-prod-20260828c';
+  var BUILD = 'redux-2.1.2-prod-20260828d';
 
   // The approved v11 patch historically requests the Essential Redux QA page
   // only to extract the I18N table. Production owns a frozen snapshot of that
@@ -68,7 +68,8 @@
     html = html.replace('</head>', css + '</head>');
 
     var patchScript = '<scr' + 'ipt src="./app-config-patch.js?v=' + encodeURIComponent(BUILD) + '"></scr' + 'ipt>';
-    html = html.replace('</body>', patchScript + '</body>');
+    var analyticsScript = '<scr' + 'ipt src="./app-config-analytics.js?v=' + encodeURIComponent(BUILD) + '"></scr' + 'ipt>';
+    html = html.replace('</body>', patchScript + analyticsScript + '</body>');
 
     document.open();
     document.write(html);
