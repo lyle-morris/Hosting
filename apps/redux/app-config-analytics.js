@@ -12,6 +12,24 @@
   function value(id,fallback){var el=byId(id);return el&&el.value!==undefined?el.value:(fallback||'');}
   function checked(id){var el=byId(id);return !!(el&&el.checked);}
 
+  function selectedTheme(){
+    var selected=document.querySelector('.theme-choice[aria-pressed="true"]');
+    return selected&&selected.dataset?selected.dataset.theme:'';
+  }
+
+  function themeMode(){
+    var custom=byId('customThemePanel');
+    return custom&&!custom.hidden?'custom':'preset';
+  }
+
+  function themeUsage(){
+    var mode=themeMode();
+    return {
+      theme:mode==='custom'?'custom':(selectedTheme()||'unknown'),
+      theme_mode:mode
+    };
+  }
+
   function loadGA(){
     if(gaLoaded||gaLoading||!enabled())return;
     gaLoading=true;
@@ -35,6 +53,14 @@
         app_version:APP_VERSION,
         transport_type:'beacon'
       });
+      var usage=themeUsage();
+      track('theme_used',{
+        theme:usage.theme,
+        theme_mode:usage.theme_mode,
+        source:'config_open',
+        orientation:checked('verticalLayout')?'vertical':'horizontal',
+        slot_count:checked('threeSlots')?3:2
+      });
     };
     script.onerror=function(){gaLoading=false;};
     document.head.appendChild(script);
@@ -49,24 +75,6 @@
     if(gaLoaded&&window.gtag){window.gtag('event',name,data);return;}
     loadGA();
     if((tries||0)<12)setTimeout(function(){track(name,data,(tries||0)+1);},250);
-  }
-
-  function selectedTheme(){
-    var selected=document.querySelector('.theme-choice[aria-pressed="true"]');
-    return selected&&selected.dataset?selected.dataset.theme:'';
-  }
-
-  function themeMode(){
-    var custom=byId('customThemePanel');
-    return custom&&!custom.hidden?'custom':'preset';
-  }
-
-  function themeUsage(){
-    var mode=themeMode();
-    return {
-      theme:mode==='custom'?'custom':selectedTheme(),
-      theme_mode:mode
-    };
   }
 
   function settingsSnapshot(){
@@ -103,6 +111,7 @@
     track('theme_used',{
       theme:snapshot.theme,
       theme_mode:snapshot.theme_mode,
+      source:'settings_saved',
       orientation:snapshot.orientation,
       slot_count:snapshot.slot_count
     });
