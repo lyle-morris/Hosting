@@ -1,0 +1,79 @@
+<!doctype html>
+<!-- Redux 2.1.0 QA app configuration v11
+     Source of truth: REDUX - PEBBLE / node 2036:14801
+     https://www.figma.com/design/xzRHQ8LtcLqtyn7TW0x9J5/REDUX---PEBBLE?node-id=2036-14801
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Redux Settings</title>
+</head>
+<body>
+<script>
+(function(){
+  'use strict';
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', './app-config.html?base=v11-20260828', false);
+    xhr.send(null);
+    if(xhr.status && (xhr.status < 200 || xhr.status >= 300)) throw new Error('HTTP ' + xhr.status);
+
+    var html = xhr.responseText || '';
+
+    var css = '<style id="redux-v11-figma">' +
+      '.page-heading h1{font-size:42px!important;line-height:normal!important;font-weight:500!important;letter-spacing:0!important}' +
+      '.page-heading p{font-size:18px!important;line-height:24px!important}' +
+      '.layout-toggle-group{display:flex;flex-direction:column;gap:1px;width:100%;overflow:hidden;border-radius:4px}' +
+      '.layout-toggle-group .layout-toggle{border-radius:0!important;margin:0!important}' +
+      '.slot-row.last-visible-slot{border-bottom:0!important}' +
+      '.slots>.info-reset{width:100%;min-height:51px;margin-top:0}' +
+      '.theme-choice-swatch{font-size:18px!important}' +
+      '.theme-reset-wrap{padding:0 16px 16px}' +
+      '.theme-reset-button{width:100%;min-height:51px;padding:12px 24px;border:0;border-radius:4px;background:rgba(255,255,255,.15);color:#fff;font:inherit;font-weight:700;cursor:pointer}' +
+      '.custom-theme-list{padding-bottom:0!important}' +
+      '.theme-row{border-bottom-color:rgba(255,255,255,.10)!important}' +
+      '.actions{z-index:200!important}' +
+      '.actions-inner{grid-template-columns:1fr!important;gap:0!important}' +
+      '.actions #saveButton{width:100%;min-height:51px}' +
+      '.actions .status:not(:empty){margin-bottom:8px}' +
+      '@media(max-width:360px){.theme-reset-wrap{padding-left:12px;padding-right:12px}}' +
+      '</style>';
+    html = html.replace('</head>', css + '</head>');
+
+    var patch = '<scr' + 'ipt>(function(){' +
+      'function byId(id){return document.getElementById(id);}' +
+      'var info=document.querySelector("section[aria-labelledby=informationTitle]");' +
+      'var form=info&&info.querySelector(".card-form");' +
+      'var vertical=byId("verticalLayout");var three=byId("threeSlots");' +
+      'if(form&&vertical&&three){' +
+        'var vLabel=vertical.closest("label");var tLabel=three.closest("label");' +
+        'if(vLabel&&tLabel){' +
+          'var vs=vLabel.querySelector("strong");var ts=tLabel.querySelector("strong");' +
+          'if(vs)vs.textContent="Vertical layout";if(ts)ts.textContent="3 informational slots";' +
+          'var group=document.createElement("div");group.className="layout-toggle-group";' +
+          'form.insertBefore(group,vLabel);group.appendChild(vLabel);group.appendChild(tLabel);' +
+        '}' +
+      '}' +
+      'var reset=byId("resetButton");var slots=info&&info.querySelector(".slots");' +
+      'if(reset&&slots){reset.classList.add("info-reset");reset.textContent="Reset layout";slots.appendChild(reset);}' +
+      'function syncSlotEnd(){var row2=byId("slot2Metric");row2=row2&&row2.closest(".slot-row");var row3=byId("slot3Row");if(row2&&row3)row2.classList.toggle("last-visible-slot",!!row3.hidden);}' +
+      'syncSlotEnd();if(three)three.addEventListener("change",function(){setTimeout(syncSlotEnd,0);});' +
+      'function addThemeReset(panel,isCustom){if(!panel||panel.querySelector(".theme-reset-wrap"))return;var wrap=document.createElement("div");wrap.className="theme-reset-wrap";var btn=document.createElement("button");btn.type="button";btn.className="theme-reset-button";btn.textContent="Reset theme";btn.addEventListener("click",function(){var orange=document.querySelector(".theme-choice[data-theme=orange]");if(!orange)return;orange.click();if(isCustom){var customTab=byId("customThemeTab");if(customTab)customTab.click();}});wrap.appendChild(btn);panel.appendChild(wrap);}' +
+      'addThemeReset(byId("presetThemePanel"),false);addThemeReset(byId("customThemePanel"),true);' +
+      'var save=byId("saveButton");if(save)save.textContent="Save settings";' +
+      'var heading=document.querySelector(".page-heading h1");if(heading)heading.textContent="Redux";' +
+      'document.documentElement.setAttribute("data-redux-config","v11");' +
+      '}());</scr' + 'ipt>';
+    html = html.replace('</body>', patch + '</body>');
+
+    document.open();
+    document.write(html);
+    document.close();
+  } catch(error) {
+    document.body.innerHTML = '<div style="padding:24px;background:#222;color:#fff;font-family:sans-serif">Unable to load Redux settings v11. Please close and reopen settings.</div>';
+  }
+}());
+</script>
+</body>
+</html>
