@@ -61,10 +61,19 @@
     return custom&&!custom.hidden?'custom':'preset';
   }
 
-  function settingsSnapshot(){
+  function themeUsage(){
+    var mode=themeMode();
     return {
-      theme:selectedTheme(),
-      theme_mode:themeMode(),
+      theme:mode==='custom'?'custom':selectedTheme(),
+      theme_mode:mode
+    };
+  }
+
+  function settingsSnapshot(){
+    var usage=themeUsage();
+    return {
+      theme:usage.theme,
+      theme_mode:usage.theme_mode,
       language:value('language','en'),
       use_24_hour:checked('hour12')?0:1,
       leading_zero:checked('leadingZero')?1:0,
@@ -88,7 +97,16 @@
   }
 
   var save=byId('saveButton');
-  if(save)save.addEventListener('click',function(){track('settings_saved',settingsSnapshot());},true);
+  if(save)save.addEventListener('click',function(){
+    var snapshot=settingsSnapshot();
+    track('settings_saved',snapshot);
+    track('theme_used',{
+      theme:snapshot.theme,
+      theme_mode:snapshot.theme_mode,
+      orientation:snapshot.orientation,
+      slot_count:snapshot.slot_count
+    });
+  },true);
 
   var reset=document.querySelector('.info-reset');
   if(reset)reset.addEventListener('click',function(){track('layout_reset',{source:'app_config'});},true);
