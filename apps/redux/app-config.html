@@ -17,7 +17,7 @@
 (function(){
   'use strict';
 
-  var BUILD = 'redux-2.1.2-prod-20260828g';
+  var BUILD = 'redux-2.1.2-prod-20260829h';
 
   var originalOpen = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function(method, url) {
@@ -36,6 +36,17 @@
     var html = xhr.responseText || '';
     html = html.replace(/https:\/\/raw\.githubusercontent\.com\/lyle-morris\/Hosting\/main\/apps\/redux\/qa\/images\//g, './images/');
     html = html.replace('<!-- Redux 2.1.0 QA app configuration — Figma node 2036:14801 -->', '<!-- Redux 2.1.2 production base configuration — Figma node 2036:14801 -->');
+
+    // The 2.1.2 companion stores active custom colors as flattened fields.
+    // Rehydrate those fields into the active orientation before the base config
+    // normalizes customTheme, otherwise changing/saving another setting can
+    // restore Time box / slot text colors to their defaults on the next open.
+    var oldColorHydration = '      v.dateText=firstValue(raw.dateTextColor,raw.date_text_color,v.dateText);\n      return{';
+    var newColorHydration = '      v.dateText=firstValue(raw.dateTextColor,raw.date_text_color,v.dateText);\n' +
+      '      var activeTimeText=firstValue(raw.timeTextColor,raw.time_text_color),activeSlot1=firstValue(raw.slot1TextColor,raw.slot_1_text_color),activeSlot2=firstValue(raw.slot2TextColor,raw.slot_2_text_color),activeSlot3=firstValue(raw.slot3TextColor,raw.slot_3_text_color);\n' +
+      '      if(layout.vertical){if(activeTimeText)v.timeText=activeTimeText;if(activeSlot1)v.slot1Text=activeSlot1;if(activeSlot2)v.slot2Text=activeSlot2;if(activeSlot3)v.slot3Text=activeSlot3}else{if(activeTimeText)h.timeText=activeTimeText;if(activeSlot1)h.slot1Text=activeSlot1;if(activeSlot2)h.slot2Text=activeSlot2;if(activeSlot3)h.slot3Text=activeSlot3}\n' +
+      '      return{';
+    html = html.replace(oldColorHydration, newColorHydration);
 
     var css = '<style id="redux-2-1-production">' +
       '.page-heading h1{font-size:42px!important;line-height:normal!important;font-weight:500!important;letter-spacing:0!important}' +
