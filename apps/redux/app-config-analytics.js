@@ -120,6 +120,7 @@
       use_24_hour:checked('hour12')?0:1,
       leading_zero:checked('leadingZero')?1:0,
       battery_indicator:checked('batteryIndicator')?1:0,
+      battery_percentage:checked('batteryPercentage')?1:0,
       bluetooth:checked('bluetooth')?1:0,
       use_celsius:checked('celsius')?1:0,
       manual_location:(value('manualPostalCode','').trim()||value('manualCity','').trim())?1:0,

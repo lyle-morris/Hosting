@@ -17,7 +17,7 @@
 (function(){
   'use strict';
 
-  var BUILD = 'redux-2.1.2-prod-20260829h';
+  var BUILD = 'redux-2.1.2-prod-20260911a';
 
   var originalOpen = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function(method, url) {
@@ -62,7 +62,7 @@
       '.theme-reset-button{width:100%;min-height:51px;padding:12px 24px;border:0;border-radius:4px;background:rgba(255,255,255,.15);color:#fff;font:inherit;font-weight:700;cursor:pointer}' +
       '.custom-theme-list{padding-bottom:0!important}' +
       '.theme-row{border-bottom-color:rgba(255,255,255,.10)!important}' +
-      '.setting-list:has(#batteryIndicatorRow[hidden]) label.setting-row[for="bluetooth"]{border-bottom:0!important}' +
+      '.setting-list:has(#batteryIndicatorRow[hidden]) label.setting-row[for="bluetooth"],.setting-list:has(#batteryPercentageRow[hidden]) #batteryIndicatorRow:not([hidden]){border-bottom:0!important}' +
       '#language{padding-right:84px!important;background-position:right 10px center!important}' +
       '#languageClear{right:40px!important;width:36px!important}' +
       '.actions{z-index:200!important}' +
