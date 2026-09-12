@@ -339,7 +339,7 @@
     function copyCustomTheme(from,to){
       if(!state||state.themeMode!=="custom"||from===to)return;
       var h=state.customTheme.horizontal,v=state.customTheme.vertical;
-      if(from==="vertical"&&to==="horizontal"){h.background=v.trayBackground;h.boxBackground=v.background;h.boxTopBorder=v.divider;h.boxBottomBorder=v.divider;h.timeText=v.timeText;h.slot1Text=v.slot1Text;h.slot2Text=v.slot2Text;h.slot3Text=v.slot3Text}
+      if(from==="vertical"&&to==="horizontal"){h.background=v.trayBackground;h.batteryIndicator=v.trayBackground;h.boxBackground=v.background;h.boxTopBorder=v.divider;h.boxBottomBorder=v.divider;h.timeText=v.timeText;h.slot1Text=v.slot1Text;h.slot2Text=v.slot2Text;h.slot3Text=v.slot3Text}
       else if(from==="horizontal"&&to==="vertical"){v.trayBackground=h.background;v.background=h.boxBackground;v.divider=h.boxBottomBorder;v.timeText=h.timeText;v.dateText=h.timeText;v.slot1Text=h.slot1Text;v.slot2Text=h.slot2Text;v.slot3Text=h.slot3Text}
     }
     function handleLayoutChange(){var next=byId("verticalLayout").checked?"vertical":"horizontal";if(currentOrientation&&next!==currentOrientation)copyCustomTheme(currentOrientation,next);currentOrientation=next;updateDynamicUi()}
