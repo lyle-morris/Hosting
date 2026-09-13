@@ -176,6 +176,7 @@
     var celsius=byId('celsius');if(celsius)setText(celsius.closest('label').querySelector('strong'),t.celsius);
     var bluetooth=byId('bluetooth');if(bluetooth)setText(bluetooth.closest('label').querySelector('strong'),t.bluetooth);
     var battery=byId('batteryIndicator');if(battery)setText(battery.closest('label').querySelector('strong'),t.batteryIndicator);
+    var batteryPct=byId('batteryPercentage');if(batteryPct)setText(batteryPct.closest('label').querySelector('strong'),t.batteryPercentage||'Show battery percentage');
     setText(byId('presetThemeTab'),t.themeTab);setText(byId('customThemeTab'),t.customTab);
     if(locationCard){var title=locationCard.querySelector('.card-title');setText(title,t.locationTitle);var labels=locationCard.querySelectorAll('.field-label');if(labels[0])setText(labels[0],t.countryLabel);if(labels[1])setText(labels[1],t.postalLabel);if(labels[2])setText(labels[2],t.cityLabel);}
     var languageCard=language&&closestCard(language);if(languageCard){var lt=languageCard.querySelector('.card-title');setText(lt,t.languageLabel);var lc=languageCard.querySelector('.card-copy');setText(lc,t.languageCopy);}

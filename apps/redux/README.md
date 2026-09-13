@@ -16,7 +16,7 @@ This directory is the production configuration environment for the Redux Pebble 
 
 Current production build token at closeout:
 
-`redux-2.1.2-prod-20260829h`
+`redux-2.1.2-prod-20260913a`
 
 ## Rules
 
@@ -42,8 +42,16 @@ The production environment includes fixes for:
 - GA4 runtime restoration
 - Theme usage + Custom color Analytics
 - Custom-theme state rehydration so Time box and slot text colors are not reset when the user changes an unrelated setting
+- Custom-theme layout switching so vertical and horizontal color choices remain in sync, including the horizontal battery indicator color
+- Horizontal-only `Show battery percentage` setting, hidden when the horizontal battery indicator is off and hidden for vertical layouts
 
-The last issue was fixed by rehydrating flattened companion color fields into the active `customTheme` orientation before base normalization/render/save.
+The custom-theme rehydration issue was fixed by rehydrating flattened companion
+color fields into the active `customTheme` orientation before base
+normalization/render/save.
+
+The September 13 maintenance update must be deployed from Hosting before the
+matching Redux PBW is published, because the installed companion opens this
+GitHub Pages directory for App Config.
 
 ## Technical debt
 
